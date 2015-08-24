@@ -53,13 +53,38 @@
     };
 
     /**
-     *
+     * 路由
      */
     Route = function(hashchange, sensitive1, strict1) {
       this.hashchange = hashchange != null ? hashchange : Route.changeByLocationHash;
       this.sensitive = sensitive1 != null ? sensitive1 : false;
       this.strict = strict1 != null ? strict1 : false;
       this.rule = [];
+    };
+    Route.prototype.add = function(path, fn) {
+      var key, reg;
+      key = [];
+      reg = pathToRegexp(path, key, this.sensitive, this.strict);
+      this.rule.push({
+        path: path,
+        reg: reg,
+        key: key,
+        fn: fn
+      });
+    };
+    Route.prototype.urlToObject = function(url) {
+      var argStr, attr;
+      url = String(url);
+      argStr = '';
+      attr = [];
+      if (url.indexOf('?') !== -1) {
+        argStr = url.split('?').pop();
+      } else if (url.indexOf('&') !== -1) {
+        argStr = url.split('&').pop();
+      }
+      if (argStr === '') {
+        return {};
+      }
     };
     Route.changeByLocationHash = function(emit) {
       var hashChanged;

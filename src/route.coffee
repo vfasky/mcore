@@ -80,6 +80,9 @@ define 'mcore/route', ->
         if url.indexOf('?') != -1
             argStr = url.split('?').pop()
         else if url.indexOf('&') != -1
+            argStr = url.split('&').pop()
+
+        return {} if argStr == ''
 
 
     # 通过 hashchange 触发
