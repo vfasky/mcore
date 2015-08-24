@@ -64,54 +64,46 @@
       var ru;
       ru = new route.Route();
       it('/show/:id', function(done) {
-        ru.add('/show/:id', function(id) {
+        return ru.add('/show/:id', function(id) {
           assert.equal(2, id);
           return done();
-        });
-        return ru.match('/show/2');
+        }).match('/show/2');
       });
       it('/show2/:id context', function(done) {
-        ru.add('/show2/:id', function(id) {
+        return ru.add('/show2/:id', function(id) {
           assert.equal(2, id);
           assert.equal(2, this.data.id);
           assert.equal(3, this.context.v);
           assert.equal(this.url, '/show2/2?v=3');
           return done();
-        });
-        ru.match('/show2/2?v=3');
-        ru.add('/show0/:id', function(id) {
+        }).match('/show2/2?v=3').add('/show0/:id', function(id) {
           assert.equal(2, id);
           assert.equal(2, this.data.id);
           assert.equal(3, this.context.v);
           assert.equal(this.url, '/show0/2&v=3');
           return done();
-        });
-        return ru.match('/show0/2&v=3');
+        }).match('/show0/2&v=3');
       });
       it('/show3/:id?', function(done) {
-        ru.add('/show3/:id?', function(id) {
+        return ru.add('/show3/:id?', function(id) {
           assert.equal(null, id);
           return done();
-        });
-        return ru.match('/show3/');
+        }).match('/show3/');
       });
       it('/show4/:id?/:v', function(done) {
-        ru.add('/show4/:id?/:v', function(id, v) {
+        return ru.add('/show4/:id?/:v', function(id, v) {
           assert.equal(null, id);
           assert.equal(7, v);
           return done();
-        });
-        ru.add('/show4/:id?/:v', function(id, v) {
+        }).add('/show4/:id?/:v', function(id, v) {
           return done('重复配对');
-        });
-        return ru.match('/show4//7');
+        }).match('/show4//7');
       });
       return it('/show5/*', function(done) {
-        ru.add('/show5/*', function(id) {
+        return ru.add('/show5/*', function(id) {
           assert.equal('7/8/9', id);
           return done();
-        });
-        return ru.match('/show5/7/8/9');
+        }).match('/show5/7/8/9');
       });
     });
   });

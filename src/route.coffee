@@ -19,11 +19,9 @@
  *
  * route.run()
 ###
-define 'mcore/route', ->
+define 'mcore/route', ['mcore/util'], (util)->
     
     "use strict"
-
-    _isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/
 
     # 将路径转化为正则
     pathToRegexp = (path, keys = [], sensitive = false, strict = false)->
@@ -78,7 +76,7 @@ define 'mcore/route', ->
 
             key = v[0].trim()
             value = v[1]
-            if _isNumberReg.test value
+            if util.isNumber value
                 value = Number value
             else
                 value = decodeURIComponent value
@@ -125,8 +123,8 @@ define 'mcore/route', ->
             argStr = path.substring getIx
             path = path.substring 0, getIx
 
-        @rule.forEach (v)=>
-            return if isMatch
+        util.each @rule, (v)->
+            return false if isMatch
             ref = v.reg.exec path
             return if null == ref
 
@@ -139,7 +137,7 @@ define 'mcore/route', ->
                 k = v.keys[i-1]
                 value = ref[i]
 
-                if _isNumberReg.test value
+                if util.isNumber value
                     value = Number value
                 else if value
                     value = decodeURIComponent value
@@ -149,7 +147,9 @@ define 'mcore/route', ->
 
             env =
                 url: fullPath
-                path: v.path
+                path: path
+                args: argStr
+                rule: v.path
                 context: context
                 keys: v.keys
                 data: data

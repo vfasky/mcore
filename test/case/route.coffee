@@ -63,7 +63,7 @@ define 'case/route',
                 assert.equal 2, id
                 done()
 
-            ru.match '/show/2'
+            .match '/show/2'
 
 
         it '/show2/:id context', (done)->
@@ -75,9 +75,9 @@ define 'case/route',
                 
                 done()
 
-            ru.match '/show2/2?v=3'
+            .match '/show2/2?v=3'
 
-            ru.add '/show0/:id', (id)->
+            .add '/show0/:id', (id)->
                 assert.equal 2, id
                 assert.equal 2, @data.id
                 assert.equal 3, @context.v
@@ -85,7 +85,7 @@ define 'case/route',
                 
                 done()
 
-            ru.match '/show0/2&v=3'
+            .match '/show0/2&v=3'
 
 
         it '/show3/:id?', (done)->
@@ -93,7 +93,7 @@ define 'case/route',
                 assert.equal null, id
                 done()
 
-            ru.match '/show3/'
+            .match '/show3/'
 
 
         it '/show4/:id?/:v', (done)->
@@ -102,10 +102,10 @@ define 'case/route',
                 assert.equal 7, v
                 done()
 
-            ru.add '/show4/:id?/:v', (id, v)->
+            .add '/show4/:id?/:v', (id, v)->
                 done '重复配对'
 
-            ru.match '/show4//7'
+            .match '/show4//7'
             
 
         it '/show5/*', (done)->
@@ -113,7 +113,7 @@ define 'case/route',
                 assert.equal '7/8/9', id
                 done()
 
-            ru.match '/show5/7/8/9'
+            .match '/show5/7/8/9'
 
 
 

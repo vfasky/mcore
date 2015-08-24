@@ -23,10 +23,9 @@
  */
 
 (function() {
-  define('mcore/route', function() {
+  define('mcore/route', ['mcore/util'], function(util) {
     "use strict";
-    var Route, _isNumberReg, pathToObject, pathToRegexp;
-    _isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/;
+    var Route, pathToObject, pathToRegexp;
     pathToRegexp = function(path, keys, sensitive, strict) {
       var toKeys;
       if (keys == null) {
@@ -79,7 +78,7 @@
         }
         key = v[0].trim();
         value = v[1];
-        if (_isNumberReg.test(value)) {
+        if (util.isNumber(value)) {
           value = Number(value);
         } else {
           value = decodeURIComponent(value);
@@ -124,43 +123,43 @@
         argStr = path.substring(getIx);
         path = path.substring(0, getIx);
       }
-      this.rule.forEach((function(_this) {
-        return function(v) {
-          var args, context, data, env, i, j, k, ref, ref1, value;
-          if (isMatch) {
-            return;
+      util.each(this.rule, function(v) {
+        var args, context, data, env, i, j, k, ref, ref1, value;
+        if (isMatch) {
+          return false;
+        }
+        ref = v.reg.exec(path);
+        if (null === ref) {
+          return;
+        }
+        isMatch = true;
+        context = pathToObject(argStr);
+        data = {};
+        args = [];
+        for (i = j = 1, ref1 = ref.length; 1 <= ref1 ? j < ref1 : j > ref1; i = 1 <= ref1 ? ++j : --j) {
+          k = v.keys[i - 1];
+          value = ref[i];
+          if (util.isNumber(value)) {
+            value = Number(value);
+          } else if (value) {
+            value = decodeURIComponent(value);
           }
-          ref = v.reg.exec(path);
-          if (null === ref) {
-            return;
+          if (k && k.name) {
+            data[k.name] = value;
           }
-          isMatch = true;
-          context = pathToObject(argStr);
-          data = {};
-          args = [];
-          for (i = j = 1, ref1 = ref.length; 1 <= ref1 ? j < ref1 : j > ref1; i = 1 <= ref1 ? ++j : --j) {
-            k = v.keys[i - 1];
-            value = ref[i];
-            if (_isNumberReg.test(value)) {
-              value = Number(value);
-            } else if (value) {
-              value = decodeURIComponent(value);
-            }
-            if (k && k.name) {
-              data[k.name] = value;
-            }
-            args.push(value || null);
-          }
-          env = {
-            url: fullPath,
-            path: v.path,
-            context: context,
-            keys: v.keys,
-            data: data
-          };
-          v.fn.apply(env, args);
+          args.push(value || null);
+        }
+        env = {
+          url: fullPath,
+          path: path,
+          args: argStr,
+          rule: v.path,
+          context: context,
+          keys: v.keys,
+          data: data
         };
-      })(this));
+        v.fn.apply(env, args);
+      });
       return this;
     };
     Route.changeByLocationHash = function(emit) {
