@@ -25,7 +25,8 @@
 (function() {
   define('mcore/route', function() {
     "use strict";
-    var Route, pathToRegexp;
+    var Route, _isNumberReg, pathToObject, pathToRegexp;
+    _isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/;
     pathToRegexp = function(path, keys, sensitive, strict) {
       var toKeys;
       if (keys == null) {
@@ -51,6 +52,42 @@
       path = path.concat(strict && '' || '/?').replace(/\/\(/g, '(?:/').replace(/\+/g, '__plus__').replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, toKeys).replace(/([\/.])/g, '\\$1').replace(/__plus__/g, '(.+)').replace(/\*/g, '(.*)');
       return new RegExp('^' + path + '$', sensitive && '' || 'i');
     };
+    pathToObject = function(url) {
+      var argStr, args, attr, data, keys;
+      url = String(url);
+      argStr = '';
+      attr = [];
+      if (url.indexOf('?') !== -1) {
+        argStr = url.split('?').pop();
+      } else if (url.indexOf('&') !== -1) {
+        argStr = url;
+      }
+      if (argStr === '') {
+        return {};
+      }
+      args = argStr.split('&');
+      data = {};
+      keys = [];
+      args.forEach(function(v) {
+        var key, value;
+        if (v.indexOf('=') === -1) {
+          return;
+        }
+        v = v.split('=');
+        if (v.length !== 2) {
+          return;
+        }
+        key = v[0].trim();
+        value = v[1];
+        if (_isNumberReg.test(value)) {
+          value = Number(value);
+        } else {
+          value = decodeURIComponent(value);
+        }
+        data[key] = value;
+      });
+      return data;
+    };
 
     /**
      * 路由
@@ -62,29 +99,69 @@
       this.rule = [];
     };
     Route.prototype.add = function(path, fn) {
-      var key, reg;
-      key = [];
-      reg = pathToRegexp(path, key, this.sensitive, this.strict);
+      var keys, reg;
+      keys = [];
+      reg = pathToRegexp(path, keys, this.sensitive, this.strict);
       this.rule.push({
         path: path,
         reg: reg,
-        key: key,
+        keys: keys,
         fn: fn
       });
+      return this;
     };
-    Route.prototype.urlToObject = function(url) {
-      var argStr, attr;
-      url = String(url);
+    Route.prototype.match = function(url) {
+      var argStr, fullPath, getIx, isMatch, path;
+      path = String(url);
+      fullPath = path;
       argStr = '';
-      attr = [];
-      if (url.indexOf('?') !== -1) {
-        argStr = url.split('?').pop();
-      } else if (url.indexOf('&') !== -1) {
-        argStr = url.split('&').pop();
+      getIx = path.indexOf('?');
+      if (getIx === -1) {
+        getIx = path.indexOf('&');
       }
-      if (argStr === '') {
-        return {};
+      isMatch = false;
+      if (getIx !== -1) {
+        argStr = path.substring(getIx);
+        path = path.substring(0, getIx);
       }
+      this.rule.forEach((function(_this) {
+        return function(v) {
+          var args, context, data, env, i, j, k, ref, ref1, value;
+          if (isMatch) {
+            return;
+          }
+          ref = v.reg.exec(path);
+          if (null === ref) {
+            return;
+          }
+          isMatch = true;
+          context = pathToObject(argStr);
+          data = {};
+          args = [];
+          for (i = j = 1, ref1 = ref.length; 1 <= ref1 ? j < ref1 : j > ref1; i = 1 <= ref1 ? ++j : --j) {
+            k = v.keys[i - 1];
+            value = ref[i];
+            if (_isNumberReg.test(value)) {
+              value = Number(value);
+            } else if (value) {
+              value = decodeURIComponent(value);
+            }
+            if (k && k.name) {
+              data[k.name] = value;
+            }
+            args.push(value || null);
+          }
+          env = {
+            url: fullPath,
+            path: v.path,
+            context: context,
+            keys: v.keys,
+            data: data
+          };
+          v.fn.apply(env, args);
+        };
+      })(this));
+      return this;
     };
     Route.changeByLocationHash = function(emit) {
       var hashChanged;
@@ -99,6 +176,7 @@
     };
     return {
       pathToRegexp: pathToRegexp,
+      pathToObject: pathToObject,
       Route: Route
     };
   });

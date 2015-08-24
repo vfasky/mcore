@@ -23,6 +23,8 @@ define 'mcore/route', ->
     
     "use strict"
 
+    _isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/
+
     # 将路径转化为正则
     pathToRegexp = (path, keys = [], sensitive = false, strict = false)->
 
@@ -51,6 +53,39 @@ define 'mcore/route', ->
                    .replace /\*/g, '(.*)'
 
         new RegExp('^' + path + '$', sensitive and '' or 'i')
+                       
+
+    # 将get 参数转换为对象
+    pathToObject = (url)->
+        url = String url
+        argStr = ''
+        attr = []
+        if url.indexOf('?') != -1
+            argStr = url.split('?').pop()
+        else if url.indexOf('&') != -1
+            argStr = url
+
+        return {} if argStr == ''
+
+        args = argStr.split '&'
+        data = {}
+        keys = []
+
+        args.forEach (v)->
+            return if v.indexOf('=') == -1
+            v = v.split '='
+            return if v.length != 2
+
+            key = v[0].trim()
+            value = v[1]
+            if _isNumberReg.test value
+                value = Number value
+            else
+                value = decodeURIComponent value
+            data[key] = value
+            return
+        
+        data
 
     ###*
      * 路由
@@ -63,26 +98,66 @@ define 'mcore/route', ->
         @rule = []
         return
 
+
     Route::add = (path, fn)->
-        key = []
-        reg = pathToRegexp(path, key, @sensitive, @strict)
+        keys = []
+        reg = pathToRegexp(path, keys, @sensitive, @strict)
+
         @rule.push
             path: path
             reg: reg
-            key: key
+            keys: keys
             fn: fn
-        return
+            
+        @
 
-    Route::urlToObject = (url)->
-        url = String url
+
+    Route::match = (url)->
+        path = String url
+        fullPath = path
         argStr = ''
-        attr = []
-        if url.indexOf('?') != -1
-            argStr = url.split('?').pop()
-        else if url.indexOf('&') != -1
-            argStr = url.split('&').pop()
+        getIx = path.indexOf '?'
+        getIx = path.indexOf '&' if getIx == -1
+        # 路由只配对一次
+        isMatch = false
 
-        return {} if argStr == ''
+        if getIx != -1
+            argStr = path.substring getIx
+            path = path.substring 0, getIx
+
+        @rule.forEach (v)=>
+            return if isMatch
+            ref = v.reg.exec path
+            return if null == ref
+
+            isMatch = true
+            context = pathToObject argStr
+            
+            data = {}
+            args = []
+            for i in [1...ref.length]
+                k = v.keys[i-1]
+                value = ref[i]
+
+                if _isNumberReg.test value
+                    value = Number value
+                else if value
+                    value = decodeURIComponent value
+
+                data[k.name] = value if k and k.name
+                args.push value or null
+
+            env =
+                url: fullPath
+                path: v.path
+                context: context
+                keys: v.keys
+                data: data
+            
+            v.fn.apply env, args
+            return
+
+        @
 
 
     # 通过 hashchange 触发
@@ -98,5 +173,6 @@ define 'mcore/route', ->
 
     return {
         pathToRegexp: pathToRegexp
+        pathToObject: pathToObject
         Route: Route
     }
