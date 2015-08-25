@@ -54,6 +54,14 @@ define 'case/route',
             assert.equal 2, reg.exec('/show/sf/sdf/').length
 
 
+    describe 'route test History Api', ->
+
+        it 'changeByHistory', ->
+            window.location.hash = '#/index/12/13'
+            route.Route.changeByHistory (data) ->
+                assert.equal data, '/index/12/13'
+
+
     describe 'route test Route::match', ->
 
         ru = new route.Route()
@@ -115,12 +123,12 @@ define 'case/route',
 
             .match '/show5/7/8/9'
 
-        it 'run', (done)->
+        ###it 'run', (done)->
             ru.add '*', (url)->
                 console.log url
                 done()
 
-            .run()
+            .run()###
 
 
 

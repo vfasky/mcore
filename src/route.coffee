@@ -211,6 +211,23 @@ define 'mcore/route', ['mcore/util'], (util)->
         hashChanged()
 
 
+    ###
+        通过 history api 触发
+        @author jackieLin <dashi_lin@163.com>
+    ###
+    Route.changeByHistory = (emit) ->
+        if !window.history
+            Route.changeByLocationHash emit
+
+        historyChange = ->
+            emit window.location.hash.substring(1)
+
+        window.onpopstate = (event) ->
+            historyChange()
+
+        # init
+        historyChange()
+
     return {
         pathToRegexp: pathToRegexp
         pathToObject: pathToObject
