@@ -25,6 +25,12 @@
 (function() {
   define('mcore/route', ['mcore/util'], function(util) {
     "use strict";
+
+    /**
+     * 将路径转化为正则 
+     * @author vfasky <vfasky@gmail.com>
+     *
+     */
     var Route, pathToObject, pathToRegexp;
     pathToRegexp = function(path, keys, sensitive, strict) {
       var toKeys;
@@ -51,6 +57,12 @@
       path = path.concat(strict && '' || '/?').replace(/\/\(/g, '(?:/').replace(/\+/g, '__plus__').replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, toKeys).replace(/([\/.])/g, '\\$1').replace(/__plus__/g, '(.+)').replace(/\*/g, '(.*)');
       return new RegExp('^' + path + '$', sensitive && '' || 'i');
     };
+
+    /**
+     * 将 url 的参数转换为对象
+     * @author vfasky <vfasky@gmail.com>
+     *
+     */
     pathToObject = function(url) {
       var argStr, args, attr, data, keys;
       url = String(url);
@@ -90,6 +102,8 @@
 
     /**
      * 路由
+     * @author vfasky <vfasky@gmail.com>
+     *
      */
     Route = function(hashchange, sensitive1, strict1) {
       this.hashchange = hashchange != null ? hashchange : Route.changeByLocationHash;
@@ -97,6 +111,25 @@
       this.strict = strict1 != null ? strict1 : false;
       this.rule = [];
     };
+
+    /**
+     * 开始监听路由
+     * @author vfasky <vfasky@gmail.com>
+     *
+     */
+    Route.prototype.run = function() {
+      this.hashchange((function(_this) {
+        return function(url) {
+          _this.match(url);
+        };
+      })(this));
+    };
+
+    /**
+     * 添加规则
+     * @author vfasky <vfasky@gmail.com>
+     *
+     */
     Route.prototype.add = function(path, fn) {
       var keys, reg;
       keys = [];
@@ -109,6 +142,12 @@
       });
       return this;
     };
+
+    /**
+     * 配对 url
+     * @author vfasky <vfasky@gmail.com>
+     *
+     */
     Route.prototype.match = function(url) {
       var argStr, fullPath, getIx, isMatch, path;
       path = String(url);
@@ -162,16 +201,23 @@
       });
       return this;
     };
+
+    /**
+     * 通过 hashchange 触发
+     * @author vfasky <vfasky@gmail.com>
+     *
+     */
     Route.changeByLocationHash = function(emit) {
       var hashChanged;
       hashChanged = function() {
         return emit(window.location.hash.substring(1));
       };
       if (window.addEventListener) {
-        return window.addEventListener('hashchange', hashChanged, false);
+        window.addEventListener('hashchange', hashChanged, false);
       } else {
-        return window.attachEvent('onhashchange', hashChanged);
+        window.attachEvent('onhashchange', hashChanged);
       }
+      return hashChanged();
     };
     return {
       pathToRegexp: pathToRegexp,

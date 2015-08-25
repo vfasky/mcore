@@ -99,11 +99,17 @@
           return done('重复配对');
         }).match('/show4//7');
       });
-      return it('/show5/*', function(done) {
+      it('/show5/*', function(done) {
         return ru.add('/show5/*', function(id) {
           assert.equal('7/8/9', id);
           return done();
         }).match('/show5/7/8/9');
+      });
+      return it('run', function(done) {
+        return ru.add('*', function(url) {
+          console.log(url);
+          return done();
+        }).run();
       });
     });
   });

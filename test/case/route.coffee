@@ -115,6 +115,13 @@ define 'case/route',
 
             .match '/show5/7/8/9'
 
+        it 'run', (done)->
+            ru.add '*', (url)->
+                console.log url
+                done()
+
+            .run()
+
 
 
 

@@ -23,7 +23,11 @@ define 'mcore/route', ['mcore/util'], (util)->
     
     "use strict"
 
-    # 将路径转化为正则
+    ###*
+     * 将路径转化为正则 
+     * @author vfasky <vfasky@gmail.com>
+     * 
+    ###
     pathToRegexp = (path, keys = [], sensitive = false, strict = false)->
 
         return path if path instanceof RegExp
@@ -53,7 +57,12 @@ define 'mcore/route', ['mcore/util'], (util)->
         new RegExp('^' + path + '$', sensitive and '' or 'i')
                        
 
-    # 将get 参数转换为对象
+    
+    ###*
+     * 将 url 的参数转换为对象
+     * @author vfasky <vfasky@gmail.com>
+     * 
+    ###
     pathToObject = (url)->
         url = String url
         argStr = ''
@@ -87,6 +96,8 @@ define 'mcore/route', ['mcore/util'], (util)->
 
     ###*
      * 路由
+     * @author vfasky <vfasky@gmail.com>
+     * 
     ###
     Route = (
         @hashchange = Route.changeByLocationHash,
@@ -97,6 +108,23 @@ define 'mcore/route', ['mcore/util'], (util)->
         return
 
 
+    ###*
+     * 开始监听路由
+     * @author vfasky <vfasky@gmail.com>
+     * 
+    ###
+    Route::run = ->
+        @hashchange (url)=>
+            @match url
+            return
+        return
+
+
+    ###*
+     * 添加规则
+     * @author vfasky <vfasky@gmail.com>
+     *
+    ###
     Route::add = (path, fn)->
         keys = []
         reg = pathToRegexp(path, keys, @sensitive, @strict)
@@ -110,6 +138,11 @@ define 'mcore/route', ['mcore/util'], (util)->
         @
 
 
+    ###*
+     * 配对 url
+     * @author vfasky <vfasky@gmail.com>
+     *
+    ###
     Route::match = (url)->
         path = String url
         fullPath = path
@@ -160,7 +193,11 @@ define 'mcore/route', ['mcore/util'], (util)->
         @
 
 
-    # 通过 hashchange 触发
+    ###*
+     * 通过 hashchange 触发
+     * @author vfasky <vfasky@gmail.com>
+     * 
+    ###
     Route.changeByLocationHash = (emit)->
         hashChanged = ->
             emit window.location.hash.substring(1)
@@ -169,6 +206,9 @@ define 'mcore/route', ['mcore/util'], (util)->
             window.addEventListener 'hashchange', hashChanged, false
         else
             window.attachEvent 'onhashchange', hashChanged
+
+        #init
+        hashChanged()
 
 
     return {
