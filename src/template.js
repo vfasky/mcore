@@ -7,6 +7,8 @@
  */
 
 (function() {
+  var slice = [].slice;
+
   define('mcore/template', ['jquery', 'rivets', 'mcore/util'], function($, rivets, util) {
     "use strict";
     rivets.adapters[':'] = {
@@ -121,14 +123,14 @@
     rivets.formatters['isArray'] = function(value) {
       return Array.isArray(value);
     };
-    return rivets.formatters['eachObject'] = function(obj) {
-      var data, i, k, len, results, v;
+    rivets.formatters['eachObject'] = function(obj) {
+      var data, k, results, v;
       if (false === util.isObject(obj)) {
         return [];
       }
       data = [];
       results = [];
-      for (k = i = 0, len = obj.length; i < len; k = ++i) {
+      for (k in obj) {
         v = obj[k];
         results.push(data.push({
           key: k,
@@ -136,6 +138,28 @@
         }));
       }
       return results;
+    };
+    rivets.formatters['toFixed'] = function(value, len) {
+      if (len == null) {
+        len = 1;
+      }
+      if (false === util.isNumber(value)) {
+        return 0;
+      }
+      return Number(value).toFixed(len);
+    };
+    return rivets.formatters['in'] = function() {
+      var args, value;
+      args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      if (args.length < 2) {
+        return false;
+      }
+      value = args[0];
+      args.splice(0, 1);
+      if (util.isNumber(value)) {
+        value = Number(value);
+      }
+      return args.indexOf(value) !== -1;
     };
   });
 

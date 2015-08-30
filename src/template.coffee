@@ -137,15 +137,35 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util'],
         Number(value) / Number(x)
 
 
+    # 是否数组
     rivets.formatters['isArray'] = (value)->
         Array.isArray value
 
 
+    # 遍历对象
     rivets.formatters['eachObject'] = (obj)->
         return [] if false == util.isObject(obj)
 
         data = []
-        for v, k in obj
+        for k, v of obj
             data.push
                 key: k
                 value: v
+                
+
+    # toFixed
+    rivets.formatters['toFixed'] = (value, len = 1)->
+        return 0 if false == util.isNumber(value)
+
+        Number(value).toFixed(len)
+
+
+    rivets.formatters['in'] = (args...)->
+        return false if args.length < 2
+
+        value = args[0]
+        args.splice(0, 1)
+
+        value = Number value if util.isNumber(value)
+
+        args.indexOf(value) != -1
