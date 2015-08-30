@@ -18,6 +18,9 @@
     exports.isObject = function(x) {
       return Object.prototype.toString.call(x) === '[object Object]';
     };
+    exports.clone = function(value) {
+      return JSON.parse(JSON.stringify(value));
+    };
 
     /**
      * 遍历数组

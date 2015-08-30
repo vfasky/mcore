@@ -11,6 +11,7 @@
 
   define('mcore/template', ['jquery', 'rivets', 'mcore/util'], function($, rivets, util) {
     "use strict";
+    var Template;
     rivets.adapters[':'] = {
       observe: function(obj, keypath, callback) {
         obj.on('change:' + keypath, callback);
@@ -148,7 +149,7 @@
       }
       return Number(value).toFixed(len);
     };
-    return rivets.formatters['in'] = function() {
+    rivets.formatters['in'] = function() {
       var args, value;
       args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
       if (args.length < 2) {
@@ -161,6 +162,151 @@
       }
       return args.indexOf(value) !== -1;
     };
+
+    /**
+     * 模板渲染
+     * @param {Object} view
+     * @param {jQuery} view.$el
+     * @param {Function} view.set
+     * @param {Object} data
+     */
+    Template = function(view, data) {
+      var dtd, keys, rv;
+      this.view = view;
+      if (data == null) {
+        data = {};
+      }
+      keys = Object.keys(data);
+      this.rv = false;
+      dtd = $.Deferred();
+      if (keys.length === 0) {
+        rv = rivets.bind(this.view.$el, {
+          self: this.view
+        });
+        this.rv = rv;
+        dtd.resolve(rv);
+      } else {
+        Template.loadPromise(data).done((function(_this) {
+          return function(vData) {
+            keys.forEach(function(k) {
+              var v;
+              v = vData[k];
+              if (v != null) {
+                return _this.view.set(k, v);
+              }
+            });
+            rv = rivets.bind(_this.view.$el, {
+              self: _this.view
+            });
+            _this.rv = rv;
+            dtd.resolve(rv);
+          };
+        })(this)).fail(function() {
+          return dtd.reject();
+        });
+      }
+      return dtd.promise();
+    };
+    Template.prototype.set = function(key, promise) {
+      return promise.then((function(_this) {
+        return function(val) {
+          return _this.view.set(key, val);
+        };
+      })(this));
+    };
+    Template.prototype.update = function(data) {
+      var dtd, keys;
+      if (data == null) {
+        data = {};
+      }
+      dtd = $.Deferred();
+      if (false === this.rv) {
+        dtd.reject('Template no init');
+      } else {
+        keys = Object.keys(data);
+        Template.loadPromise(data).done((function(_this) {
+          return function(vData) {
+            keys.forEach(function(k) {
+              var v;
+              v = vData[k];
+              if (v != null) {
+                return _this.view.set(k, v);
+              }
+            });
+            dtd.resolve;
+          };
+        })(this)).fail(function() {
+          return dtd.reject();
+        });
+      }
+      return dtd.promise();
+    };
+    Template.prototype.destroy = function() {
+      if (this.rv) {
+        return this.rv.unbind();
+      }
+    };
+    Template.loadPromise = function(data) {
+      var dtd, keys, promises;
+      dtd = $.Deferred();
+      keys = Object.keys(data);
+      if (keys.length === 0) {
+        dtd.resolve({});
+      } else {
+        promises = [];
+        keys.forEach((function(_this) {
+          return function(v) {
+            return promises.push(data[v]);
+          };
+        })(this));
+        $.when(promises).done(function() {
+          var args, vData;
+          args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+          vData = {};
+          args.forEach((function(_this) {
+            return function(v, k) {
+              var key;
+              key = keys[k];
+              if (key) {
+                return vData[key] = v;
+              }
+            };
+          })(this));
+          return dtd.resolve(vData);
+        }).fail(function() {
+          return dtd.reject();
+        });
+      }
+      return dtd.promise();
+    };
+
+    /**
+     * 加载amd规范的模板，
+     * 包名必须为 tpl/ 前缀
+     */
+    Template.loadTpl = function(uri) {
+      var dtd, info;
+      dtd = $.Deferred();
+      info = uri.split('/');
+      if (info.length === 2) {
+        requirejs(["tpl/" + info[0]], function(tpl) {
+          var html;
+          html = tpl[info[1]];
+          if (html) {
+            return dtd.resolve(html);
+          } else {
+            return dtd.reject('url data map error');
+          }
+        });
+      } else {
+        dtd.reject('uri error');
+      }
+      return dtd.promise();
+    };
+    Template.formatters = function(name, fun) {
+      return rivets.formatters[name] = fun;
+    };
+    return Template;
   });
 
 }).call(this);

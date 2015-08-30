@@ -18,6 +18,11 @@ define 'mcore/util', ->
     exports.isObject = (x)->
         Object::toString.call(x) == '[object Object]'
 
+
+    exports.clone = (value)->
+        JSON.parse JSON.stringify(value)
+
+
     ###*
      * 遍历数组
     ###

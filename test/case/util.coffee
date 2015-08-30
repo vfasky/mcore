@@ -38,6 +38,22 @@ define 'case/util',
 
         it '123.456.789 is false', ->
             assert.equal false, util.isNumber '123.456.789'
+            
+
+    describe 'util isObject', ->
+        
+        it '123 is false', ->
+            assert.equal false, util.isObject 123
+
+        it '{} is true', ->
+            assert.equal true, util.isObject {}
+
+        it '{ key: 123 } is true', ->
+            assert.equal true, util.isObject { key: 123 }
+
+        it 'function test(){} is false', ->
+            test = ->
+            assert.equal false, util.isObject test
 
 
     describe 'util each', ->

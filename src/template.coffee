@@ -160,6 +160,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util'],
         Number(value).toFixed(len)
 
 
+    # 是否在数组中
     rivets.formatters['in'] = (args...)->
         return false if args.length < 2
 
@@ -169,3 +170,131 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util'],
         value = Number value if util.isNumber(value)
 
         args.indexOf(value) != -1
+
+
+    ###*
+     * 模板渲染
+     * @param {Object} view
+     * @param {jQuery} view.$el
+     * @param {Function} view.set
+     * @param {Object} data
+    ###
+    Template = (@view, data = {})->
+        keys = Object.keys data
+        @rv = false
+
+        dtd = $.Deferred()
+        
+        if keys.length == 0
+            rv = rivets.bind @view.$el,
+                self: @view
+            @rv = rv
+            dtd.resolve rv
+
+        else
+            Template.loadPromise(data).done (vData)=>
+                keys.forEach (k)=>
+                    v = vData[k]
+                    @view.set k, v if v?
+
+                rv = rivets.bind @view.$el,
+                    self: @view
+                @rv = rv
+                dtd.resolve rv
+                return
+            .fail ->
+                dtd.reject()
+        
+        dtd.promise()
+
+        
+    # 设置单个值
+    Template::set = (key, promise)->
+        promise.then (val)=>
+            @view.set key, val
+
+
+    # 更新数据
+    Template::update = (data = {})->
+        dtd = $.Deferred()
+
+        if false == @rv
+            dtd.reject 'Template no init'
+        
+        else
+            keys = Object.keys data
+
+            Template.loadPromise(data).done (vData)=>
+                keys.forEach (k)=>
+                    v = vData[k]
+                    @view.set k, v if v?
+
+                dtd.resolve
+
+                return
+            .fail ->
+                dtd.reject()
+        
+        dtd.promise()
+
+        
+    # 销毁
+    Template::destroy = ->
+        @rv.unbind() if @rv
+
+
+    # 加载以object存放的promise,并以object返回
+    Template.loadPromise = (data)->
+        dtd = $.Deferred()
+        keys = Object.keys data
+
+        if keys.length == 0
+            dtd.resolve {}
+        else
+            promises = []
+            keys.forEach (v)=>
+                promises.push data[v]
+
+            $.when(promises).done (args...)->
+                vData = {}
+                args.forEach (v, k)=>
+                    key = keys[k]
+                    if key
+                        vData[key] = v
+
+                dtd.resolve vData
+            .fail ->
+                dtd.reject()
+            
+        dtd.promise()
+
+        
+    ###*
+     * 加载amd规范的模板，
+     * 包名必须为 tpl/ 前缀
+    ###
+    Template.loadTpl = (uri)->
+        dtd = $.Deferred()
+
+        info = uri.split('/')
+
+        if info.length == 2
+            requirejs ["tpl/#{info[0]}"], (tpl)->
+                html = tpl[info[1]]
+                if html
+                    dtd.resolve html
+                else
+                    dtd.reject 'url data map error'
+        else
+            dtd.reject 'uri error'
+        
+        dtd.promise()
+
+
+    # 添加过滤函数
+    Template.formatters = (name, fun)->
+        rivets.formatters[name] = fun
+
+
+    Template
+

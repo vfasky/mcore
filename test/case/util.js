@@ -39,6 +39,24 @@
         return assert.equal(false, util.isNumber('123.456.789'));
       });
     });
+    describe('util isObject', function() {
+      it('123 is false', function() {
+        return assert.equal(false, util.isObject(123));
+      });
+      it('{} is true', function() {
+        return assert.equal(true, util.isObject({}));
+      });
+      it('{ key: 123 } is true', function() {
+        return assert.equal(true, util.isObject({
+          key: 123
+        }));
+      });
+      return it('function test(){} is false', function() {
+        var test;
+        test = function() {};
+        return assert.equal(false, util.isObject(test));
+      });
+    });
     return describe('util each', function() {
       it('[1,2,3,4,5]', function() {
         var total;
