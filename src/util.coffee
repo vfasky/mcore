@@ -13,6 +13,10 @@ define 'mcore/util', ->
 
     exports.isNumber = (x)->
         _isNumberReg.test x
+        
+
+    exports.isObject = (x)->
+        Object::toString.call(x) == '[object Object]'
 
     ###*
      * 遍历数组

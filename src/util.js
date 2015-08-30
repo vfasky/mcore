@@ -15,6 +15,9 @@
     exports.isNumber = function(x) {
       return _isNumberReg.test(x);
     };
+    exports.isObject = function(x) {
+      return Object.prototype.toString.call(x) === '[object Object]';
+    };
 
     /**
      * 遍历数组

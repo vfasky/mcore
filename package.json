@@ -11,5 +11,8 @@
   ],
   "author": "vfasky@gmail.com",
   "license": "BSD",
-  "devDependencies": {}
+  "devDependencies": {},
+  "dependencies": {
+    "react-tools": "^0.13.3"
+  }
 }
