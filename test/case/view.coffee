@@ -59,33 +59,14 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
 
                 
         render: (uri, data = {})->
-            keys = Object.keys data
-            dtd = $.Deferred()
-            
-            # 初始值
-            if keys.length > 0
-                keys.forEach (k)=>
-                    @set k, {}
-                    
-            # 模板已经初始化，更新
-            if @tpl
-                @tpl.update data
-                dtd.resolve()
-                @emit 'tplUpdate'
-            else
-                Template.loadTpl(uri).done (html)=>
-                    @$el.append html
-                    @tpl = new Template @, data
-                    dtd.resolve()
-                    @emit 'render'
-                .reject (err)->
-                    dtd.reject err || 'Template init error'
-
-            dtd.promise()
-
+            Template.render uri, data, @
                 
-        when: -> $.when.apply @, arguments
+        when: ->
+            $.when.apply @, arguments
 
+        destroy: ->
+            @tpl.destroy() if @tpl
+            @$el.remove()
         
         beforeInit: ->
         init: ->

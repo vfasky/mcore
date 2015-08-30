@@ -3,8 +3,8 @@
  * @module mcore/template
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'mcore/template', ['jquery', 'rivets', 'mcore/util'],
-($, rivets, util)->
+define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
+($, rivets, util, Stapes)->
     
     "use strict"
 
@@ -291,10 +291,74 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util'],
         dtd.promise()
 
 
+    Template.render = (uri, data = {}, model)->
+        keys = Object.keys data
+        dtd = $.Deferred()
+        
+        # 初始值
+        if keys.length > 0
+            keys.forEach (k)=>
+                model.set k, {}
+                
+        # 模板已经初始化，更新
+        if model.tpl
+            model.tpl.update data
+            dtd.resolve()
+            model.emit 'tplUpdate'
+        else
+            Template.loadTpl(uri).done (html)->
+                model.$el.append html
+                model.tpl = new Template model, data
+                dtd.resolve()
+                model.emit 'render'
+            .reject (err)->
+                dtd.reject err || 'Template init error'
+
+        dtd.promise()
+
+
+
     # 添加过滤函数
     Template.formatters = (name, fun)->
         rivets.formatters[name] = fun
 
+
+    # 自定义属性类
+    Template.Attr = Stapes.subclass
+        constructor: (@name, @rv, @el)->
+            @$el = $ @el
+            @init @el
+
+        sync: (value)->
+            @rv.observer.setValue value
+            
+        init: (el)->
+        update: (value, el)->
+        destroy: (el)->
+
+    
+    # 注册自定义属性
+    Template.regAttr = (name, Attr)->
+        attr = null
+        rivets.binders[name] =
+            bind: (el)->
+                attr = new Attr name, @, el
+                
+            unbind: (el)->
+                attr.destroy el
+
+            routine: (el, value)->
+                attr.update value, el
+
+
+    # 注册自定义tag
+    Template.regTag = (name, options = {})->
+        rivets.components[name] =
+            static: options.static or []
+            attributes: options.attr or []
+            template: options.template or -> ''
+            initialize: options.init or ->
+                
 
     Template
 

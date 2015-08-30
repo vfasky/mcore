@@ -47,39 +47,19 @@
         }
       },
       render: function(uri, data) {
-        var dtd, keys;
         if (data == null) {
           data = {};
         }
-        keys = Object.keys(data);
-        dtd = $.Deferred();
-        if (keys.length > 0) {
-          keys.forEach((function(_this) {
-            return function(k) {
-              return _this.set(k, {});
-            };
-          })(this));
-        }
-        if (this.tpl) {
-          this.tpl.update(data);
-          dtd.resolve();
-          this.emit('tplUpdate');
-        } else {
-          Template.loadTpl(uri).done((function(_this) {
-            return function(html) {
-              _this.$el.append(html);
-              _this.tpl = new Template(_this, data);
-              dtd.resolve();
-              return _this.emit('render');
-            };
-          })(this)).reject(function(err) {
-            return dtd.reject(err || 'Template init error');
-          });
-        }
-        return dtd.promise();
+        return Template.render(uri, data, this);
       },
       when: function() {
         return $.when.apply(this, arguments);
+      },
+      destroy: function() {
+        if (this.tpl) {
+          this.tpl.destroy();
+        }
+        return this.$el.remove();
       },
       beforeInit: function() {},
       init: function() {},

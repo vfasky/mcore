@@ -9,7 +9,7 @@
 (function() {
   var slice = [].slice;
 
-  define('mcore/template', ['jquery', 'rivets', 'mcore/util'], function($, rivets, util) {
+  define('mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'], function($, rivets, util, Stapes) {
     "use strict";
     var Template;
     rivets.adapters[':'] = {
@@ -303,8 +303,81 @@
       }
       return dtd.promise();
     };
+    Template.render = function(uri, data, model) {
+      var dtd, keys;
+      if (data == null) {
+        data = {};
+      }
+      keys = Object.keys(data);
+      dtd = $.Deferred();
+      if (keys.length > 0) {
+        keys.forEach((function(_this) {
+          return function(k) {
+            return model.set(k, {});
+          };
+        })(this));
+      }
+      if (model.tpl) {
+        model.tpl.update(data);
+        dtd.resolve();
+        model.emit('tplUpdate');
+      } else {
+        Template.loadTpl(uri).done(function(html) {
+          model.$el.append(html);
+          model.tpl = new Template(model, data);
+          dtd.resolve();
+          return model.emit('render');
+        }).reject(function(err) {
+          return dtd.reject(err || 'Template init error');
+        });
+      }
+      return dtd.promise();
+    };
     Template.formatters = function(name, fun) {
       return rivets.formatters[name] = fun;
+    };
+    Template.Attr = Stapes.subclass({
+      constructor: function(name1, rv1, el1) {
+        this.name = name1;
+        this.rv = rv1;
+        this.el = el1;
+        this.$el = $(this.el);
+        return this.init(this.el);
+      },
+      sync: function(value) {
+        return this.rv.observer.setValue(value);
+      },
+      init: function(el) {},
+      update: function(value, el) {},
+      destroy: function(el) {}
+    });
+    Template.regAttr = function(name, Attr) {
+      var attr;
+      attr = null;
+      return rivets.binders[name] = {
+        bind: function(el) {
+          return attr = new Attr(name, this, el);
+        },
+        unbind: function(el) {
+          return attr.destroy(el);
+        },
+        routine: function(el, value) {
+          return attr.update(value, el);
+        }
+      };
+    };
+    Template.regTag = function(name, options) {
+      if (options == null) {
+        options = {};
+      }
+      return rivets.components[name] = {
+        "static": options["static"] || [],
+        attributes: options.attr || [],
+        template: options.template || function() {
+          return '';
+        },
+        initialize: options.init || function() {}
+      };
     };
     return Template;
   });
