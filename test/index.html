@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mocha</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="mocha.css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="mocha.js"></script>
+    <script src="require.js"></script>
+    <script>
+      requirejs.config({
+          paths: {
+              mcore: '../dist/mcore.all',
+              chai: 'chai',
+              sightglass: '../vendor/sightglass',
+              rivets: '../vendor/rivets',
+              stapes: '../vendor/stapes',
+              formSerializer: '../attr/vendor/formSerializer', 
+              scroller: '../attr/vendor/scroller', 
+              jquery: '../vendor/jquery-2.1.4.min'
+          },
+          packages: [
+              {
+                  name: 'mcore',
+                  location: '../src',
+                  main: 'mcore'
+              },
+              {
+                  name: 'mcore-attr',
+                  location: '../attr/src',
+                  main: 'mcore-attr'
+              },
+              {
+                  name: 'case',
+                  location: 'case',
+                  main: 'case'
+              },
+              {
+                  name: 'tpl',
+                  location: 'tpl',
+                  main: 'tpl'
+              }
+          ]
+      });
+      mocha.setup('bdd');
+
+      define('describe', function(){   
+          return window.describe;
+      });
+      define('it', function(){
+          return window.it;
+      });
+      define('mocha', function(){
+          return window.mocha;
+      });
+      define('assert', ['chai'], function(chai){
+          return chai.assert;
+      });
+
+      requirejs(
+          ['case/util', 'case/route', 'case/view', 'case/app', 'case/attr'], 
+          function(){
+              mocha.run(); 
+          }
+      );
+    </script>
+  </body>
+</html>
