@@ -3,7 +3,7 @@
  * @module mcore/app
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'mcore/app', ['jquery', 'stapes', 'route'], ($, Stapes, route)->
+define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
     
     "use strict"
 
@@ -39,7 +39,7 @@ define 'mcore/app', ['jquery', 'stapes', 'route'], ($, Stapes, route)->
                     @emit 'destroyView', @curView
                     @curView.instantiate.destroy()
 
-            requirejs [viewName], (View)->
+            requirejs [viewName], (View)=>
                 $el = $ "<div class='#{@options.viewClass}' />"
 
                 @curView =

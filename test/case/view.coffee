@@ -131,14 +131,21 @@ define 'case/view',
                     @render 'test/t5',
                         data: [0...5]
 
+                changeData: ->
+                    @set 'data', [0...3]
+                    
+
             $el = $ '<div/>'
             testView = new TestView $el
 
             testView.on 'render', ->
-                console.log $el.html()
                 assert.equal 5, $el.find('.t5').length
-                done()
-                
+
+                # 更改值
+                testView.changeData()
+
+                done() if $el.find('.t5').length == 3
+                            
             testView.run()
 
                     

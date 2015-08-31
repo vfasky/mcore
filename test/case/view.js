@@ -135,14 +135,19 @@
             return this.render('test/t5', {
               data: [0, 1, 2, 3, 4]
             });
+          },
+          changeData: function() {
+            return this.set('data', [0, 1, 2]);
           }
         });
         $el = $('<div/>');
         testView = new TestView($el);
         testView.on('render', function() {
-          console.log($el.html());
           assert.equal(5, $el.find('.t5').length);
-          return done();
+          testView.changeData();
+          if ($el.find('.t5').length === 3) {
+            return done();
+          }
         });
         return testView.run();
       });

@@ -7,7 +7,7 @@
  */
 
 (function() {
-  define('mcore/app', ['jquery', 'stapes', 'route'], function($, Stapes, route) {
+  define('mcore/app', ['jquery', 'stapes', 'mcore/route'], function($, Stapes, route) {
     "use strict";
     return Stapes.subclass({
       constructor: function($el1, options) {
@@ -42,20 +42,22 @@
             this.curView.instantiate.destroy();
           }
         }
-        return requirejs([viewName], function(View) {
-          var $el;
-          $el = $("<div class='" + this.options.viewClass + "' />");
-          this.curView = {
-            name: viewName,
-            instantiate: new View($el, this)
+        return requirejs([viewName], (function(_this) {
+          return function(View) {
+            var $el;
+            $el = $("<div class='" + _this.options.viewClass + "' />");
+            _this.curView = {
+              name: viewName,
+              instantiate: new View($el, _this)
+            };
+            _this.curView.instantiate.route = route;
+            _this.curView.instantiate.context = route.context;
+            _this.curView.instantiate.run.apply(_this.curView.instantiate, args);
+            _this.curView.instantiate.$el.appendTo(_this.$el);
+            _this.emit('runView', _this.curView);
+            return _this.curView.instantiate.afterRun();
           };
-          this.curView.instantiate.route = route;
-          this.curView.instantiate.context = route.context;
-          this.curView.instantiate.run.apply(this.curView.instantiate, args);
-          this.curView.instantiate.$el.appendTo(this.$el);
-          this.emit('runView', this.curView);
-          return this.curView.instantiate.afterRun();
-        });
+        })(this));
       },
       run: function() {
         return this.router.run();
