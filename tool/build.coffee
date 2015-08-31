@@ -38,7 +38,9 @@ FS.write path.join(rootPath, 'dist/mcore.min.js.map'), result.map
 
 extList = [
     'attr/vendor/formSerializer.js'
+    'attr/vendor/scroller.js'
     'attr/src/validator.js'
+    'attr/src/scroller.js'
 ]
 extList.map (v)->
     fileList.push path.join rootPath, v
