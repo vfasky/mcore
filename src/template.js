@@ -317,7 +317,7 @@
       if (keys.length > 0 && !model.tpl) {
         keys.forEach((function(_this) {
           return function(k) {
-            return model.set(k, {});
+            return model.set(k, null);
           };
         })(this));
       }
