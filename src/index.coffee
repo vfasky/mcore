@@ -15,7 +15,7 @@ define 'mcore',
         View: View
         Route: Route
         Ui: Ui
-        App: app
+        App: App
 
     exports
 

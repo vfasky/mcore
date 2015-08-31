@@ -16,7 +16,7 @@
       View: View,
       Route: Route,
       Ui: Ui,
-      App: app
+      App: App
     };
     return exports;
   });

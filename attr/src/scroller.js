@@ -9,8 +9,9 @@
 (function() {
   define('mcore-attr/scroller', ['jquery', 'mcore/template', 'scroller'], function($, Template, scroller) {
     "use strict";
-    var $win, _id, docStyle, engine, helperElem, loadImg, perspectiveProperty, render, transformProperty, vendorPrefix;
-    $win = $(document);
+    var $doc, $win, _id, docStyle, engine, helperElem, loadImg, perspectiveProperty, render, transformProperty, vendorPrefix;
+    $win = $(window);
+    $doc = $(document);
     docStyle = document.documentElement.style;
     if (docStyle.hasOwnProperty('WebkitAppearance')) {
       engine = 'webkit';

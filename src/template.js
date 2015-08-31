@@ -350,14 +350,16 @@
         this.rv = rv1;
         this.el = el1;
         this.$el = $(this.el);
-        return this.init(this.el);
+        this.init(this.el);
+        return this.watch();
       },
       sync: function(value) {
         return this.rv.observer.setValue(value);
       },
       init: function(el) {},
       update: function(value, el) {},
-      destroy: function(el) {}
+      destroy: function(el) {},
+      watch: function() {}
     });
     Template.regAttr = function(name, Attr) {
       var attr;
