@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>CNodejs</title>
+    <link rel="stylesheet" href="//dn-cdnjscn.qbox.me/ajax/libs/ionicons/1.5.2/css/ionicons.min.css">
+    <link rel="stylesheet" href="//dn-cdnjscn.qbox.me/ajax/libs/ionic/1.0.0-rc.5/css/ionic.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+    <div id="app-view">
+        <div class="progress" id="app-load">
+            <div class="indeterminate"></div>
+        </div>
+    </div>
+
+    <script src="//dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.18/require.min.js"></script>
+
+    <script src="./js/config.dev.js"></script>
+    <script>
+        requirejs(['cnode'], function(bootstrap){
+            bootstrap('#app-view', '#app-load');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+    "cnode": {
+        "hash": "8c228b",
+        "path": "/Users/vfasky/code/web/mcore/example/cnodejs/js/pack/cnode/1.0.0/dist/cnode.all.min.8c228b.js",
+        "devPath": "/Users/vfasky/code/web/mcore/example/cnodejs/js/pack/cnode/1.0.0/dist/cnode.all.js"
+    },
+    "tpl/cnode": {
+        "hash": "240b72",
+        "path": "/Users/vfasky/code/web/mcore/example/cnodejs/js/tpl/cnode.240b72.js",
+        "devPath": false
+    }
+}

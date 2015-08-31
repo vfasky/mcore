@@ -8,7 +8,7 @@ define 'mcore-attr/scroller', ['jquery', 'mcore/template', 'scroller'],
     
     "use strict"
     
-    $win = $ document
+    $win = $ window
 
     docStyle = document.documentElement.style
 

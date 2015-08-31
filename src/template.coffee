@@ -329,6 +329,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         constructor: (@name, @rv, @el)->
             @$el = $ @el
             @init @el
+            @watch()
 
         sync: (value)->
             @rv.observer.setValue value
@@ -336,6 +337,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         init: (el)->
         update: (value, el)->
         destroy: (el)->
+        watch: ->
 
     
     # 注册自定义属性

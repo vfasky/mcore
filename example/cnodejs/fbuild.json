@@ -1,0 +1,21 @@
+{
+    "//": "自动打包的目录",
+    "pack": "./js/pack",
+
+    "//": "指定包的版本,注：如果没有指定，修改那个版本，就使用那个版本",
+    "packVersion": {},
+
+    "//": "tpl目录",
+    "tpl": "./tpl",
+
+    "//": "requireJS 的配置",
+    "requireConfig": {
+        "paths": {
+            "jquery": "//dn-cdnjscn.qbox.me/ajax/libs/jquery/2.1.4/jquery.min",
+            "mcore": "/dist/mcore.all.min"
+        }
+    },
+
+    "//": "配置文件",
+    "configFile": "./js/config.js"
+}
