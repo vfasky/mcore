@@ -60,6 +60,9 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
                 
         render: (uri, data = {})->
             Template.render uri, data, @
+
+        renderString: (html, data = {})->
+            Template.renderString html, data, @
                 
         when: ->
             $.when.apply @, arguments

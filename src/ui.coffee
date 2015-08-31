@@ -25,5 +25,8 @@ define 'mcore/ui', ['jquery', 'mcore/template', 'stapes'], ($, Template, stapes)
         render: (uri, data = {})->
             Template.render uri, data, @
 
+        renderString: (html, data = {})->
+            Template.renderString html, data, @
+
         init: ->
         watch: ->

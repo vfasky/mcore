@@ -203,7 +203,7 @@
             dtd.resolve(rv);
           };
         })(this)).fail(function() {
-          return dtd.reject();
+          return dtd.reject('template render error');
         });
       }
       return dtd.promise();
@@ -237,7 +237,7 @@
             dtd.resolve;
           };
         })(this)).fail(function() {
-          return dtd.reject();
+          return dtd.reject('template update error');
         });
       }
       return dtd.promise();
@@ -308,14 +308,13 @@
       }
       return dtd.promise();
     };
-    Template.render = function(uri, data, model) {
-      var dtd, keys;
+    Template.renderString = function(html, data, model) {
+      var keys;
       if (data == null) {
         data = {};
       }
       keys = Object.keys(data);
-      dtd = $.Deferred();
-      if (keys.length > 0) {
+      if (keys.length > 0 && !model.tpl) {
         keys.forEach((function(_this) {
           return function(k) {
             return model.set(k, {});
@@ -323,20 +322,24 @@
         })(this));
       }
       if (model.tpl) {
-        model.tpl.update(data);
-        dtd.resolve();
-        model.emit('tplUpdate');
+        return model.tpl.update(data).then(function() {
+          return model.emit('tplUpdate');
+        });
       } else {
-        Template.loadTpl(uri).done(function(html) {
-          model.$el.append(html);
-          model.tpl = new Template(model, data);
-          dtd.resolve();
+        model.$el.append(html);
+        model.tpl = new Template(model, data);
+        return model.tpl.then(function() {
           return model.emit('render');
-        }).fail(function(err) {
-          return dtd.reject(err || 'Template init error');
         });
       }
-      return dtd.promise();
+    };
+    Template.render = function(uri, data, model) {
+      if (data == null) {
+        data = {};
+      }
+      return Template.loadTpl(uri).then(function(html) {
+        return Template.renderString(html, data, model);
+      });
     };
     Template.formatters = function(name, fun) {
       return rivets.formatters[name] = fun;

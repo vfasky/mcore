@@ -52,6 +52,12 @@
         }
         return Template.render(uri, data, this);
       },
+      renderString: function(html, data) {
+        if (data == null) {
+          data = {};
+        }
+        return Template.renderString(html, data, this);
+      },
       when: function() {
         return $.when.apply(this, arguments);
       },

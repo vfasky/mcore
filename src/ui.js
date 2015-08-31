@@ -34,6 +34,12 @@
         }
         return Template.render(uri, data, this);
       },
+      renderString: function(html, data) {
+        if (data == null) {
+          data = {};
+        }
+        return Template.renderString(html, data, this);
+      },
       init: function() {},
       watch: function() {}
     });

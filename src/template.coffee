@@ -204,7 +204,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
                 dtd.resolve rv
                 return
             .fail ->
-                dtd.reject()
+                dtd.reject 'template render error'
         
         dtd.promise()
 
@@ -234,7 +234,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
 
                 return
             .fail ->
-                dtd.reject()
+                dtd.reject 'template update error'
         
         dtd.promise()
 
@@ -294,31 +294,28 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         
         dtd.promise()
 
-
-    Template.render = (uri, data = {}, model)->
+    Template.renderString = (html, data = {}, model)->
         keys = Object.keys data
-        dtd = $.Deferred()
         
         # 初始值
-        if keys.length > 0
+        if keys.length > 0 and !model.tpl
             keys.forEach (k)=>
                 model.set k, {}
                 
         # 模板已经初始化，更新
         if model.tpl
-            model.tpl.update data
-            dtd.resolve()
-            model.emit 'tplUpdate'
+            return model.tpl.update(data).then ->
+                model.emit 'tplUpdate'
         else
-            Template.loadTpl(uri).done (html)->
-                model.$el.append html
-                model.tpl = new Template model, data
-                dtd.resolve()
+            model.$el.append html
+            model.tpl = new Template model, data
+            return model.tpl.then ->
                 model.emit 'render'
-            .fail (err)->
-                dtd.reject err || 'Template init error'
 
-        dtd.promise()
+
+    Template.render = (uri, data = {}, model)->
+        Template.loadTpl(uri).then (html)->
+            Template.renderString html, data, model
 
 
 
