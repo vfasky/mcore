@@ -30,6 +30,8 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
             @$body = $body
             @util = util
 
+            @_cacheMap = {}
+
             @isWeixinBrowser = _isWeixinBrowser
             @isIOS = _isIOS
 
@@ -70,6 +72,43 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
         destroy: ->
             @tpl.destroy() if @tpl
             @$el.remove()
+
+        ###*
+         * 缓存 promise
+         * @param {String} key
+         * @param {Promise} promise
+         * @param {Object} options
+         * @param {String} [options.storage = session] 存放类型
+         *   session: 更换 view 失效，
+         *   memory: 刷新页面 失败
+         *   localStorage: 放在 localStorage
+         * @param {Number} options.time 有效时间，只对 localStorage 有效
+         * @author vfasky <vfasky@gmail.com>
+         * 
+        ###
+        cache: (key, promise, options = {})->
+            options = $.extend
+                 storage: 'session'
+                 time: Infinity #只对 localStorage 有效
+            , options
+
+            proxyMap =
+                session: @promiseCacheSessionProxy
+                memory: util.promiseCacheMemoryproxy
+                localStorage: util.promiseCacheLocalProxy
+
+            options.proxy = proxyMap[options.time] or @promiseCacheSessionProxy
+
+            util.promise.cache key, promise, options
+
+        # 缓存 proxy
+        promiseCacheSessionProxy: ->
+            proxy =
+                set: (key, value)->
+                    @_cacheMap[key] = value
+                get: (key)->
+                    @_cacheMap[key] or null
+            proxy
         
         beforeInit: ->
         init: ->

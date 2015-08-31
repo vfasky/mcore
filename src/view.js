@@ -21,6 +21,7 @@
         this.$win = $win;
         this.$body = $body;
         this.util = util;
+        this._cacheMap = {};
         this.isWeixinBrowser = _isWeixinBrowser;
         this.isIOS = _isIOS;
         this.tpl = false;
@@ -66,6 +67,49 @@
           this.tpl.destroy();
         }
         return this.$el.remove();
+      },
+
+      /**
+       * 缓存 promise
+       * @param {String} key
+       * @param {Promise} promise
+       * @param {Object} options
+       * @param {String} [options.storage = session] 存放类型
+       *   session: 更换 view 失效，
+       *   memory: 刷新页面 失败
+       *   localStorage: 放在 localStorage
+       * @param {Number} options.time 有效时间，只对 localStorage 有效
+       * @author vfasky <vfasky@gmail.com>
+       *
+       */
+      cache: function(key, promise, options) {
+        var proxyMap;
+        if (options == null) {
+          options = {};
+        }
+        options = $.extend({
+          storage: 'session',
+          time: Infinity
+        }, options);
+        proxyMap = {
+          session: this.promiseCacheSessionProxy,
+          memory: util.promiseCacheMemoryproxy,
+          localStorage: util.promiseCacheLocalProxy
+        };
+        options.proxy = proxyMap[options.time] || this.promiseCacheSessionProxy;
+        return util.promise.cache(key, promise, options);
+      },
+      promiseCacheSessionProxy: function() {
+        var proxy;
+        proxy = {
+          set: function(key, value) {
+            return this._cacheMap[key] = value;
+          },
+          get: function(key) {
+            return this._cacheMap[key] || null;
+          }
+        };
+        return proxy;
       },
       beforeInit: function() {},
       init: function() {},
