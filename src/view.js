@@ -7,8 +7,66 @@
  */
 
 (function() {
-  define('mcore/view', ['jquery', 'rivets'], function($, rivets) {
-    return "use strict";
+  define('mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'], function($, Template, Stapes, util) {
+    "use strict";
+    var $body, $win, _isIOS, _isWeixinBrowser;
+    $win = $(window);
+    $body = $('body');
+    _isWeixinBrowser = /MicroMessenger/i.test(window.navigator.userAgent);
+    _isIOS = /iphone|ipad/gi.test(window.navigator.appVersion);
+    return Stapes.subclass({
+      constructor: function($el, app) {
+        this.$el = $el;
+        this.app = app;
+        this.$win = $win;
+        this.$body = $body;
+        this.util = util;
+        this.isWeixinBrowser = _isWeixinBrowser;
+        this.isIOS = _isIOS;
+        this.tpl = false;
+        this.beforeInit();
+        return this.init();
+      },
+      clone: function(value) {
+        return util.clone(value);
+      },
+      setTitle: function(title) {
+        var $iframe;
+        this.title = title;
+        if (document.title === this.title) {
+          return;
+        }
+        document.title = this.title;
+        if (this.isWeixinBrowser && this.isIOS) {
+          $iframe = $('<iframe src="/favicon.ico"></iframe>');
+          return $iframe.one('load', function() {
+            return setTimeout(function() {
+              return $iframe.remove();
+            }, 0);
+          }).appendTo(this.$body);
+        }
+      },
+      render: function(uri, data) {
+        if (data == null) {
+          data = {};
+        }
+        return Template.render(uri, data, this);
+      },
+      when: function() {
+        return $.when.apply(this, arguments);
+      },
+      destroy: function() {
+        if (this.tpl) {
+          this.tpl.destroy();
+        }
+        return this.$el.remove();
+      },
+      beforeInit: function() {},
+      init: function() {},
+      run: function() {},
+      afterRun: function() {},
+      watch: function() {}
+    });
   });
 
 }).call(this);

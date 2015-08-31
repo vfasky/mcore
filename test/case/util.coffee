@@ -74,3 +74,14 @@ define 'case/util',
                 total += v
 
             assert.equal '123', total
+
+            
+    describe 'util clone', ->
+
+        it 't1 clone t2', ->
+            t1 = ok: 'yes'
+            t2 = util.clone t1
+
+            t2.ok = 'no'
+
+            assert.equal false, t1.ok == t2.ok

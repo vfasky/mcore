@@ -57,7 +57,7 @@
         return assert.equal(false, util.isObject(test));
       });
     });
-    return describe('util each', function() {
+    describe('util each', function() {
       it('[1,2,3,4,5]', function() {
         var total;
         total = '';
@@ -76,6 +76,17 @@
           return total += v;
         });
         return assert.equal('123', total);
+      });
+    });
+    return describe('util clone', function() {
+      return it('t1 clone t2', function() {
+        var t1, t2;
+        t1 = {
+          ok: 'yes'
+        };
+        t2 = util.clone(t1);
+        t2.ok = 'no';
+        return assert.equal(false, t1.ok === t2.ok);
       });
     });
   });

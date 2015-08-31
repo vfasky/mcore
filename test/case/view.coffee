@@ -1,77 +1,157 @@
 ###*
- * View
- * @module mcore/view
+ * view test
+ * @module case/view
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
-($, Template, Stapes, util)->
+define 'case/view',
+['describe', 'it', 'mcore/view', 'assert', 'jquery', 'mcore/template'],
+(describe, it, View, assert, $, Template)->
     
     "use strict"
 
-    # window
-    $win = $ window
-    # body
-    $body = $ 'body'
+    describe 'test view and template', ->
 
-    # 是否在微信中打开
-    _isWeixinBrowser = (/MicroMessenger/i).test(
-        window.navigator.userAgent
-    )
+        it 'hello', (done)->
 
-    # 是否在ios中打开
-    _isIOS = (/iphone|ipad/gi).test(
-        window.navigator.appVersion
-    )
+            TestView = View.subclass
+                constructor: View::constructor
+                run: ->
+                    @render 'test/t1'
 
-    Stapes.subclass
+            $el = $ '<div/>'
+            testView = new TestView $el
 
-        constructor: (@$el, @app)->
-            @$win = $win
-            @$body = $body
-            @util = util
+            testView.on 'render', ->
+                assert.equal true, $el.text().trim() == 'hello'
+                done()
 
-            @isWeixinBrowser = _isWeixinBrowser
-            @isIOS = _isIOS
-
-            @tpl = false
-
-            @beforeInit()
-            @init()
+            testView.run()
 
 
-        clone: (value)->
-            util.clone value
+        it 'each', (done)->
+
+            TestView = View.subclass
+                constructor: View::constructor
+                run: ->
+                    @render 'test/t2',
+                        testData: [0...5]
+
+            $el = $ '<div/>'
+            testView = new TestView $el
+
+            testView.on 'render', ->
+                assert.equal true, $el.find('.t1').length == 5
+                done()
+
+            testView.run()
 
 
-        setTitle: (@title)->
-            return if document.title == @title
-
-            document.title = @title
+        it 'promise data', (done)->
             
-            if @isWeixinBrowser and @isIOS
-                $iframe = $ '<iframe src="/favicon.ico"></iframe>'
+            TestView = View.subclass
+                constructor: View::constructor
+                run: ->
+                    @render 'test/t2',
+                        testData: @getData()
 
-                $iframe.one 'load', ->
-                    setTimeout ->
-                        $iframe.remove()
-                    , 0
-                .appendTo @$body
+                getData: ->
+                    dtd = $.Deferred()
+                    
+                    dtd.resolve [0...5]
+                    
+                    dtd.promise()
 
+            $el = $ '<div/>'
+            testView = new TestView $el
+
+            testView.on 'render', ->
+                assert.equal true, $el.find('.t1').length == 5
+                done()
+
+            testView.run()
+
+        it 'template diy attr', (done)->
+
+            Template.regAttr 'test', Template.Attr.subclass
+                constructor: Template.Attr::constructor
+                init: (el)->
+                    $(el).html 'diy'
+
+            TestView = View.subclass
+                constructor: View::constructor
+                run: ->
+                    @render 'test/t3'
+
+            $el = $ '<div/>'
+            testView = new TestView $el
+
+            testView.on 'render', ->
+                assert.equal true, $el.text().trim() == 'diy'
+                done()
+
+            testView.run()
+
+        it 'template 2way attr', (done)->
+
+            Template.regAttr 'test', Template.Attr.subclass
+                constructor: Template.Attr::constructor
+                init: (el)->
+                    $(el).html 'diy'
+                update: (value)->
+                    @sync 'ok'
+
+            TestView = View.subclass
+                constructor: View::constructor
+                run: ->
+                    @render 'test/t4',
+                        t: 0
+
+            $el = $ '<div/>'
+            testView = new TestView $el
+
+            testView.on 'change:t', (val)->
+                done() if val == 'ok'
                 
-        render: (uri, data = {})->
-            Template.render uri, data, @
-                
-        when: ->
-            $.when.apply @, arguments
+            testView.run()
 
-        destroy: ->
-            @tpl.destroy() if @tpl
-            @$el.remove()
-        
-        beforeInit: ->
-        init: ->
-        run: ->
-        afterRun: ->
-        watch: ->
+
+        it 'template components', (done)->
+            Template.regTag 'test',
+                attr: 'list'
+                template: ->
+                    '''
+                    <div rv-each-v="list" class="t5">{v}</div>
+                    '''
+                init: (el, data)->
+                    data
+
+            TestView = View.subclass
+                constructor: View::constructor
+                run: ->
+                    @render 'test/t5',
+                        data: [0...5]
+
+            $el = $ '<div/>'
+            testView = new TestView $el
+
+            testView.on 'render', ->
+                console.log $el.html()
+                assert.equal 5, $el.find('.t5').length
+                done()
+                
+            testView.run()
+
+                    
+
+
+
+
+
+
+
+
+
+
+
 
 

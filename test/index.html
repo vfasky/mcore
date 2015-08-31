@@ -30,6 +30,11 @@
                   name: 'case',
                   location: 'case',
                   main: 'case'
+              },
+              {
+                  name: 'tpl',
+                  location: 'tpl',
+                  main: 'tpl'
               }
           ]
       });
@@ -48,9 +53,12 @@
           return chai.assert;
       });
 
-      requirejs(['case/util', 'case/route'], function(){
-          mocha.run(); 
-      });
+      requirejs(
+          ['case/util', 'case/route', 'case/view'], 
+          function(){
+              mocha.run(); 
+          }
+      );
     </script>
   </body>
 </html>

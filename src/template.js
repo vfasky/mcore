@@ -27,6 +27,7 @@
       }
     };
     rivets.configure({
+      rootInterface: '.',
       handler: function(target, event, binding) {
         var ref;
         ref = this.call(binding.view.models.self, target, event);
@@ -253,12 +254,16 @@
       if (keys.length === 0) {
         dtd.resolve({});
       } else {
-        promises = [];
-        keys.forEach((function(_this) {
-          return function(v) {
-            return promises.push(data[v]);
-          };
-        })(this));
+        if (keys.length === 1) {
+          promises = data[keys[0]];
+        } else {
+          promises = [];
+          keys.forEach((function(_this) {
+            return function(v) {
+              return promises.push(data[v]);
+            };
+          })(this));
+        }
         $.when(promises).done(function() {
           var args, vData;
           args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
@@ -327,7 +332,7 @@
           model.tpl = new Template(model, data);
           dtd.resolve();
           return model.emit('render');
-        }).reject(function(err) {
+        }).fail(function(err) {
           return dtd.reject(err || 'Template init error');
         });
       }

@@ -23,6 +23,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
     
 
     rivets.configure
+        rootInterface: '.'
         # 模板事件传递方式
         handler: (target, event, binding)->
             ref = @call(binding.view.models.self, target, event)
@@ -251,9 +252,12 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         if keys.length == 0
             dtd.resolve {}
         else
-            promises = []
-            keys.forEach (v)=>
-                promises.push data[v]
+            if keys.length == 1
+                promises = data[keys[0]]
+            else
+                promises = []
+                keys.forEach (v)=>
+                    promises.push data[v]
 
             $.when(promises).done (args...)->
                 vData = {}
@@ -311,7 +315,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
                 model.tpl = new Template model, data
                 dtd.resolve()
                 model.emit 'render'
-            .reject (err)->
+            .fail (err)->
                 dtd.reject err || 'Template init error'
 
         dtd.promise()
