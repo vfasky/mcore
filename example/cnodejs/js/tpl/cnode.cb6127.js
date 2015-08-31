@@ -1,0 +1,1 @@
+define("tpl/cnode",function(){"use strict";return{}});
