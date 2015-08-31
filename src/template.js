@@ -171,14 +171,15 @@
      * @param {Function} view.set
      * @param {Object} data
      */
-    Template = function(view, data) {
-      var dtd, keys, rv;
+    Template = function(view, data1) {
       this.view = view;
-      if (data == null) {
-        data = {};
-      }
-      keys = Object.keys(data);
+      this.data = data1 != null ? data1 : {};
       this.rv = false;
+    };
+    Template.prototype.init = function() {
+      var data, dtd, keys, rv;
+      data = this.data;
+      keys = Object.keys(data);
       dtd = $.Deferred();
       if (keys.length === 0) {
         rv = rivets.bind(this.view.$el, {
@@ -328,7 +329,7 @@
       } else {
         model.$el.append(html);
         model.tpl = new Template(model, data);
-        return model.tpl.then(function() {
+        return model.tpl.init().then(function() {
           return model.emit('render');
         });
       }

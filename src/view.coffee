@@ -109,6 +109,11 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
                 get: (key)->
                     @_cacheMap[key] or null
             proxy
+
+        # 后退
+        back: ->
+            window.history.back() if window.history.length > 1
+            window.location.href = '#'
         
         beforeInit: ->
         init: ->

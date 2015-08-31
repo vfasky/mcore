@@ -180,10 +180,13 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
      * @param {Function} view.set
      * @param {Object} data
     ###
-    Template = (@view, data = {})->
-        keys = Object.keys data
+    Template = (@view, @data = {})->
         @rv = false
+        return
 
+    Template::init = ->
+        data = @data
+        keys = Object.keys data
         dtd = $.Deferred()
         
         if keys.length == 0
@@ -309,7 +312,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         else
             model.$el.append html
             model.tpl = new Template model, data
-            return model.tpl.then ->
+            return model.tpl.init().then ->
                 model.emit 'render'
 
 

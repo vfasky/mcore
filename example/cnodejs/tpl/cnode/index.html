@@ -4,13 +4,13 @@
 
 <div class="content has-header" rv-scroller="self:topics.data">
     <div class="list card" rv-each-v="self:topics.data">
-        <a class="item item-avatar">
+        <a rv-href="'#/topic/' | link v.id" class="item item-avatar">
             <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname" >
             <h2>{v.title}</h2>
-            <p>November 05, 1955</p>
+            <p>{v.create_at}</p>
         </a>
 
-        <a class="item item-body">
+        <a rv-href="'#/topic/' | link v.id" class="item item-body">
             
             <p>{v.content | substr 0 120}</p>
         </a>

@@ -10,7 +10,7 @@
   define('cnode/api', ['jquery'], function($) {
     "use strict";
     var _host, exports;
-    _host = 'https://cnodejs.org';
+    _host = 'https://cnodejs.org/api/v1';
     return exports = {
       topics: function(data) {
         if (data == null) {
@@ -20,7 +20,12 @@
           mdrender: false,
           limit: 10
         }, data);
-        return $.get(_host + '/api/v1/topics', data);
+        return $.get(_host + '/topics', data);
+      },
+      topic: function(id) {
+        return $.get(_host + '/topic/' + id, {
+          mdrender: false
+        });
       }
     };
   });
@@ -67,8 +72,16 @@
  */
 
 (function() {
-  define('cnode/topic', ['jquery'], function($) {
-    return "use strict";
+  define('cnode/topic', ['jquery', 'cnode/view'], function($, View) {
+    "use strict";
+    return View.subclass({
+      constructor: View.prototype.constructor,
+      run: function(id) {
+        return this.render('cnode/topic.html', {
+          topic: this.api.topic(id)
+        });
+      }
+    });
   });
 
 }).call(this);
