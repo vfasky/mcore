@@ -7,8 +7,16 @@
  */
 
 (function() {
-  define('cnode/topic', ['jquery'], function($) {
-    return "use strict";
+  define('cnode/topic', ['jquery', 'cnode/view'], function($, View) {
+    "use strict";
+    return View.subclass({
+      constructor: View.prototype.constructor,
+      run: function(id) {
+        return this.render('cnode/topic.html', {
+          topic: this.api.topic(id)
+        });
+      }
+    });
   });
 
 }).call(this);

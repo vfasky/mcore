@@ -7,7 +7,7 @@ define 'cnode/api', ['jquery'], ($)->
     
     "use strict"
 
-    _host = 'https://cnodejs.org'
+    _host = 'https://cnodejs.org/api/v1'
 
     exports =
         topics: (data = {})->
@@ -16,7 +16,12 @@ define 'cnode/api', ['jquery'], ($)->
                 limit: 10
             , data
             
-            $.get _host + '/api/v1/topics', data
+            $.get _host + '/topics', data
+
+        topic: (id)->
+            $.get _host + '/topic/' + id,
+                mdrender: false
+
 
 
 

@@ -21,6 +21,7 @@
         }, options);
         this.router = new route.Route(this.options.routeChange);
         this.curView = null;
+        this.onLoadViw = false;
       },
       route: function(path, viewName) {
         var self;
@@ -31,6 +32,10 @@
         return this;
       },
       runView: function(viewName, route, args) {
+        if (this.onLoadViw) {
+          return;
+        }
+        this.onLoadViw = true;
         if (this.curView) {
           if (this.curView.name === viewName) {
             this.curView.instantiate.route = route;
@@ -40,6 +45,7 @@
           } else {
             this.emit('destroyView', this.curView);
             this.curView.instantiate.destroy();
+            this.curView = null;
           }
         }
         return requirejs([viewName], (function(_this) {
@@ -55,7 +61,8 @@
             _this.curView.instantiate.run.apply(_this.curView.instantiate, args);
             _this.curView.instantiate.$el.appendTo(_this.$el);
             _this.emit('runView', _this.curView);
-            return _this.curView.instantiate.afterRun();
+            _this.curView.instantiate.afterRun();
+            return _this.onLoadViw = false;
           };
         })(this));
       },

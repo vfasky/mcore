@@ -16,6 +16,7 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
 
             @router = new route.Route @options.routeChange
             @curView = null
+            @onLoadViw = false
             
             return
         
@@ -27,6 +28,10 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
             @
 
         runView: (viewName, route, args)->
+            return if @onLoadViw
+
+            @onLoadViw = true
+
             if @curView
                 # 已经初始化，只调用run方法
                 if @curView.name == viewName
@@ -38,6 +43,7 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
                 else
                     @emit 'destroyView', @curView
                     @curView.instantiate.destroy()
+                    @curView = null
 
             requirejs [viewName], (View)=>
                 $el = $ "<div class='#{@options.viewClass}' />"
@@ -52,6 +58,8 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
                 @curView.instantiate.$el.appendTo @$el
                 @emit 'runView', @curView
                 @curView.instantiate.afterRun()
+
+                @onLoadViw = false
 
         run: ->
             @router.run()
