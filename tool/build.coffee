@@ -30,8 +30,22 @@ minList.map (v)->
     fileList.push path.join rootPath, v
 
 result = UglifyJS.minify fileList,
-    sourceRoot: ''
     outSourceMap: 'mcore.min.js.map'
 
 FS.write path.join(rootPath, 'dist/mcore.min.js'), result.code
 FS.write path.join(rootPath, 'dist/mcore.min.js.map'), result.map
+
+
+extList = [
+    'attr/vendor/formSerializer.js'
+    'attr/src/validator.js'
+]
+extList.map (v)->
+    fileList.push path.join rootPath, v
+
+result = UglifyJS.minify fileList,
+    outSourceMap: 'mcore.all.min.js.map'
+
+FS.write path.join(rootPath, 'dist/mcore.all.min.js'), result.code
+FS.write path.join(rootPath, 'dist/mcore.all.min.js.map'), result.map
+
