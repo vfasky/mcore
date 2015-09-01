@@ -26,7 +26,8 @@
         this.isIOS = _isIOS;
         this.tpl = false;
         this.beforeInit();
-        return this.init();
+        this.init();
+        return this.watch();
       },
       clone: function(value) {
         return util.clone(value);
@@ -114,8 +115,10 @@
       back: function() {
         if (window.history.length > 1) {
           window.history.back();
+        } else {
+          window.location.href = '#';
         }
-        return window.location.href = '#';
+        return false;
       },
       beforeInit: function() {},
       init: function() {},

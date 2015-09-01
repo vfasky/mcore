@@ -76,8 +76,19 @@
         this.loadImgTime = false;
         this.$el.wrap('<div class="scroller-wrap"></div>');
         this.$container = this.$el.parent().css({
-          overflow: 'hidden'
+          overflow: 'hidden',
+          position: 'relative'
         });
+        this.$el.css({
+          position: 'absolute',
+          left: 0,
+          top: 0
+        });
+        if (this.scrollingX === false) {
+          this.$el.css({
+            width: '100%'
+          });
+        }
         this.scroller = new scroller.Scroller(render(this.$el[0]), {
           scrollingX: this.scrollingX,
           scrollingY: this.scrollingY,

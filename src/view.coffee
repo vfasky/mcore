@@ -39,6 +39,7 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
 
             @beforeInit()
             @init()
+            @watch()
 
 
         clone: (value)->
@@ -112,8 +113,11 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
 
         # 后退
         back: ->
-            window.history.back() if window.history.length > 1
-            window.location.href = '#'
+            if window.history.length > 1
+                window.history.back()
+            else
+                window.location.href = '#'
+            return false
         
         beforeInit: ->
         init: ->
