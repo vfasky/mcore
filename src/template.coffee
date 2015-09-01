@@ -303,7 +303,8 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         # 初始值
         if keys.length > 0 and !model.tpl
             keys.forEach (k)=>
-                model.set k, null
+                #model.set k, null
+                model.set k, {}
                 
         # 模板已经初始化，更新
         if model.tpl

@@ -7,7 +7,7 @@
  */
 
 (function() {
-  define('cnode/topic', ['jquery', 'cnode/view'], function($, View) {
+  define('cnode/topic', ['jquery', 'cnode/view', 'mcore-attr/scroller'], function($, View) {
     "use strict";
     return View.subclass({
       constructor: View.prototype.constructor,

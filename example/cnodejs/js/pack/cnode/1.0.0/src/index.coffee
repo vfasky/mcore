@@ -15,7 +15,4 @@ define 'cnode/index', ['jquery', 'cnode/view', 'mcore-attr/scroller'], ($, View)
                 topics: @api.topics()
 
         watch: ->
-            @on 'render', ->
-                $scroller = @$el.find('.scroller')
-                console.log $scroller.data 'scroller'
 

@@ -1,27 +1,29 @@
-<div class="bar bar-header bar-royal">
-    <button rv-on-click="self.back" class="button button-icon icon ion-ios-arrow-thin-left"></button>
+<loading watch="self:topic.data"></loading>
 
-    <h1 class="title">{self:topic.data.title | substr 0 14}</h1>
-</div>
+<div rv-show="self:topic.data" rv-scroller="self:topic.data">
+    <top-header title="self:topic.data.title" back="self.back">
+    </top-header>
 
-<div class="content has-header" rv-scroller="self:topic.data">
-    <div class="list card" >
-        <a class="item item-avatar">
-            <img rv-src="self:topic.data.author.avatar_url" rv-alt="self:topic.data.author.loginname" >
-            <h2>{self:topic.data.title}</h2>
-            <p>{self:topic.data.create_at}</p>
-        </a>
-
-        <a class="item item-body">
-            
-            <p>{self:topic.data.content}</p>
-        </a>
-
-        <div class="item tabs tabs-secondary tabs-icon-left">
-            <a class="tab-item" href="#">
-                <i class="icon ion-chatbox"></i>
-                Comment
+    
+    <div class="content has-header" >
+        <div class="list card" >
+            <a class="item item-avatar">
+                <img rv-src="self:topic.data.author.avatar_url" rv-alt="self:topic.data.author.loginname" >
+                <h2>{self:topic.data.title}</h2>
+                <p>{self:topic.data.create_at}</p>
             </a>
+
+            <a class="item item-body">
+                
+                <p>{self:topic.data.content}</p>
+            </a>
+
+            <div class="item tabs tabs-secondary tabs-icon-left">
+                <a class="tab-item" href="#">
+                    <i class="icon ion-chatbox"></i>
+                    Comment
+                </a>
+            </div>
         </div>
     </div>
 </div>

@@ -42,7 +42,7 @@
  */
 
 (function() {
-  define('cnode', ['jquery', 'mcore'], function($, mcore) {
+  define('cnode', ['jquery', 'mcore', 'tag'], function($, mcore) {
     "use strict";
     var init;
     init = false;
@@ -72,7 +72,7 @@
  */
 
 (function() {
-  define('cnode/topic', ['jquery', 'cnode/view'], function($, View) {
+  define('cnode/topic', ['jquery', 'cnode/view', 'mcore-attr/scroller'], function($, View) {
     "use strict";
     return View.subclass({
       constructor: View.prototype.constructor,
@@ -127,13 +127,7 @@
           topics: this.api.topics()
         });
       },
-      watch: function() {
-        return this.on('render', function() {
-          var $scroller;
-          $scroller = this.$el.find('.scroller');
-          return console.log($scroller.data('scroller'));
-        });
-      }
+      watch: function() {}
     });
   });
 
