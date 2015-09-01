@@ -26,7 +26,8 @@
         this.isIOS = _isIOS;
         this.tpl = false;
         this.beforeInit();
-        return this.init();
+        this.init();
+        return this.watch();
       },
       clone: function(value) {
         return util.clone(value);

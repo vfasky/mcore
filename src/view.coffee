@@ -39,6 +39,7 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
 
             @beforeInit()
             @init()
+            @watch()
 
 
         clone: (value)->

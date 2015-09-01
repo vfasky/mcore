@@ -126,6 +126,13 @@
         return this.render('cnode/index.html', {
           topics: this.api.topics()
         });
+      },
+      watch: function() {
+        return this.on('render', function() {
+          var $scroller;
+          $scroller = this.$el.find('.scroller');
+          return console.log($scroller.data('scroller'));
+        });
       }
     });
   });
