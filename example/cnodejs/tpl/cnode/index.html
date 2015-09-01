@@ -6,25 +6,30 @@
     </div>
 
     <div class="content has-header">
-        <div class="list card" rv-each-v="self:topics.data">
+        <div rv-class-hg-border="v.top" class="list card" rv-each-v="self:topics.data">
             <a rv-href="'#/topic/' | link v.id" class="item item-avatar">
                 <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname" >
                 <h2>{v.title}</h2>
-                <p>{v.create_at}</p>
+                <p>
+                    <i class="icon ion-ios-stopwatch-outline"></i>
+                    {v.create_at | fromNow}
+                </p>
             </a>
 
             <a rv-href="'#/topic/' | link v.id" class="item item-body">
                 
-                <p>{v.content | substr 0 120}</p>
+                <div rv-html="v.content | substr 0 120 | markdown"></div>
             </a>
 
-            <div class="item tabs tabs-secondary tabs-icon-left">
-                <a class="tab-item" href="#">
+            <div class="item tabs tabs-secondary tabs-icon-left" rv-if="v.reply_count">
+                <a class="tab-item" >
                     <i class="icon ion-chatbox"></i>
-                    Comment
+                    {v.reply_count}
                 </a>
             </div>
         </div>
+        <loading watch="self:loadPageDone"></loading>
+
     </div>
 </div>
 

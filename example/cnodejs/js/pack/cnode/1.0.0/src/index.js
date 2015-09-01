@@ -7,16 +7,42 @@
  */
 
 (function() {
-  define('cnode/index', ['jquery', 'cnode/view', 'mcore-attr/scroller'], function($, View) {
+  define('cnode/index', ['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters'], function($, View) {
     "use strict";
     return View.subclass({
       constructor: View.prototype.constructor,
       run: function(tab) {
+        this.page = 1;
         return this.render('cnode/index.html', {
-          topics: this.api.topics()
+          topics: this.api.topics({
+            page: this.page
+          }),
+          loadPageDone: true
         });
       },
-      watch: function() {}
+      watch: function() {
+        return this.$el.on('scrollend', (function(_this) {
+          return function() {
+            var topics;
+            if (_this.get('loadPageDone') === false) {
+              return;
+            }
+            _this.set('loadPageDone', false);
+            topics = _this.clone(_this.get('topics'));
+            return _this.api.topics({
+              page: _this.page + 1
+            }).done(function(res) {
+              _this.page++;
+              res.data.map(function(v) {
+                return topics.data.push(v);
+              });
+              return _this.set('topics', topics);
+            }).always(function() {
+              return _this.set('loadPageDone', true);
+            });
+          };
+        })(this));
+      }
     });
   });
 

@@ -255,23 +255,24 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         if keys.length == 0
             dtd.resolve {}
         else
-            if keys.length == 1
-                promises = data[keys[0]]
-            else
-                promises = []
-                keys.forEach (v)=>
-                    promises.push data[v]
+            promises = []
+            keys.forEach (v)=>
+                promises.push data[v]
 
-            $.when(promises).done (args...)->
+            $.when.apply(null, promises).done (args...)->
                 vData = {}
                 args.forEach (v, k)=>
                     key = keys[k]
                     if key
+                        # 坑
+                        if Array.isArray(v) and v.length == 3 and v[2].promise
+                            v = v[0]
                         vData[key] = v
 
                 dtd.resolve vData
-            .fail ->
-                dtd.reject()
+            .fail (err)->
+                console.log err
+                dtd.reject err
             
         dtd.promise()
 
