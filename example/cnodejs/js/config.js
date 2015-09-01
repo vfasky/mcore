@@ -1,1 +1,1 @@
-requirejs.config({"paths":{"tpl/cnode":"./js/tpl/cnode.c9eb2b","cnode":"./js/pack/cnode/1.0.0/dist/cnode.all.min.143016","jquery":"//dn-cdnjscn.qbox.me/ajax/libs/jquery/2.1.4/jquery.min","mcore":"../../dist/mcore.all.min"}});
+requirejs.config({"paths":{"cnode":"./js/pack/cnode/1.0.0/dist/cnode.all.min.aea198","tag":"./js/pack/tag/1.0.0/dist/tag.all.min.29ff1f","tpl/cnode":"./js/tpl/cnode.87e535","jquery":"//dn-cdnjscn.qbox.me/ajax/libs/jquery/2.1.4/jquery.min","mcore":"../../dist/mcore.all.min"}});
