@@ -163,10 +163,18 @@
       run: function(tab) {
         this.page = 1;
         return this.render('cnode/index.html', {
-          topics: this.api.topics({
-            page: this.page
-          }),
+          topics: this.getTopics(this.page),
           loadPageDone: true
+        });
+      },
+      getTopics: function(page) {
+        if (page == null) {
+          page = 1;
+        }
+        return this.cache("indexTopics" + page, this.api.topics({
+          page: page
+        }), {
+          storage: 'memory'
         });
       },
       watch: function() {
