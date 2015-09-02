@@ -9,7 +9,7 @@
         <div rv-class-hg-border="v.top" class="list card" rv-each-v="self:topics.data">
             <a rv-href="'#/topic/' | link v.id" class="item item-avatar">
                 <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname" >
-                <h2>{v.title}</h2>
+                <h2 rv-text="v.title"></h2>
                 <p>
                     <i class="icon ion-ios-stopwatch-outline"></i>
                     {v.create_at | fromNow}

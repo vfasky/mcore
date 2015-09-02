@@ -13,9 +13,13 @@ define 'cnode/index',
         run: (tab)->
             @page = 1
             @render 'cnode/index.html',
-                topics: @api.topics
-                    page: @page
+                topics: @getTopics @page
                 loadPageDone: true
+
+        getTopics: (page = 1)->
+            @cache "indexTopics#{page}", @api.topics(
+                page: page
+            ), storage: 'memory'
 
         watch: ->
 

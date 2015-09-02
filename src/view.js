@@ -93,22 +93,26 @@
           time: Infinity
         }, options);
         proxyMap = {
-          session: this.promiseCacheSessionProxy,
+          session: this.promiseCacheSessionProxy(),
           memory: util.promiseCacheMemoryproxy,
           localStorage: util.promiseCacheLocalProxy
         };
-        options.proxy = proxyMap[options.time] || this.promiseCacheSessionProxy;
-        return util.promise.cache(key, promise, options);
+        options.proxy = proxyMap[options.storage];
+        return util.promiseCache(key, promise, options);
       },
       promiseCacheSessionProxy: function() {
         var proxy;
         proxy = {
-          set: function(key, value) {
-            return this._cacheMap[key] = value;
-          },
-          get: function(key) {
-            return this._cacheMap[key] || null;
-          }
+          set: (function(_this) {
+            return function(key, value) {
+              return _this._cacheMap[key] = value;
+            };
+          })(this),
+          get: (function(_this) {
+            return function(key) {
+              return _this._cacheMap[key] || null;
+            };
+          })(this)
         };
         return proxy;
       },

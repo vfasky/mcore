@@ -70,6 +70,9 @@
       var data, dtd;
       data = options.proxy.get(key);
       if (data) {
+        if (promise.abort) {
+          promise.abort();
+        }
         dtd = $.Deferred();
         dtd.resolve(exports.clone(data));
         return dtd.promise();
