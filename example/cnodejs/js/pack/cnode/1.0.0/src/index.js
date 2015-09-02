@@ -12,44 +12,31 @@
     return View.subclass({
       constructor: View.prototype.constructor,
       run: function(tab) {
+        this.context.page = Number(this.context.page || 1);
+        this.context.tab = this.context.tab || '';
+        this.nextPage = this.context.page + 1;
+        this.prePage = this.context.page - 1;
         this.page = 1;
         return this.render('cnode/index.html', {
-          topics: this.getTopics(this.page),
+          topics: this.getTopics(),
           loadPageDone: true
         });
       },
-      getTopics: function(page) {
-        if (page == null) {
-          page = 1;
-        }
-        return this.cache("indexTopics" + page, this.api.topics({
-          page: page
-        }), {
-          storage: 'memory'
-        });
-      },
-      watch: function() {
-        return this.$el.on('scrollend', (function(_this) {
+      getTopics: function() {
+        var page, promise, tab;
+        page = this.context.page;
+        tab = this.context.tab;
+        promise = (function(_this) {
           return function() {
-            var topics;
-            if (_this.get('loadPageDone') === false) {
-              return;
-            }
-            _this.set('loadPageDone', false);
-            topics = _this.clone(_this.get('topics'));
             return _this.api.topics({
-              page: _this.page + 1
-            }).done(function(res) {
-              _this.page++;
-              res.data.map(function(v) {
-                return topics.data.push(v);
-              });
-              return _this.set('topics', topics);
-            }).always(function() {
-              return _this.set('loadPageDone', true);
+              page: page,
+              tab: tab
             });
           };
-        })(this));
+        })(this);
+        return this.cache("index_topics_" + page + "_" + tab, promise, {
+          storage: 'memory'
+        });
       }
     });
   });

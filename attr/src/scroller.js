@@ -80,9 +80,7 @@
           position: 'relative'
         });
         this.$el.css({
-          position: 'absolute',
-          left: 0,
-          top: 0
+          position: 'absolute'
         });
         if (this.scrollingX === false) {
           this.$el.css({

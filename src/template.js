@@ -310,7 +310,7 @@
       return dtd.promise();
     };
     Template.renderString = function(html, data, model) {
-      var keys;
+      var $parent, isHasParent, keys;
       if (data == null) {
         data = {};
       }
@@ -327,10 +327,19 @@
           return model.emit('tplUpdate');
         });
       } else {
+        $parent = model.$el.parent();
+        isHasParent = $parent.length > 0;
+        if (isHasParent) {
+          model.$el.detach();
+        }
         model.$el.append(html);
         model.tpl = new Template(model, data);
         return model.tpl.init().then(function() {
-          return model.emit('render');
+          if (isHasParent) {
+            model.$el.appendTo($parent);
+          }
+          model.emit('render');
+          return model.tpl;
         });
       }
     };

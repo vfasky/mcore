@@ -70,14 +70,11 @@
       var data, dtd;
       data = options.proxy.get(key);
       if (data) {
-        if (promise.abort) {
-          promise.abort();
-        }
         dtd = $.Deferred();
         dtd.resolve(exports.clone(data));
         return dtd.promise();
       } else {
-        return promise.then(function(res) {
+        return promise().then(function(res) {
           return options.proxy.set(key, exports.clone(res), options.time);
         });
       }

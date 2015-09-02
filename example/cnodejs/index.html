@@ -19,7 +19,6 @@
     <script src="./js/config.dev.js"></script>
     <script>
         //dev
-        /*
         requirejs.config({
             paths: {
               sightglass: '../../vendor/sightglass',
@@ -40,7 +39,7 @@
                   main: 'index'
               }
             ]
-        });*/
+        });
 
         requirejs(['cnode'], function(bootstrap){
             bootstrap('#app-view', '#app-load');

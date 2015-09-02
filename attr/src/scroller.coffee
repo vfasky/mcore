@@ -86,8 +86,8 @@ define 'mcore-attr/scroller', ['jquery', 'mcore/template', 'scroller'],
 
             @$el.css
                 position: 'absolute'
-                left: 0
-                top: 0
+                #left: 0
+                #top: 0
                 
             @$el.css width: '100%' if @scrollingX == false
                 

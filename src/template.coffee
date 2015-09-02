@@ -312,10 +312,17 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
             return model.tpl.update(data).then ->
                 model.emit 'tplUpdate'
         else
+            $parent = model.$el.parent()
+            isHasParent = $parent.length > 0
+
+            model.$el.detach() if isHasParent
             model.$el.append html
+
             model.tpl = new Template model, data
             return model.tpl.init().then ->
+                model.$el.appendTo $parent if isHasParent
                 model.emit 'render'
+                model.tpl
 
 
     Template.render = (uri, data = {}, model)->
