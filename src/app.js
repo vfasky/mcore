@@ -35,19 +35,20 @@
         if (this.onLoadViw) {
           return;
         }
-        this.onLoadViw = true;
         if (this.curView) {
           if (this.curView.name === viewName) {
             this.curView.instantiate.route = route;
             this.curView.instantiate.context = route.context;
             this.curView.instantiate.run.apply(this.curView.instantiate, args);
             this.emit('runView', this.curView);
+            return;
           } else {
             this.emit('destroyView', this.curView);
             this.curView.instantiate.destroy();
             this.curView = null;
           }
         }
+        this.onLoadViw = true;
         return requirejs([viewName], (function(_this) {
           return function(View) {
             var $el;

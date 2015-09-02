@@ -55,6 +55,7 @@
         app.route('/test/show/:id', 'view/show').route('*', 'view/home');
         app.on('runView', function(view) {
           var ref;
+          console.log(view);
           if (view.name === 'view/show') {
             ref = view.instantiate.$el.text();
             if (ref === '1') {
@@ -62,7 +63,7 @@
             }
           }
         });
-        return app.run();
+        return app.router.match('/test/show/1');
       });
     });
   });

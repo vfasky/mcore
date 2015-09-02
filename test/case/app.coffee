@@ -58,9 +58,10 @@ define 'case/app',
                .route '*', 'view/home'
 
             app.on 'runView', (view)->
+                console.log view
                 if view.name == 'view/show'
                     ref = view.instantiate.$el.text()
                     done() if ref == '1'
 
-            app.run()
+            app.router.match '/test/show/1'
 

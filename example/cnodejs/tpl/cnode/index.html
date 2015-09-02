@@ -1,34 +1,58 @@
 <loading watch="self:topics.data"></loading>
 
-<div rv-show="self:topics.data" rv-scroller="self:topics.data" >
+<div rv-show="self:topics.data" rv-scroller="self:topics.data" class="scroller">
     <div class="bar bar-header bar-royal">
+        <button class="button button-icon icon ion-navicon"></button>
         <h1 class="title">CNode</h1>
     </div>
 
-    <div class="content has-header">
-        <div rv-class-hg-border="v.top" class="list card" rv-each-v="self:topics.data">
-            <a rv-href="'#/topic/' | link v.id" class="item item-avatar">
-                <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname" >
-                <h2 rv-text="v.title"></h2>
+    <div class="bar bar-subheader ">
+        <div class="button-bar">
+            <a href="#/" class="button">全部</a>
+            <a href="#/?tab=good" class="button">精华</a>
+            <a href="#/?tab=share" class="button">分享</a>
+            <a href="#/?tab=ask" class="button">问答</a>
+            <a href="#/?tab=job" class="button">招聘</a>
+        </div>
+    </div>
+    
+    <div class="content has-subheader">
+        
+        <div class="list" >
+            <a class="item item-avatar" 
+               rv-class-hg-border="v.top"
+               rv-href="'#/topic/' | link v.id" 
+               rv-each-v="self:topics.data">
+                <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname">
+                <h2>{v.title}</h2>
                 <p>
                     <i class="icon ion-ios-stopwatch-outline"></i>
                     {v.create_at | fromNow}
-                </p>
-            </a>
-
-            <a rv-href="'#/topic/' | link v.id" class="item item-body">
-                
-                <div rv-html="v.content | substr 0 120 | markdown"></div>
-            </a>
-
-            <div class="item tabs tabs-secondary tabs-icon-left" rv-if="v.reply_count">
-                <a class="tab-item" >
+                    &nbsp;
                     <i class="icon ion-chatbox"></i>
                     {v.reply_count}
-                </a>
+                    
+                    &nbsp;
+
+                    <i class="icon ion-pound"></i>
+                    {v.tab}
+                </p>
+
+            </a>
+        </div>
+        
+        <div class="row">
+            <div class="col ">
+                <a rv-if="self.prePage | > 0" 
+                   rv-href="'#?tab=' | link self.context.tab | link '&page=' | link self.prePage"
+                   class="button icon-left ion-chevron-left button-clear button-dark"> New</a>
+            </div>
+            <div class="col col-25 col-offset-50">
+                <a rv-href="'#?tab=' | link self.context.tab | link '&page=' | link self.nextPage" 
+                   class="button icon-right ion-chevron-right button-clear button-dark"> Old</a>
+
             </div>
         </div>
-        <loading watch="self:loadPageDone"></loading>
 
     </div>
 </div>

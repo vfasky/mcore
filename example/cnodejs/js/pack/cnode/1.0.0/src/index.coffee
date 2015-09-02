@@ -11,32 +11,27 @@ define 'cnode/index',
     View.subclass
         constructor: View::constructor
         run: (tab)->
+            
+            @context.page = Number @context.page or 1
+            @context.tab = @context.tab or ''
+
+            @nextPage = @context.page + 1
+            @prePage = @context.page - 1
+
             @page = 1
             @render 'cnode/index.html',
-                topics: @getTopics @page
+                topics: @getTopics()
                 loadPageDone: true
 
-        getTopics: (page = 1)->
-            @cache "indexTopics#{page}", @api.topics(
-                page: page
-            ), storage: 'memory'
+        getTopics: ->
+            page = @context.page
+            tab = @context.tab
 
-        watch: ->
-
-            @$el.on 'scrollend', =>
-                return if @get('loadPageDone') == false
-
-                @set 'loadPageDone', false
-                topics = @clone @get 'topics'
+            promise = =>
                 @api.topics
-                    page: @page + 1
-                .done (res)=>
-                    @page++
-                    res.data.map (v)=>
-                        topics.data.push v
+                    page: page
+                    tab: tab
                     
-                    @set 'topics', topics
-                .always =>
-                    @set 'loadPageDone', true
+            @cache "index_topics_#{page}_#{tab}", promise, storage: 'memory'
 
-
+     

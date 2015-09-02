@@ -30,8 +30,6 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
         runView: (viewName, route, args)->
             return if @onLoadViw
 
-            @onLoadViw = true
-
             if @curView
                 # 已经初始化，只调用run方法
                 if @curView.name == viewName
@@ -39,12 +37,15 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
                     @curView.instantiate.context = route.context
                     @curView.instantiate.run.apply @curView.instantiate, args
                     @emit 'runView', @curView
+                    return
                 # 删除旧实例
                 else
                     @emit 'destroyView', @curView
                     @curView.instantiate.destroy()
                     @curView = null
 
+            @onLoadViw = true
+            
             requirejs [viewName], (View)=>
                 $el = $ "<div class='#{@options.viewClass}' />"
 
