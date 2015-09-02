@@ -39,6 +39,7 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
 
             @beforeInit()
             @init()
+            @watch()
 
 
         clone: (value)->
@@ -93,27 +94,30 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
             , options
 
             proxyMap =
-                session: @promiseCacheSessionProxy
+                session: @promiseCacheSessionProxy()
                 memory: util.promiseCacheMemoryproxy
                 localStorage: util.promiseCacheLocalProxy
 
-            options.proxy = proxyMap[options.time] or @promiseCacheSessionProxy
+            options.proxy = proxyMap[options.storage]
 
-            util.promise.cache key, promise, options
+            util.promiseCache key, promise, options
 
         # 缓存 proxy
         promiseCacheSessionProxy: ->
             proxy =
-                set: (key, value)->
+                set: (key, value)=>
                     @_cacheMap[key] = value
-                get: (key)->
+                get: (key)=>
                     @_cacheMap[key] or null
             proxy
 
         # 后退
         back: ->
-            window.history.back() if window.history.length > 1
-            window.location.href = '#'
+            if window.history.length > 1
+                window.history.back()
+            else
+                window.location.href = '#'
+            return false
         
         beforeInit: ->
         init: ->

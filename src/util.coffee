@@ -66,6 +66,7 @@ define 'mcore/util', ->
         data = options.proxy.get key
         
         if data
+            promise.abort() if promise.abort
             dtd = $.Deferred()
             dtd.resolve exports.clone(data)
             return dtd.promise()

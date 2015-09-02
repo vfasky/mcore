@@ -255,17 +255,13 @@
       if (keys.length === 0) {
         dtd.resolve({});
       } else {
-        if (keys.length === 1) {
-          promises = data[keys[0]];
-        } else {
-          promises = [];
-          keys.forEach((function(_this) {
-            return function(v) {
-              return promises.push(data[v]);
-            };
-          })(this));
-        }
-        $.when(promises).done(function() {
+        promises = [];
+        keys.forEach((function(_this) {
+          return function(v) {
+            return promises.push(data[v]);
+          };
+        })(this));
+        $.when.apply(null, promises).done(function() {
           var args, vData;
           args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
           vData = {};
@@ -274,13 +270,17 @@
               var key;
               key = keys[k];
               if (key) {
+                if (Array.isArray(v) && v.length === 3 && v[2].promise) {
+                  v = v[0];
+                }
                 return vData[key] = v;
               }
             };
           })(this));
           return dtd.resolve(vData);
-        }).fail(function() {
-          return dtd.reject();
+        }).fail(function(err) {
+          console.log(err);
+          return dtd.reject(err);
         });
       }
       return dtd.promise();
@@ -318,7 +318,7 @@
       if (keys.length > 0 && !model.tpl) {
         keys.forEach((function(_this) {
           return function(k) {
-            return model.set(k, null);
+            return model.set(k, {});
           };
         })(this));
       }

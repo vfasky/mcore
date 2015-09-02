@@ -26,7 +26,8 @@
         this.isIOS = _isIOS;
         this.tpl = false;
         this.beforeInit();
-        return this.init();
+        this.init();
+        return this.watch();
       },
       clone: function(value) {
         return util.clone(value);
@@ -92,30 +93,36 @@
           time: Infinity
         }, options);
         proxyMap = {
-          session: this.promiseCacheSessionProxy,
+          session: this.promiseCacheSessionProxy(),
           memory: util.promiseCacheMemoryproxy,
           localStorage: util.promiseCacheLocalProxy
         };
-        options.proxy = proxyMap[options.time] || this.promiseCacheSessionProxy;
-        return util.promise.cache(key, promise, options);
+        options.proxy = proxyMap[options.storage];
+        return util.promiseCache(key, promise, options);
       },
       promiseCacheSessionProxy: function() {
         var proxy;
         proxy = {
-          set: function(key, value) {
-            return this._cacheMap[key] = value;
-          },
-          get: function(key) {
-            return this._cacheMap[key] || null;
-          }
+          set: (function(_this) {
+            return function(key, value) {
+              return _this._cacheMap[key] = value;
+            };
+          })(this),
+          get: (function(_this) {
+            return function(key) {
+              return _this._cacheMap[key] || null;
+            };
+          })(this)
         };
         return proxy;
       },
       back: function() {
         if (window.history.length > 1) {
           window.history.back();
+        } else {
+          window.location.href = '#';
         }
-        return window.location.href = '#';
+        return false;
       },
       beforeInit: function() {},
       init: function() {},

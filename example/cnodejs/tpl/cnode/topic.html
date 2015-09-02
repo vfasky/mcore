@@ -1,27 +1,50 @@
-<div class="bar bar-header bar-royal">
-    <button rv-on-click="self.back" class="button button-icon icon ion-ios-arrow-thin-left"></button>
+<loading watch="self:topic.data"></loading>
 
-    <h1 class="title">{self:topic.data.title | substr 0 14}</h1>
-</div>
+<div rv-show="self:topic.data" rv-scroller="self:topic.data">
+    <top-header  back="self.back"></top-header>
 
-<div class="content has-header" rv-scroller="self:topic.data">
-    <div class="list card" >
-        <a class="item item-avatar">
-            <img rv-src="self:topic.data.author.avatar_url" rv-alt="self:topic.data.author.loginname" >
-            <h2>{self:topic.data.title}</h2>
-            <p>{self:topic.data.create_at}</p>
-        </a>
+    <div class="content has-header" >
+        <div class="list card "  rv-class-hg-border="self:topic.data.top" >
+            <div class="item item-avatar">
+                <img rv-src="self:topic.data.author.avatar_url" rv-alt="self:topic.data.author.loginname" >
+                <h2>{self:topic.data.title}</h2>
+                <p>
+                    {self:topic.data.author.loginname}
+                    &nbsp;
+                    <i class="icon ion-ios-stopwatch-outline"></i>
+                    {self:topic.data.create_at | fromNow}
 
-        <a class="item item-body">
-            
-            <p>{self:topic.data.content}</p>
-        </a>
+                </p>
+            </div>
 
-        <div class="item tabs tabs-secondary tabs-icon-left">
-            <a class="tab-item" href="#">
-                <i class="icon ion-chatbox"></i>
-                Comment
-            </a>
+            <div class="item item-body" rv-html="self:topic.data.content | markdown">
+            </div>
+
+            <div class="item tabs tabs-secondary tabs-icon-left">
+                <a class="tab-item royal" href="#">
+                    <i class="icon ion-pound"></i>
+                    {self:topic.data.tab}
+                </a>
+            </div>
+        </div>
+
+        <div  >
+            <div class="list card" rv-each-v="self:topic.data.replies">
+                <div class="item item-avatar">
+                    <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname" >                   
+                    <h2>{v.author.loginname}</h2>
+
+                    <p>
+                        <i class="icon ion-ios-stopwatch-outline"></i>
+                        {v.create_at | fromNow}
+
+                    </p>
+                </div>
+
+                <div class="item item-body" rv-html="v.content | markdown">
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

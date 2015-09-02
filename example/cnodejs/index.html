@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>CNodejs</title>
     <link rel="stylesheet" href="//dn-cdnjscn.qbox.me/ajax/libs/ionic/1.0.0-rc.5/css/ionic.min.css">
+    <link rel="stylesheet" href="./style/css/cnode.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
 <body>
     <div id="app-view">
-        <div class="card text-center" id="app-load">
+        <div class="card text-center padding" id="app-load">
             loading ...
         </div>
     </div>
@@ -17,6 +18,30 @@
 
     <script src="./js/config.dev.js"></script>
     <script>
+        //dev
+        /*
+        requirejs.config({
+            paths: {
+              sightglass: '../../vendor/sightglass',
+              rivets: '../../vendor/rivets',
+              stapes: '../../vendor/stapes',
+              formSerializer: '../../attr/vendor/formSerializer', 
+              scroller: '../../attr/vendor/scroller', 
+            },
+            packages: [
+              {
+                  name: 'mcore',
+                  location: '../../src',
+                  main: 'index'
+              },
+              {
+                  name: 'mcore-attr',
+                  location: '../../attr/src',
+                  main: 'index'
+              }
+            ]
+        });*/
+
         requirejs(['cnode'], function(bootstrap){
             bootstrap('#app-view', '#app-load');
         });

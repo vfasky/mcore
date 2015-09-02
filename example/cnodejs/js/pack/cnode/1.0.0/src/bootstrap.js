@@ -7,7 +7,7 @@
  */
 
 (function() {
-  define('cnode', ['jquery', 'mcore'], function($, mcore) {
+  define('cnode', ['jquery', 'mcore', 'tag'], function($, mcore) {
     "use strict";
     var init;
     init = false;

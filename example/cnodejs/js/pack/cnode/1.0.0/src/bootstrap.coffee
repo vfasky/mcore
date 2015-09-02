@@ -3,7 +3,7 @@
  * @module cnode/bootstrap
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'cnode', ['jquery', 'mcore'], ($, mcore)->
+define 'cnode', ['jquery', 'mcore', 'tag'], ($, mcore)->
     
     "use strict"
 
