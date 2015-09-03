@@ -87,7 +87,8 @@
      */
     exports.promiseCacheLocalProxy = {
       set: exports.cache.set,
-      get: exports.cache.get
+      get: exports.cache.get,
+      remove: exports.cache.remove
     };
 
     /**
@@ -101,6 +102,9 @@
       },
       get: function(key) {
         return _memoryStorage[key] || null;
+      },
+      remove: function(key) {
+        return delete _memoryStorage[key];
       }
     };
 

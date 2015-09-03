@@ -34,9 +34,7 @@
             });
           };
         })(this);
-        return this.cache("index_topics_" + page + "_" + tab, promise, {
-          storage: 'memory'
-        });
+        return this.memoryCache("index_topics_" + page + "_" + tab).has(promise);
       }
     });
   });

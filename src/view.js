@@ -71,34 +71,70 @@
       },
 
       /**
-       * 缓存 promise
-       * @param {String} key
-       * @param {Promise} promise
-       * @param {Object} options
-       * @param {String} [options.storage = session] 存放类型
-       *   session: 更换 view 失效，
-       *   memory: 刷新页面 失败
-       *   localStorage: 放在 localStorage
-       * @param {Number} options.time 有效时间，只对 localStorage 有效
+       * 缓存，基本内存，刷新页面失效
        * @author vfasky <vfasky@gmail.com>
        *
        */
-      cache: function(key, promise, options) {
-        var proxyMap;
-        if (options == null) {
-          options = {};
-        }
-        options = $.extend({
-          storage: 'session',
-          time: Infinity
-        }, options);
-        proxyMap = {
-          session: this.promiseCacheSessionProxy(),
-          memory: util.promiseCacheMemoryproxy,
-          localStorage: util.promiseCacheLocalProxy
+      memoryCache: function(key) {
+        var cache, proxy;
+        proxy = util.promiseCacheMemoryproxy;
+        cache = {
+          has: function(promise) {
+            return util.promiseCache(key, promise, {
+              proxy: proxy
+            });
+          },
+          remove: function() {
+            return proxy.remove(key);
+          }
         };
-        options.proxy = proxyMap[options.storage];
-        return util.promiseCache(key, promise, options);
+        return cache;
+      },
+
+      /**
+       * 缓存，基本 localStorage
+       * @author vfasky <vfasky@gmail.com>
+       *
+       */
+      localCache: function(key) {
+        var cache, proxy;
+        proxy = util.promiseCacheLocalProxy;
+        cache = {
+          has: function(promise, time) {
+            if (time == null) {
+              time = Infinity;
+            }
+            return util.promiseCache(key, promise, {
+              proxy: proxy,
+              time: time
+            });
+          },
+          remove: function() {
+            return proxy.remove(key);
+          }
+        };
+        return cache;
+      },
+
+      /**
+       * 缓存，基本当前 view 的生命周期
+       * @author vfasky <vfasky@gmail.com>
+       *
+       */
+      sessionCach: function(key) {
+        var cache, proxy;
+        proxy = this.promiseCacheSessionProxy();
+        cache = {
+          has: function(promise) {
+            return util.promiseCache(key, promise, {
+              proxy: proxy
+            });
+          },
+          remove: function() {
+            return proxy.remove(key);
+          }
+        };
+        return cache;
       },
       promiseCacheSessionProxy: function() {
         var proxy;

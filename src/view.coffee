@@ -30,6 +30,7 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
             @$body = $body
             @util = util
 
+            # 用于同一个view的缓存
             @_cacheMap = {}
 
             @isWeixinBrowser = _isWeixinBrowser
@@ -75,32 +76,54 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
             @$el.remove()
 
         ###*
-         * 缓存 promise
-         * @param {String} key
-         * @param {Promise} promise
-         * @param {Object} options
-         * @param {String} [options.storage = session] 存放类型
-         *   session: 更换 view 失效，
-         *   memory: 刷新页面 失败
-         *   localStorage: 放在 localStorage
-         * @param {Number} options.time 有效时间，只对 localStorage 有效
+         * 缓存，基本内存，刷新页面失效
          * @author vfasky <vfasky@gmail.com>
          * 
         ###
-        cache: (key, promise, options = {})->
-            options = $.extend
-                 storage: 'session'
-                 time: Infinity #只对 localStorage 有效
-            , options
+        memoryCache: (key)->
+            proxy = util.promiseCacheMemoryproxy
+            
+            cache =
+                has: (promise)->
+                    util.promiseCache key, promise, proxy: proxy
+                remove: ->
+                    proxy.remove key
+                    
+            cache
 
-            proxyMap =
-                session: @promiseCacheSessionProxy()
-                memory: util.promiseCacheMemoryproxy
-                localStorage: util.promiseCacheLocalProxy
+        ###*
+         * 缓存，基本 localStorage
+         * @author vfasky <vfasky@gmail.com>
+         * 
+        ###
+        localCache: (key)->
+            proxy = util.promiseCacheLocalProxy
+            
+            cache =
+                has: (promise, time = Infinity)->
+                    util.promiseCache key, promise,
+                        proxy: proxy
+                        time: time
+                remove: ->
+                    proxy.remove key
+                    
+            cache
 
-            options.proxy = proxyMap[options.storage]
+        ###*
+         * 缓存，基本当前 view 的生命周期
+         * @author vfasky <vfasky@gmail.com>
+         * 
+        ###
+        sessionCach: (key)->
+            proxy = @promiseCacheSessionProxy()
 
-            util.promiseCache key, promise, options
+            cache =
+                has: (promise)->
+                    util.promiseCache key, promise, proxy: proxy
+                remove: ->
+                    proxy.remove key
+                    
+            cache
 
         # 缓存 proxy
         promiseCacheSessionProxy: ->

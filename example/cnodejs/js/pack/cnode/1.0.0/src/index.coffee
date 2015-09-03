@@ -32,6 +32,5 @@ define 'cnode/index',
                     page: page
                     tab: tab
                     
-            @cache "index_topics_#{page}_#{tab}", promise, storage: 'memory'
-
+            @memoryCache("index_topics_#{page}_#{tab}").has promise
      

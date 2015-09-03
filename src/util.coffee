@@ -81,6 +81,7 @@ define 'mcore/util', ->
     exports.promiseCacheLocalProxy =
         set: exports.cache.set
         get: exports.cache.get
+        remove: exports.cache.remove
 
     ###*
      * 基于内存的cache
@@ -92,6 +93,8 @@ define 'mcore/util', ->
             _memoryStorage[key] = value
         get: (key)->
             _memoryStorage[key] or null
+        remove: (key)->
+            delete _memoryStorage[key]
 
             
     ###*
