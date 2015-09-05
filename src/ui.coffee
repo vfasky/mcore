@@ -7,10 +7,12 @@ define 'mcore/ui', ['jquery', 'mcore/template', 'stapes'], ($, Template, stapes)
     
     "use strict"
 
+    $body = $ 'body'
+
     stapes.subclass
         constructor: ($el, @options = {})->
             @$el = $ '<div/>'
-            @$parent = $el
+            @$parent = $el or $body
 
             @on 'render', =>
                 @$el.appendTo @$parent
