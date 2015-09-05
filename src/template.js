@@ -235,7 +235,7 @@
                 return _this.view.set(k, v);
               }
             });
-            dtd.resolve;
+            dtd.resolve(vData);
           };
         })(this)).fail(function() {
           return dtd.reject('template update error');

@@ -233,7 +233,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
                     v = vData[k]
                     @view.set k, v if v?
 
-                dtd.resolve
+                dtd.resolve vData
 
                 return
             .fail ->
