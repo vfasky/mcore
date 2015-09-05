@@ -76,7 +76,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
 
     # array slice
     rivets.formatters['slice'] = (value, start, end)->
-        return [] if Array.isArray value
+        return [] if false == Array.isArray value
 
         value.slice start, end
         
@@ -284,7 +284,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
     Template.loadTpl = (uri)->
         dtd = $.Deferred()
 
-        info = uri.split('/')
+        info = String(uri).split('/')
 
         if info.length == 2
             requirejs ["tpl/#{info[0]}"], (tpl)->
@@ -294,7 +294,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
                 else
                     dtd.reject 'url data map error'
         else
-            dtd.reject 'uri error'
+            dtd.reject 'uri error: ' + uri
         
         dtd.promise()
 
