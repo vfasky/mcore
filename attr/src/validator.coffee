@@ -99,6 +99,8 @@ define 'mcore-attr/validator',
             Number(x) <= Number(max)
         # 是否相符
         equals: (x, value)->
+            value = value.val() if value instanceof $
+            x = x.val() if x instanceof $
             String(x) == String(value)
         # 是否邮箱
         isEmail: (x) -> _isEmailReg.test x

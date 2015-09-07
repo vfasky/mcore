@@ -293,7 +293,7 @@
     Template.loadTpl = function(uri) {
       var dtd, info;
       dtd = $.Deferred();
-      info = uri.split('/');
+      info = String(uri).split('/');
       if (info.length === 2) {
         requirejs(["tpl/" + info[0]], function(tpl) {
           var html;
@@ -305,7 +305,7 @@
           }
         });
       } else {
-        dtd.reject('uri error');
+        dtd.reject('uri error: ' + uri);
       }
       return dtd.promise();
     };

@@ -100,6 +100,12 @@
         return Number(x) <= Number(max);
       },
       equals: function(x, value) {
+        if (value instanceof $) {
+          value = value.val();
+        }
+        if (x instanceof $) {
+          x = x.val();
+        }
         return String(x) === String(value);
       },
       isEmail: function(x) {
