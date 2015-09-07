@@ -72,7 +72,7 @@
       return show;
     };
     rivets.formatters['slice'] = function(value, start, end) {
-      if (Array.isArray(value)) {
+      if (false === Array.isArray(value)) {
         return [];
       }
       return value.slice(start, end);
@@ -235,7 +235,7 @@
                 return _this.view.set(k, v);
               }
             });
-            dtd.resolve;
+            dtd.resolve(vData);
           };
         })(this)).fail(function() {
           return dtd.reject('template update error');

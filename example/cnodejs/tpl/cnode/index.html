@@ -29,12 +29,12 @@
                     <i class="icon ion-ios-stopwatch-outline"></i>
                     {v.create_at | fromNow}
                     &nbsp;
-                    <i class="icon ion-chatbox"></i>
+                    <i rv-if="v.reply_count" class="icon ion-chatbox"></i>
                     {v.reply_count}
                     
                     &nbsp;
 
-                    <i class="icon ion-pound"></i>
+                    <i rv-if="v.tab" class="icon ion-pound"></i>
                     {v.tab}
                 </p>
 

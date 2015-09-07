@@ -76,7 +76,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
 
     # array slice
     rivets.formatters['slice'] = (value, start, end)->
-        return [] if Array.isArray value
+        return [] if false == Array.isArray value
 
         value.slice start, end
         
@@ -233,7 +233,7 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
                     v = vData[k]
                     @view.set k, v if v?
 
-                dtd.resolve
+                dtd.resolve vData
 
                 return
             .fail ->

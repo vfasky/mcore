@@ -9,11 +9,13 @@
 (function() {
   define('mcore/ui', ['jquery', 'mcore/template', 'stapes'], function($, Template, stapes) {
     "use strict";
+    var $body;
+    $body = $('body');
     return stapes.subclass({
       constructor: function($el, options) {
         this.options = options != null ? options : {};
         this.$el = $('<div/>');
-        this.$parent = $el;
+        this.$parent = $el || $body;
         this.on('render', (function(_this) {
           return function() {
             return _this.$el.appendTo(_this.$parent);
