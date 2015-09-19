@@ -52,6 +52,11 @@ define 'case/app',
             $el = $ '<div />'
 
             app = new App $el
+
+            # 中间件1
+            app.use (err, next)-> next()
+            # 中间件2
+            app.use (err, next)-> next()
             
             # 路由分发
             app.route '/test/show/:id', 'view/show'

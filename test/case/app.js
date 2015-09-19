@@ -52,6 +52,12 @@
         var $el, app;
         $el = $('<div />');
         app = new App($el);
+        app.use(function(err, next) {
+          return next();
+        });
+        app.use(function(err, next) {
+          return next();
+        });
         app.route('/test/show/:id', 'view/show').route('*', 'view/home');
         app.on('runView', function(view) {
           var ref;

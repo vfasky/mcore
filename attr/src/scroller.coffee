@@ -238,8 +238,14 @@ define 'mcore-attr/scroller', ['jquery', 'mcore/template', 'scroller'],
             $win.on "resize.scroller#{@id}", =>
                 @resize()
 
-                
         resize: ->
+            if window.requestAnimationFrame
+                window.requestAnimationFrame =>
+                    @_resize()
+            else
+                @_resize()
+                
+        _resize: ->
             container = @$container[0]
             content = @$el[0]
             rect = container.getBoundingClientRect()

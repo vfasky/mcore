@@ -14,9 +14,16 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
                 routeChange: route.Route.changeByLocationHash
             , options
 
+            # 路由
             @router = new route.Route @options.routeChange
+            # 当前的 view
             @curView = null
-            @onLoadViw = false
+
+            # 标注是否正在加载view
+            @_onLoadViw = false
+
+            # 中间件
+            @_middlewares = []
             
             return
         
@@ -27,16 +34,57 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
             
             @
 
+        # 添加中间件
+        use: (middleware)->
+            @_middlewares.push middleware
+            @
+
+        _runView: (done = ->)->
+            @curView.instantiate.route = @env.route
+            @curView.instantiate.context = @env.context
+            @curView.instantiate.run.apply @curView.instantiate, @env.args
+            @emit 'runView', @curView
+
+            done @curView.instantiate
+
+        # stack
+        stack: (ix = 0, err = null, done = ->)->
+            return @_runView done if ix == @_middlewares.length
+
+            middleware = @_middlewares[ix]
+            nextIx = ix + 1
+            next = (err)=>
+                @stack nextIx, err, done
+
+            @env.view = @curView.instantiate
+            middleware.call @env, err, next
+
+
+        # 运行中间件
+        runMiddlewares: (done = ->)->
+            if @_middlewares.length == 0
+                return @_runView done
+
+            @stack 0, null, done
+
+
+        # 启动view
         runView: (viewName, route, args)->
-            return if @onLoadViw
+            return if @_onLoadViw
+
+            # ENV
+            @env =
+                route: route
+                context: route.context
+                args: args
+                viewName: viewName
+                app: @
 
             if @curView
                 # 已经初始化，只调用run方法
                 if @curView.name == viewName
-                    @curView.instantiate.route = route
-                    @curView.instantiate.context = route.context
-                    @curView.instantiate.run.apply @curView.instantiate, args
-                    @emit 'runView', @curView
+                    @runMiddlewares =>
+                        @curView.instantiate.afterRun()
                     return
                 # 删除旧实例
                 else
@@ -44,8 +92,8 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
                     @curView.instantiate.destroy()
                     @curView = null
 
-            @onLoadViw = true
-            
+            @_onLoadViw = true
+        
             requirejs [viewName], (View)=>
                 $el = $ "<div class='#{@options.viewClass}' />"
 
@@ -53,14 +101,11 @@ define 'mcore/app', ['jquery', 'stapes', 'mcore/route'], ($, Stapes, route)->
                     name: viewName
                     instantiate: new View $el, @
 
-                @curView.instantiate.route = route
-                @curView.instantiate.context = route.context
-                @curView.instantiate.run.apply @curView.instantiate, args
-                @curView.instantiate.$el.appendTo @$el
-                @emit 'runView', @curView
-                @curView.instantiate.afterRun()
+                @runMiddlewares =>
+                    @curView.instantiate.$el.appendTo @$el
+                    @curView.instantiate.afterRun()
+                    @_onLoadViw = false
 
-                @onLoadViw = false
 
         run: ->
             @router.run()

@@ -265,6 +265,17 @@
         })(this));
       },
       resize: function() {
+        if (window.requestAnimationFrame) {
+          return window.requestAnimationFrame((function(_this) {
+            return function() {
+              return _this._resize();
+            };
+          })(this));
+        } else {
+          return this._resize();
+        }
+      },
+      _resize: function() {
         var _width, container, content, height, rect, sHeight, sWidth, width;
         container = this.$container[0];
         content = this.$el[0];
