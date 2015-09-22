@@ -27,7 +27,7 @@
         return testView.run();
       });
       it('each', function(done) {
-        var $el, TestView, testView;
+        var $el, $parent, TestView, testView;
         TestView = View.subclass({
           constructor: View.prototype.constructor,
           run: function() {
@@ -37,9 +37,11 @@
           }
         });
         $el = $('<div/>');
+        $parent = $('<div />');
+        $el.appendTo($parent);
         testView = new TestView($el);
         testView.on('render', function() {
-          assert.equal(true, $el.find('.t1').length === 5);
+          assert.equal(true, testView.$el.find('.t1').length === 5);
           return done();
         });
         return testView.run();

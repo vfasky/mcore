@@ -228,13 +228,16 @@
         keys = Object.keys(data);
         Template.loadPromise(data).done((function(_this) {
           return function(vData) {
+            var newData;
+            newData = {};
             keys.forEach(function(k) {
               var v;
               v = vData[k];
               if (v != null) {
-                return _this.view.set(k, v);
+                return newData[k] = v;
               }
             });
+            _this.view.set(newData);
             dtd.resolve(vData);
           };
         })(this)).fail(function() {
@@ -310,33 +313,46 @@
       return dtd.promise();
     };
     Template.renderString = function(html, data, model) {
-      var $parent, isHasParent, keys;
+      var $cloneEl, $parent, defTplVal, isHasParent, keys, soureEl;
       if (data == null) {
         data = {};
       }
       keys = Object.keys(data);
       if (keys.length > 0 && !model.tpl) {
+        defTplVal = {};
         keys.forEach((function(_this) {
           return function(k) {
-            return model.set(k, {});
+            return defTplVal[k] = {};
           };
         })(this));
+        model.set(defTplVal);
       }
+      $parent = model.$el.parent();
+      isHasParent = $parent.length > 0;
       if (model.tpl) {
-        return model.tpl.update(data).then(function() {
-          return model.emit('tplUpdate');
-        });
-      } else {
-        $parent = model.$el.parent();
-        isHasParent = $parent.length > 0;
+        model.emit('tplBeforeUpdate');
         if (isHasParent) {
           model.$el.detach();
+        }
+        return model.tpl.update(data).then(function() {
+          if (isHasParent) {
+            model.$el.appendTo($parent);
+          }
+          model.emit('tplUpdate');
+          return model.tpl;
+        });
+      } else {
+        model.emit('beforeRender');
+        if (isHasParent) {
+          $cloneEl = model.$el.clone();
+          soureEl = model.$el[0];
+          model.$el = $cloneEl;
         }
         model.$el.append(html);
         model.tpl = new Template(model, data);
         return model.tpl.init().then(function() {
-          if (isHasParent) {
-            model.$el.appendTo($parent);
+          if (isHasParent && $parent[0].replaceChild) {
+            $parent[0].replaceChild(model.$el[0], soureEl);
           }
           model.emit('render');
           return model.tpl;

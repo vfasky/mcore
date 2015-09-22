@@ -32,6 +32,14 @@
       clone: function(value) {
         return util.clone(value);
       },
+      asyncSet: function(key, promise) {
+        return promise.then((function(_this) {
+          return function(val) {
+            _this.set(key, val);
+            return val;
+          };
+        })(this));
+      },
       setTitle: function(title) {
         var $iframe;
         this.title = title;

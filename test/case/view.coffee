@@ -37,10 +37,12 @@ define 'case/view',
                         testData: [0...5]
 
             $el = $ '<div/>'
+            $parent = $ '<div />'
+            $el.appendTo $parent
             testView = new TestView $el
 
             testView.on 'render', ->
-                assert.equal true, $el.find('.t1').length == 5
+                assert.equal true, testView.$el.find('.t1').length == 5
                 done()
 
             testView.run()

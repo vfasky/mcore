@@ -46,6 +46,11 @@ define 'mcore/view', ['jquery', 'mcore/template', 'stapes', 'mcore/util'],
         clone: (value)->
             util.clone value
 
+        asyncSet: (key, promise)->
+            promise.then (val)=>
+                @set key, val
+                val
+
 
         setTitle: (@title)->
             return if document.title == @title

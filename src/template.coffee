@@ -229,9 +229,13 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
             keys = Object.keys data
 
             Template.loadPromise(data).done (vData)=>
+                newData = {}
                 keys.forEach (k)=>
                     v = vData[k]
-                    @view.set k, v if v?
+                    newData[k] = v if v?
+                    #@view.set k, v if v?
+
+                @view.set newData
 
                 dtd.resolve vData
 
@@ -303,24 +307,45 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         
         # 初始值
         if keys.length > 0 and !model.tpl
+            defTplVal = {}
+            
             keys.forEach (k)=>
-                #model.set k, null
-                model.set k, {}
+                defTplVal[k] = {}
+
+            model.set defTplVal
+
+        $parent = model.$el.parent()
+        isHasParent = $parent.length > 0
+
+        
                 
         # 模板已经初始化，更新
         if model.tpl
-            return model.tpl.update(data).then ->
-                model.emit 'tplUpdate'
-        else
-            $parent = model.$el.parent()
-            isHasParent = $parent.length > 0
+            model.emit 'tplBeforeUpdate'
 
             model.$el.detach() if isHasParent
+            
+            return model.tpl.update(data).then ->
+                model.$el.appendTo $parent if isHasParent
+
+                model.emit 'tplUpdate'
+                model.tpl
+        else
+            
+            model.emit 'beforeRender'
+
+            if isHasParent
+                $cloneEl = model.$el.clone()
+                soureEl = model.$el[0]
+                model.$el = $cloneEl
+            
             model.$el.append html
 
             model.tpl = new Template model, data
             return model.tpl.init().then ->
-                model.$el.appendTo $parent if isHasParent
+                if isHasParent and $parent[0].replaceChild
+                    $parent[0].replaceChild model.$el[0], soureEl
+
                 model.emit 'render'
                 model.tpl
 
