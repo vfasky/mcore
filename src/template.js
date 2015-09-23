@@ -92,6 +92,7 @@
       }
       return String(value).length;
     };
+    rivets.formatters['%'] = util.format;
     rivets.formatters['eq'] = function(value, x) {
       return value === x;
     };

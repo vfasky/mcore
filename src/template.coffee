@@ -95,6 +95,9 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         
         String(value).length
 
+    # sprintf
+    rivets.formatters['%'] = util.format
+
 
     # 判断两个值是否绝对相等
     rivets.formatters['eq'] = (value, x)->
