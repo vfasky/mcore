@@ -127,6 +127,80 @@
         }
       }
     };
+    exports.format = function(format) {
+      var arg, argIndex, args, c, escaped, i, n, nextArg, precision, result, slurpNumber;
+      argIndex = 1;
+      args = [].slice.call(arguments);
+      i = 0;
+      n = format.length;
+      result = '';
+      c = void 0;
+      escaped = false;
+      arg = void 0;
+      precision = void 0;
+      nextArg = function() {
+        return args[argIndex++];
+      };
+      slurpNumber = function() {
+        var digits;
+        digits = '';
+        while (format[i].match(/\d/)) {
+          digits += format[i++];
+        }
+        if (digits.length > 0) {
+          return parseInt(digits);
+        } else {
+          return null;
+        }
+      };
+      while (i < n) {
+        c = format[i];
+        if (escaped) {
+          escaped = false;
+          precision = slurpNumber();
+          switch (c) {
+            case 'b':
+              result += parseInt(nextArg(), 10).toString(2);
+              break;
+            case 'c':
+              arg = nextArg();
+              if (typeof arg === 'string' || arg instanceof String) {
+                result += arg;
+              } else {
+                result += String.fromCharCode(parseInt(arg, 10));
+              }
+              break;
+            case 'd':
+              result += parseInt(nextArg(), 10);
+              break;
+            case 'f':
+              result += parseFloat(nextArg()).toFixed(precision || 6);
+              break;
+            case 'o':
+              result += '0' + parseInt(nextArg(), 10).toString(8);
+              break;
+            case 's':
+              result += nextArg();
+              break;
+            case 'x':
+              result += '0x' + parseInt(nextArg(), 10).toString(16);
+              break;
+            case 'X':
+              result += '0x' + parseInt(nextArg(), 10).toString(16).toUpperCase();
+              break;
+            default:
+              result += c;
+              break;
+          }
+        } else if (c === '%') {
+          escaped = true;
+        } else {
+          result += c;
+        }
+        ++i;
+      }
+      return result;
+    };
     return exports;
   });
 

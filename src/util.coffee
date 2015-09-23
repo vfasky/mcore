@@ -109,5 +109,77 @@ define 'mcore/util', ->
 
         return
 
+    #
+    # format, printf-like string formatting for JavaScript
+    # github.com/samsonjs/format
+    #
+    # Copyright 2010 - 2011 Sami Samhuri <sami@samhuri.net>
+    # ISC license
+    #
+    exports.format = (format) ->
+        argIndex = 1
+        args = [].slice.call(arguments)
+        i = 0
+        n = format.length
+        result = ''
+        c = undefined
+        escaped = false
+        arg = undefined
+        precision = undefined
+
+        nextArg = ->
+            args[argIndex++]
+
+        slurpNumber = ->
+            digits = ''
+            while format[i].match(/\d/)
+                digits += format[i++]
+            if digits.length > 0 then parseInt(digits) else null
+
+        while i < n
+            c = format[i]
+            if escaped
+                escaped = false
+                precision = slurpNumber()
+                switch c
+                    when 'b'
+                        # number in binary
+                        result += parseInt(nextArg(), 10).toString(2)
+                    when 'c'
+                        # character
+                        arg = nextArg()
+                        if typeof arg == 'string' or arg instanceof String
+                            result += arg
+                        else
+                            result += String.fromCharCode(parseInt(arg, 10))
+                    when 'd'
+                        # number in decimal
+                        result += parseInt(nextArg(), 10)
+                    when 'f'
+                        # floating point number
+                        result += parseFloat(nextArg()).toFixed(precision or 6)
+                    when 'o'
+                        # number in octal
+                        result += '0' + parseInt(nextArg(), 10).toString(8)
+                    when 's'
+                        # string
+                        result += nextArg()
+                    when 'x'
+                        # lowercase hexadecimal
+                        result += '0x' + parseInt(nextArg(), 10).toString(16)
+                    when 'X'
+                        # uppercase hexadecimal
+                        result += '0x' + parseInt(nextArg(), 10).toString(16).toUpperCase()
+                    else
+                        result += c
+                        break
+            else if c == '%'
+                escaped = true
+            else
+                result += c
+            ++i
+        result
+    
+
     exports
 
