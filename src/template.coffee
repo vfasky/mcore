@@ -320,13 +320,12 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         $parent = model.$el.parent()
         isHasParent = $parent.length > 0
 
-        
+        # 移出 dom tree
+        model.$el.detach() if isHasParent
                 
         # 模板已经初始化，更新
         if model.tpl
             model.emit 'tplBeforeUpdate'
-
-            model.$el.detach() if isHasParent
             
             return model.tpl.update(data).then ->
                 model.$el.appendTo $parent if isHasParent
@@ -334,20 +333,12 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
                 model.emit 'tplUpdate'
                 model.tpl
         else
-            
-            model.emit 'beforeRender'
-
-            if isHasParent
-                $cloneEl = model.$el.clone()
-                soureEl = model.$el[0]
-                model.$el = $cloneEl
-            
             model.$el.append html
+            model.emit 'beforeRender'
 
             model.tpl = new Template model, data
             return model.tpl.init().then ->
-                if isHasParent and $parent[0].replaceChild
-                    $parent[0].replaceChild model.$el[0], soureEl
+                model.$el.appendTo $parent if isHasParent
 
                 model.emit 'render'
                 model.tpl

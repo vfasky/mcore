@@ -314,7 +314,7 @@
       return dtd.promise();
     };
     Template.renderString = function(html, data, model) {
-      var $cloneEl, $parent, defTplVal, isHasParent, keys, soureEl;
+      var $parent, defTplVal, isHasParent, keys;
       if (data == null) {
         data = {};
       }
@@ -330,11 +330,11 @@
       }
       $parent = model.$el.parent();
       isHasParent = $parent.length > 0;
+      if (isHasParent) {
+        model.$el.detach();
+      }
       if (model.tpl) {
         model.emit('tplBeforeUpdate');
-        if (isHasParent) {
-          model.$el.detach();
-        }
         return model.tpl.update(data).then(function() {
           if (isHasParent) {
             model.$el.appendTo($parent);
@@ -343,17 +343,12 @@
           return model.tpl;
         });
       } else {
-        model.emit('beforeRender');
-        if (isHasParent) {
-          $cloneEl = model.$el.clone();
-          soureEl = model.$el[0];
-          model.$el = $cloneEl;
-        }
         model.$el.append(html);
+        model.emit('beforeRender');
         model.tpl = new Template(model, data);
         return model.tpl.init().then(function() {
-          if (isHasParent && $parent[0].replaceChild) {
-            $parent[0].replaceChild(model.$el[0], soureEl);
+          if (isHasParent) {
+            model.$el.appendTo($parent);
           }
           model.emit('render');
           return model.tpl;
