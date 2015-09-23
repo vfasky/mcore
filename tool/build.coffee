@@ -41,6 +41,7 @@ extList = [
     'attr/vendor/scroller.js'
     'attr/src/validator.js'
     'attr/src/scroller.js'
+    'attr/src/index.js'
 ]
 extList.map (v)->
     fileList.push path.join rootPath, v

@@ -35,7 +35,7 @@
 
   FS.write(path.join(rootPath, 'dist/mcore.min.js.map'), result.map);
 
-  extList = ['attr/vendor/formSerializer.js', 'attr/vendor/scroller.js', 'attr/src/validator.js', 'attr/src/scroller.js'];
+  extList = ['attr/vendor/formSerializer.js', 'attr/vendor/scroller.js', 'attr/src/validator.js', 'attr/src/scroller.js', 'attr/src/index.js'];
 
   extList.map(function(v) {
     return fileList.push(path.join(rootPath, v));
