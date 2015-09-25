@@ -7,7 +7,7 @@
  */
 
 (function() {
-  define('tpl/test', [], function() {
+  define('tpl/test', ['react'], function(React) {
     "use strict";
     var exports;
     exports = {};
@@ -16,6 +16,8 @@
     exports['t3'] = '<div rv-test>...</div>';
     exports['t4'] = '<div rv-test="self:t">...</div>';
     exports['t5'] = '<test list="self:data" />';
+    exports['rtpl'] = React.createElement("div", null, "hello word");
+    exports['rtpl2'] = React.createElement("div", null, "hello word 2222222");
     return exports;
   });
 

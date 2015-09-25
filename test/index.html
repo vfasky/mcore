@@ -20,6 +20,7 @@
               stapes: '../vendor/stapes',
               formSerializer: '../attr/vendor/formSerializer', 
               scroller: '../attr/vendor/scroller', 
+              react: '../vendor/react',
               jquery: '../vendor/jquery-2.1.4.min'
           },
           packages: [
@@ -61,7 +62,11 @@
       });
 
       requirejs(
-          ['case/util', 'case/route', 'case/view', 'case/app', 'case/attr'], 
+          [
+            'case/rtpl',
+            //'case/util', 'case/route', 'case/view', 
+            //'case/app', 'case/attr'
+          ], 
           function(){
               mocha.run(); 
           }

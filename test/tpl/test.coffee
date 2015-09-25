@@ -3,7 +3,7 @@
  * @module tpl/test
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'tpl/test', [], ()->
+define 'tpl/test', ['react'], (React)->
     
     "use strict"
 
@@ -32,6 +32,8 @@ define 'tpl/test', [], ()->
     '''
 
 
+    exports['rtpl'] = React.createElement("div", null, "hello word")
+    exports['rtpl2'] = React.createElement("div", null, "hello word 2222222")
 
 
     exports
