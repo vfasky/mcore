@@ -85,7 +85,7 @@ define 'mcore/route', ['mcore/util'], (util)->
 
             key = v[0].trim()
             value = v[1]
-            if util.isNumber value
+            if util.isNumber(value) and String(value).length < 14
                 value = Number value
             else
                 value = decodeURIComponent value
@@ -170,7 +170,7 @@ define 'mcore/route', ['mcore/util'], (util)->
                 k = v.keys[i-1]
                 value = ref[i]
 
-                if util.isNumber value
+                if util.isNumber(value) and String(value).length < 14
                     value = Number value
                 else if value
                     value = decodeURIComponent value
