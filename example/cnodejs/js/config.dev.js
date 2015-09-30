@@ -1,8 +1,10 @@
 requirejs.config({
     "paths": {
-        "tpl/cnode": "./js/tpl/cnode.bccf00",
         "cnode": "./js/pack/cnode/1.0.0/dist/cnode.all",
         "tag": "./js/pack/tag/1.0.0/dist/tag.all",
+        "tpl/cnode": "./js/tpl/cnode.be8cec",
+        "middleware": "./js/pack/middleware/1.0.0/dist/middleware.all",
+        "attr": "./js/pack/attr/1.0.0/dist/attr.all",
         "mcore": "../../dist/mcore.all.min",
         "highlight": "//dn-cdnjscn.qbox.me/ajax/libs/highlight.js/8.6/highlight.min",
         "markdown-it": "//dn-cdnjscn.qbox.me/ajax/libs/markdown-it/4.2.2/markdown-it.min",

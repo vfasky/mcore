@@ -3,25 +3,29 @@
     -moz-transform: rotate(0deg);
     transform: rotate(0deg);
     -moz-box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px;
-    box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px; }
+    box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px;
+  }
   50% {
     -moz-transform: rotate(1080deg);
     transform: rotate(1080deg);
     -moz-box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px;
-    box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px; } }
-
+    box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px;
+  }
+}
 @-webkit-keyframes flower-loader {
   0% {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
     -webkit-box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px;
-    box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px; }
+    box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px;
+  }
   50% {
     -webkit-transform: rotate(1080deg);
     transform: rotate(1080deg);
     -webkit-box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px;
-    box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px; } }
-
+    box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px;
+  }
+}
 @keyframes flower-loader {
   0% {
     -moz-transform: rotate(0deg);
@@ -30,7 +34,8 @@
     transform: rotate(0deg);
     -moz-box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px;
     -webkit-box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px;
-    box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px; }
+    box-shadow: white 0 0 15px 0, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px;
+  }
   50% {
     -moz-transform: rotate(1080deg);
     -ms-transform: rotate(1080deg);
@@ -38,8 +43,9 @@
     transform: rotate(1080deg);
     -moz-box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px;
     -webkit-box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px;
-    box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px; } }
-
+    box-shadow: white 0 0 15px 0, #fd8 12px 12px 0 4px, #fd8 -12px 12px 0 4px, #fd8 -12px -12px 0 4px, #fd8 12px -12px 0 4px;
+  }
+}
 /* :not(:required) hides this rule from IE9 and below */
 .flower-loader:not(:required) {
   margin: 20% auto;
@@ -60,41 +66,13 @@
   -moz-transform-origin: 50% 50%;
   -ms-transform-origin: 50% 50%;
   -webkit-transform-origin: 50% 50%;
-  transform-origin: 50% 50%; }
+  transform-origin: 50% 50%;
+}
 
-.loader-wrap {
+.loader-wrap{
   position: fixed;
   width: 100%;
   height: 100%;
   text-align: center;
-  z-index: 999; }
-
-.hg-border {
-  border: 1px solid #e6b400; }
-
-.scroller {
-  padding-bottom: 44px; }
-
-.markdown-wrap img {
-  max-width: 100%; }
-
-.markdown-wrap a {
-  color: #886aea; }
-
-code {
-  background: #fdf6e3;
-  color: #657b83;
-  font-family: Consolas, "Liberation Mono", Courier, monospace;
-  color: #333; }
-
-pre {
-  background: #fdf6e3;
-  border-radius: 6px;
-  padding: 0 6px;
-  overflow: scroll;
-  word-wrap: normal;
-  white-space: pre; }
-
-.gutter pre {
-  border-right: 1px solid #fff;
-  text-align: right; }
+  z-index: 999;
+}

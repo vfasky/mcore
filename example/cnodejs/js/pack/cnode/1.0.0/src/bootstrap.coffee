@@ -3,7 +3,8 @@
  * @module cnode/bootstrap
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'cnode', ['jquery', 'mcore', 'tag'], ($, mcore)->
+define 'cnode', ['jquery', 'mcore', 'middleware', 'tag', 'attr'],
+($, mcore, middleware)->
     
     "use strict"
 
@@ -11,6 +12,8 @@ define 'cnode', ['jquery', 'mcore', 'tag'], ($, mcore)->
 
     (select, loadSelect)->
         app = new mcore.App $(select)
+
+        app.use middleware.loader
         
         app.route '/topic/:id', 'cnode/topic'
            .route '*', 'cnode/index'

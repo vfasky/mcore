@@ -1,4 +1,3 @@
-<loading watch="self:topic.data"></loading>
 
 <div rv-show="self:topic.data" rv-scroller="self:topic.data">
     <top-header  back="self.back"></top-header>
@@ -17,7 +16,7 @@
                 </p>
             </div>
 
-            <div class="item item-body markdown-wrap" rv-html="self:topic.data.content | markdown">
+            <div rv-link-to-blank class="item item-body markdown-wrap" rv-html="self:topic.data.content | markdown">
             </div>
 
             <div class="item tabs tabs-secondary tabs-icon-left">
@@ -41,7 +40,7 @@
                     </p>
                 </div>
 
-                <div class="item item-body" rv-html="v.content | markdown">
+                <div rv-link-to-blank class="item item-body" rv-html="v.content | markdown">
                 </div>
 
             </div>
