@@ -11,7 +11,7 @@
     "use strict";
     var $el;
     $el = $('<div class="loader-wrap">\n    <div class="flower-loader">\n        Loading…\n    </div>\n</div>');
-    $el.appendTo('body');
+    $el.hide().appendTo('body');
     return function(err, next) {
       if (err) {
         return next(err);
@@ -22,8 +22,12 @@
       this.view.on('tplBeforeUpdate', function() {
         return $el.show();
       });
-      this.view.on('render', function() {});
-      this.view.on('tplUpdate', function() {});
+      this.view.on('render', function() {
+        return $el.hide();
+      });
+      this.view.on('tplUpdate', function() {
+        return $el.hide();
+      });
       return next();
     };
   });

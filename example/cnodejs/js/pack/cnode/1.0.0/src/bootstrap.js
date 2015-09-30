@@ -15,7 +15,7 @@
       var app;
       app = new mcore.App($(select));
       app.use(middleware.loader);
-      app.route('/topic/:id', 'cnode/topic').route('*', 'cnode/index');
+      app.route('/topic/:id', 'cnode/topic').route('/user/:userName', 'cnode/user').route('*', 'cnode/index');
       app.on('runView', function() {
         if (init === false) {
           init = true;

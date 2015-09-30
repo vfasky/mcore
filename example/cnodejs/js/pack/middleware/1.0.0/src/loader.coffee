@@ -15,7 +15,7 @@ define 'middleware/loader', ['jquery'], ($)->
     </div>
     '''
 
-    $el.appendTo 'body'
+    $el.hide().appendTo 'body'
 
     (err, next)->
         return next err if err
@@ -27,10 +27,10 @@ define 'middleware/loader', ['jquery'], ($)->
             $el.show()
 
         @view.on 'render', ->
-            #$el.hide()
+            $el.hide()
 
         @view.on 'tplUpdate', ->
-            #$el.hide()
+            $el.hide()
 
         next()
 

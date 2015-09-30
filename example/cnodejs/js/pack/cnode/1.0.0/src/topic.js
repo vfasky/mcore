@@ -7,14 +7,19 @@
  */
 
 (function() {
-  define('cnode/topic', ['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters'], function($, View) {
+  define('cnode/topic', ['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters', 'attr/userLink'], function($, View) {
     "use strict";
     return View.subclass({
       constructor: View.prototype.constructor,
       run: function(id) {
         return this.render('cnode/topic.html', {
           replieEnd: 5,
-          topic: this.api.topic(id)
+          topic: this.api.topic(id).then(function(res) {
+            res.data.replies.forEach(function(v, k) {
+              return v.ix = k;
+            });
+            return res;
+          })
         });
       },
       watch: function() {

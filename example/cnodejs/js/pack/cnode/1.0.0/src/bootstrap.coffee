@@ -16,6 +16,7 @@ define 'cnode', ['jquery', 'mcore', 'middleware', 'tag', 'attr'],
         app.use middleware.loader
         
         app.route '/topic/:id', 'cnode/topic'
+           .route '/user/:userName', 'cnode/user'
            .route '*', 'cnode/index'
 
         app.on 'runView', ->

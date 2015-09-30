@@ -4,7 +4,7 @@
  * @author vfasky <vfasky@gmail.com>
 ###
 define 'cnode/topic',
-['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters'], ($, View)->
+['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters', 'attr/userLink'], ($, View)->
     
     "use strict"
 
@@ -13,7 +13,10 @@ define 'cnode/topic',
         run: (id)->
             @render 'cnode/topic.html',
                 replieEnd: 5
-                topic: @api.topic(id)
+                topic: @api.topic(id).then (res)->
+                    res.data.replies.forEach (v, k)->
+                        v.ix = k
+                    res
                
         watch: ->
             # 评伦分页

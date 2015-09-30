@@ -7,7 +7,7 @@
  */
 
 (function() {
-  define('tag', ['tag/loading', 'tag/topHeader'], function() {
+  define('tag', ['tag/topHeader'], function() {
     "use strict";
   });
 

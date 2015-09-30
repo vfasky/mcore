@@ -28,7 +28,7 @@ define 'cnode/formatters',
         ]
 
         (str, lang)->
-            lang = String(lang).toLowerCase() or 'plain'
+            lang = String(lang).toLowerCase() or 'javascript'
             lang = alias[lang] if alias[lang]
 
             if hljs.getLanguage(lang)
@@ -86,6 +86,10 @@ define 'cnode/formatters',
         
     Template.formatters 'markdown', (value)->
         markdown.render value
+
+    exports =
+        markdown: (md)->
+            markdown.render md
 
     
 

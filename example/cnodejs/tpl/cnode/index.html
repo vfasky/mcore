@@ -1,37 +1,31 @@
-
 <div rv-scroller="self:topics.data" class="scroller">
     <div class="bar bar-header bar-royal">
-        <button class="button button-icon icon ion-navicon"></button>
+        <!--<button class="button button-icon icon ion-navicon"></button>-->
         <h1 class="title">CNode</h1>
     </div>
 
     <div class="bar bar-subheader ">
         <div class="button-bar">
-            <a href="#/" class="button">全部</a>
-            <a href="#/?tab=good" class="button">精华</a>
-            <a href="#/?tab=share" class="button">分享</a>
-            <a href="#/?tab=ask" class="button">问答</a>
-            <a href="#/?tab=job" class="button">招聘</a>
+            <a href="#/" rv-class-active="self.context.tab | eq ''" class="button">全部</a>
+            <a href="#/?tab=good" rv-class-active="self.context.tab | eq 'good'" class="button">精华</a>
+            <a href="#/?tab=share" class="button" rv-class-active="self.context.tab | eq 'share'">分享</a>
+            <a href="#/?tab=ask" class="button" rv-class-active="self.context.tab | eq 'ask'">问答</a>
+            <a href="#/?tab=job" class="button" rv-class-active="self.context.tab | eq 'job'">招聘</a>
         </div>
     </div>
-    
+
     <div class="content has-subheader">
-        
-        <div class="list" >
-            <a class="item item-avatar" 
-               rv-class-hg-border="v.top"
-               rv-href="'#/topic/' | link v.id" 
-               rv-each-v="self:topics.data">
+
+        <div class="list">
+            <a class="item item-avatar" rv-class-hg-border="v.top" rv-href="'#/topic/' | link v.id"
+            rv-each-v="self:topics.data">
                 <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname">
                 <h2>{v.title}</h2>
                 <p>
                     <i class="icon ion-ios-stopwatch-outline"></i>
-                    {v.create_at | fromNow}
-                    &nbsp;
+                    {v.create_at | fromNow} &nbsp;
                     <i rv-if="v.reply_count" class="icon ion-chatbox"></i>
-                    {v.reply_count}
-                    
-                    &nbsp;
+                    {v.reply_count} &nbsp;
 
                     <i rv-if="v.tab" class="icon ion-pound"></i>
                     {v.tab}
@@ -39,21 +33,19 @@
 
             </a>
         </div>
-        
+
         <div class="row">
             <div class="col ">
-                <a rv-if="self.prePage | > 0" 
-                   rv-href="'#?tab=' | link self.context.tab | link '&page=' | link self.prePage"
-                   class="button icon-left ion-chevron-left button-clear button-dark"> New</a>
+                <a rv-if="self.prePage | > 0" rv-href="'#?tab=' | link self.context.tab | link '&page=' | link self.prePage"
+                class="button icon-left ion-chevron-left button-clear button-dark"> New</a>
             </div>
             <div class="col col-25 col-offset-50">
-                <a rv-href="'#?tab=' | link self.context.tab | link '&page=' | link self.nextPage" 
-                   class="button icon-right ion-chevron-right button-clear button-dark"> Old</a>
+                <a rv-href="'#?tab=' | link self.context.tab | link '&page=' | link self.nextPage"
+                class="button icon-right ion-chevron-right button-clear button-dark"> Old</a>
 
             </div>
         </div>
 
     </div>
 </div>
-
 
