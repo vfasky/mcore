@@ -1,5 +1,5 @@
 
-<div rv-show="self:topic.data" rv-scroller="self:topic.data">
+<div rv-scroller="self:topic.data | or self:replieEnd">
     <top-header  back="self.back"></top-header>
 
     <div class="content has-header" >
@@ -28,7 +28,7 @@
         </div>
 
         <div  >
-            <div class="list card" rv-each-v="self:topic.data.replies">
+            <div class="list card" rv-each-v="self:topic.data.replies | slice 0 self:replieEnd">
                 <div class="item item-avatar">
                     <img rv-src="v.author.avatar_url" rv-alt="v.author.loginname" >                   
                     <h2>{v.author.loginname}</h2>

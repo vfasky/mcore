@@ -2,7 +2,7 @@ requirejs.config({
     "paths": {
         "cnode": "./js/pack/cnode/1.0.0/dist/cnode.all",
         "tag": "./js/pack/tag/1.0.0/dist/tag.all",
-        "tpl/cnode": "./js/tpl/cnode.be8cec",
+        "tpl/cnode": "./js/tpl/cnode.9205ae",
         "middleware": "./js/pack/middleware/1.0.0/dist/middleware.all",
         "attr": "./js/pack/attr/1.0.0/dist/attr.all",
         "mcore": "../../dist/mcore.all.min",
