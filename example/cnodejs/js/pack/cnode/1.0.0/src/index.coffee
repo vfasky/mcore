@@ -4,7 +4,8 @@
  * @author vfasky <vfasky@gmail.com>
 ###
 define 'cnode/index',
-['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters'], ($, View)->
+['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters'],
+($, View)->
     
     "use strict"
 

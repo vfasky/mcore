@@ -4,7 +4,7 @@
  * @author vfasky <vfasky@gmail.com>
 ###
 define 'cnode/topic',
-['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters'], ($, View)->
+['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters', 'attr/userLink'], ($, View)->
     
     "use strict"
 
@@ -12,5 +12,22 @@ define 'cnode/topic',
         constructor: View::constructor
         run: (id)->
             @render 'cnode/topic.html',
-               topic: @api.topic(id)
+                replieEnd: 5
+                topic: @api.topic(id).then (res)->
+                    res.data.replies.forEach (v, k)->
+                        v.ix = k
+                    res
                
+        watch: ->
+            # 评伦分页
+            @.$el.on 'scrollend', =>
+                topic = @get 'topic'
+                replieEnd = @get 'replieEnd'
+                total = replieEnd + 5
+                topicCount = Number topic.data.reply_count
+                total = topicCount if total > topicCount
+
+                return if total == replieEnd
+                @set 'replieEnd', total
+                
+                    

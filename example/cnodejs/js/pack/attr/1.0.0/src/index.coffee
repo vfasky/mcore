@@ -1,9 +1,9 @@
 ###*
- * 自定义tag
- * @module tag
+ * 属性扩展
+ * @module attr
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'tag', ['tag/topHeader'], ->
+define 'attr', ['attr/linkToBlank'], ->
     
     "use strict"
 

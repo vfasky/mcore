@@ -9,7 +9,7 @@
 (function() {
   define('cnode/formatters', ['mcore', 'moment', 'markdown-it', 'highlight'], function(mcore, moment, Markdownit) {
     "use strict";
-    var Template, highlight, markdown;
+    var Template, exports, highlight, markdown;
     hljs.initHighlightingOnLoad();
     Template = mcore.Template;
     highlight = (function() {
@@ -31,7 +31,7 @@
       ];
       return function(str, lang) {
         var _, compiled, content, firstLine, lines, numbers, result;
-        lang = String(lang).toLowerCase() || 'plain';
+        lang = String(lang).toLowerCase() || 'javascript';
         if (alias[lang]) {
           lang = alias[lang];
         }
@@ -82,9 +82,14 @@
     Template.formatters('fromNow', function(value) {
       return moment(value).fromNow();
     });
-    return Template.formatters('markdown', function(value) {
+    Template.formatters('markdown', function(value) {
       return markdown.render(value);
     });
+    return exports = {
+      markdown: function(md) {
+        return markdown.render(md);
+      }
+    };
   });
 
 }).call(this);

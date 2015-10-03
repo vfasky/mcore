@@ -7,14 +7,38 @@
  */
 
 (function() {
-  define('cnode/topic', ['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters'], function($, View) {
+  define('cnode/topic', ['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters', 'attr/userLink'], function($, View) {
     "use strict";
     return View.subclass({
       constructor: View.prototype.constructor,
       run: function(id) {
         return this.render('cnode/topic.html', {
-          topic: this.api.topic(id)
+          replieEnd: 5,
+          topic: this.api.topic(id).then(function(res) {
+            res.data.replies.forEach(function(v, k) {
+              return v.ix = k;
+            });
+            return res;
+          })
         });
+      },
+      watch: function() {
+        return this.$el.on('scrollend', (function(_this) {
+          return function() {
+            var replieEnd, topic, topicCount, total;
+            topic = _this.get('topic');
+            replieEnd = _this.get('replieEnd');
+            total = replieEnd + 5;
+            topicCount = Number(topic.data.reply_count);
+            if (total > topicCount) {
+              total = topicCount;
+            }
+            if (total === replieEnd) {
+              return;
+            }
+            return _this.set('replieEnd', total);
+          };
+        })(this));
       }
     });
   });

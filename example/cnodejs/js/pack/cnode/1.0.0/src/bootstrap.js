@@ -7,14 +7,15 @@
  */
 
 (function() {
-  define('cnode', ['jquery', 'mcore', 'tag'], function($, mcore) {
+  define('cnode', ['jquery', 'mcore', 'middleware', 'tag', 'attr'], function($, mcore, middleware) {
     "use strict";
     var init;
     init = false;
     return function(select, loadSelect) {
       var app;
       app = new mcore.App($(select));
-      app.route('/topic/:id', 'cnode/topic').route('*', 'cnode/index');
+      app.use(middleware.loader);
+      app.route('/topic/:id', 'cnode/topic').route('/user/:userName', 'cnode/user').route('*', 'cnode/index');
       app.on('runView', function() {
         if (init === false) {
           init = true;

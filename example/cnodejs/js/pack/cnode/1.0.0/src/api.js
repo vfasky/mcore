@@ -26,6 +26,9 @@
         return $.get(_host + '/topic/' + id, {
           mdrender: false
         });
+      },
+      user: function(userName) {
+        return $.get(_host + '/user/' + userName);
       }
     };
   });
