@@ -305,6 +305,14 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
         
         dtd.promise()
 
+        
+    Template.bind = (data = {}, model)->
+        model.tpl = new Template model, data
+        model.tpl.init().then ->
+            model.emit 'render'
+            model.tpl
+
+
     Template.renderString = (html, data = {}, model)->
         keys = Object.keys data
         
@@ -336,12 +344,9 @@ define 'mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'],
             model.$el.append html
             model.emit 'beforeRender'
 
-            model.tpl = new Template model, data
-            return model.tpl.init().then ->
+            return Template.bind(data, model).then (res)->
                 model.$el.appendTo $parent if isHasParent
-
-                model.emit 'render'
-                model.tpl
+                res
 
 
     Template.render = (uri, data = {}, model)->

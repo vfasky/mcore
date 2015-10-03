@@ -68,6 +68,12 @@
         }
         return Template.renderString(html, data, this);
       },
+      bind: function(data) {
+        if (data == null) {
+          data = {};
+        }
+        return Template.bind(data, this);
+      },
       when: function() {
         return $.when.apply(this, arguments);
       },

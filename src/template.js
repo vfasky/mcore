@@ -313,6 +313,16 @@
       }
       return dtd.promise();
     };
+    Template.bind = function(data, model) {
+      if (data == null) {
+        data = {};
+      }
+      model.tpl = new Template(model, data);
+      return model.tpl.init().then(function() {
+        model.emit('render');
+        return model.tpl;
+      });
+    };
     Template.renderString = function(html, data, model) {
       var $parent, defTplVal, isHasParent, keys;
       if (data == null) {
@@ -345,13 +355,11 @@
       } else {
         model.$el.append(html);
         model.emit('beforeRender');
-        model.tpl = new Template(model, data);
-        return model.tpl.init().then(function() {
+        return Template.bind(data, model).then(function(res) {
           if (isHasParent) {
             model.$el.appendTo($parent);
           }
-          model.emit('render');
-          return model.tpl;
+          return res;
         });
       }
     };
