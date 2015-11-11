@@ -140,6 +140,7 @@
             var $form, ref;
             $form = $(el);
             ref = $form.data('check')();
+            console.log(ref().err);
             if (ref().err === '数值要大于 9') {
               done();
             }

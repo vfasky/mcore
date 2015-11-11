@@ -147,6 +147,7 @@ define 'case/attr',
                     $form = $ el
 
                     ref = $form.data('check')()
+                    console.log ref().err
 
                     done() if ref().err == '数值要大于 9'
                     

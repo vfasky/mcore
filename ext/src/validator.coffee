@@ -11,6 +11,7 @@ mcore = require 'mcore'
 require '../vendor/formSerializer'
 
 Template = mcore.Template
+util = mcore.util
 
 # 是否字母
 _isAlphabetReg = /^[A-Za-z]+$/
@@ -29,7 +30,6 @@ _isMobileReg = /^1[3-9]\d{9}$/
  * 座机：仅中国座机支持；区号可有 3、4位数并且以 0 开头；电话号不以 0 开头，最 8 位数，最少 7 位数
  * 但 400/800 除头开外，适应电话，电话本身是 7 位数
  * 0755-29819991 | 0755 29819991 | 400-6927972 | 4006927927 | 800...
- * @author vfasky <vfasky@gmail.com>
  * 
 ###
 _isTelReg = /^(?:(?:0\d{2,3}[- ]?[1-9]\d{6,7})|(?:[48]00[- ]?[1-9]\d{6}))$/
@@ -125,6 +125,8 @@ rule =
     isTel: (x) -> _isTelReg.test x
     # 检查身份证
     isIdentityCode: (x)->
+        x = String(x).replace('x', 'X')
+
         cisy =
             11: "北京",
             12: "天津",
@@ -251,6 +253,11 @@ ValidatorAttr = Template.Attr.subclass
         name = $el.attr 'name'
         return if !name
         $el.attr('validator').split('|').forEach (v)=>
+            ix = String(v).indexOf ' err:'
+            if ix != -1
+                eT = v.split(' err:')
+                v = eT[0]
+                diyErr = eT[1]
 
             args = v.split(' ').filter (s)=>
                 $.trim(s).length > 0
@@ -262,13 +269,16 @@ ValidatorAttr = Template.Attr.subclass
                 console.log "validator rule: #{ruleType} undefined"
                 return
 
-            lastArgs = String(args[args.length - 1]).trim()
-
-            err = errMsg[ruleType] or '出错了'
-            ix = lastArgs.indexOf 'err:'
-            err = lastArgs.substring 4 if ix == 0
-            err = err.apply(null, args.slice(1)) if $.isFunction err
-
+            if diyErr
+                err = diyErr
+            else
+                if $.isFunction(errMsg[ruleType])
+                    msgArgs = util.clone args
+                    msgArgs.splice 0, 1
+                    err = errMsg[ruleType].apply null, msgArgs
+                else
+                    err = errMsg[ruleType] or 'error'
+       
             args[0] = $el
             args[1] = @$el.find(args[1]).eq 0 if ruleType == 'equals'
 

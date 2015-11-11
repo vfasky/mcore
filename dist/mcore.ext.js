@@ -102,7 +102,7 @@ define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXT
 
 	(function() {
 	  "use strict";
-	  var $, Template, ValidatorAttr, _isAlphabetReg, _isDateReg, _isEmailReg, _isIDReg, _isMobileReg, _isTelReg, errMsg, exports, mcore, rule, urlCheck,
+	  var $, Template, ValidatorAttr, _isAlphabetReg, _isDateReg, _isEmailReg, _isIDReg, _isMobileReg, _isTelReg, errMsg, exports, mcore, rule, urlCheck, util,
 	    slice = [].slice;
 
 	  $ = __webpack_require__(4);
@@ -112,6 +112,8 @@ define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXT
 	  __webpack_require__(15);
 
 	  Template = mcore.Template;
+
+	  util = mcore.util;
 
 	  _isAlphabetReg = /^[A-Za-z]+$/;
 
@@ -127,7 +129,6 @@ define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXT
 	   * 座机：仅中国座机支持；区号可有 3、4位数并且以 0 开头；电话号不以 0 开头，最 8 位数，最少 7 位数
 	   * 但 400/800 除头开外，适应电话，电话本身是 7 位数
 	   * 0755-29819991 | 0755 29819991 | 400-6927972 | 4006927927 | 800...
-	   * @author vfasky <vfasky@gmail.com>
 	   *
 	   */
 
@@ -241,6 +242,7 @@ define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXT
 	    },
 	    isIdentityCode: function(x) {
 	      var ai, cisy, code, factor, i, j, last, parity, sum, wi;
+	      x = String(x).replace('x', 'X');
 	      cisy = {
 	        11: "北京",
 	        12: "天津",
@@ -381,7 +383,13 @@ define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXT
 	      }
 	      return $el.attr('validator').split('|').forEach((function(_this) {
 	        return function(v) {
-	          var args, checkRule, err, ix, lastArgs, ruleType;
+	          var args, checkRule, diyErr, eT, err, ix, msgArgs, ruleType;
+	          ix = String(v).indexOf(' err:');
+	          if (ix !== -1) {
+	            eT = v.split(' err:');
+	            v = eT[0];
+	            diyErr = eT[1];
+	          }
 	          args = v.split(' ').filter(function(s) {
 	            return $.trim(s).length > 0;
 	          });
@@ -391,14 +399,16 @@ define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXT
 	            console.log("validator rule: " + ruleType + " undefined");
 	            return;
 	          }
-	          lastArgs = String(args[args.length - 1]).trim();
-	          err = errMsg[ruleType] || '出错了';
-	          ix = lastArgs.indexOf('err:');
-	          if (ix === 0) {
-	            err = lastArgs.substring(4);
-	          }
-	          if ($.isFunction(err)) {
-	            err = err.apply(null, args.slice(1));
+	          if (diyErr) {
+	            err = diyErr;
+	          } else {
+	            if ($.isFunction(errMsg[ruleType])) {
+	              msgArgs = util.clone(args);
+	              msgArgs.splice(0, 1);
+	              err = errMsg[ruleType].apply(null, msgArgs);
+	            } else {
+	              err = errMsg[ruleType] || 'error';
+	            }
 	          }
 	          args[0] = $el;
 	          if (ruleType === 'equals') {
