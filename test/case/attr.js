@@ -7,8 +7,11 @@
  */
 
 (function() {
-  define('case/attr', ['jquery', 'mcore/view', 'mcore-attr/validator', 'describe', 'it'], function($, View, validator, describe, it) {
+  define('case/attr', ['jquery', 'mcoreExt', 'describe', 'it'], function($, mcore, describe, it) {
     "use strict";
+    var View, validator;
+    View = mcore.View;
+    validator = mcore.ext.validator;
     return describe('attr test', function() {
       it('validator required', function(done) {
         var $el, ValidatorView, view;

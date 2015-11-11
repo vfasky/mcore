@@ -4,10 +4,13 @@
  * @author vfasky <vfasky@gmail.com>
 ###
 define 'case/view',
-['describe', 'it', 'mcore/view', 'assert', 'jquery', 'mcore/template'],
-(describe, it, View, assert, $, Template)->
+['describe', 'it', 'mcore', 'assert', 'jquery'],
+(describe, it, mcore, assert, $)->
     
     "use strict"
+
+    View = mcore.View
+    Template = mcore.Template
 
     describe 'test view and template', ->
 

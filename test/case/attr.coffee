@@ -4,10 +4,13 @@
  * @author vfasky <vfasky@gmail.com>
 ###
 define 'case/attr',
-['jquery', 'mcore/view', 'mcore-attr/validator', 'describe', 'it'],
-($, View, validator, describe, it)->
+['jquery', 'mcoreExt', 'describe', 'it'],
+($, mcore, describe, it)->
     
     "use strict"
+
+    View = mcore.View
+    validator = mcore.ext.validator
 
 
     describe 'attr test', ->

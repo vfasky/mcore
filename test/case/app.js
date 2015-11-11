@@ -14,8 +14,10 @@
  */
 
 (function() {
-  define('view/home', ['jquery', 'mcore/view'], function($, View) {
+  define('view/home', ['jquery', 'mcore'], function($, mcore) {
     "use strict";
+    var View;
+    View = mcore.View;
     return View.subclass({
       constructor: View.prototype.constructor,
       run: function() {
@@ -35,8 +37,10 @@
    * @author vfasky <vfasky@gmail.com>
    */
 
-  define('view/show', ['jquery', 'mcore/view'], function($, View) {
+  define('view/show', ['jquery', 'mcore'], function($, mcore) {
     "use strict";
+    var View;
+    View = mcore.View;
     return View.subclass({
       constructor: View.prototype.constructor,
       run: function(id) {
@@ -45,8 +49,11 @@
     });
   });
 
-  define('case/app', ['describe', 'it', 'mcore/view', 'assert', 'jquery', 'mcore/app'], function(describe, it, View, assert, $, App) {
+  define('case/app', ['describe', 'it', 'mcore', 'assert', 'jquery'], function(describe, it, mcore, assert, $) {
     "use strict";
+    var App, View;
+    View = mcore.View;
+    App = mcore.App;
     return describe('app test', function() {
       return it('router', function(done) {
         var $el, app;

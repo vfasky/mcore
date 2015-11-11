@@ -9,9 +9,11 @@
  * @module view/home
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'view/home', ['jquery', 'mcore/view'], ($, View)->
+define 'view/home', ['jquery', 'mcore'], ($, mcore)->
     
     "use strict"
+
+    View = mcore.View
 
     View.subclass
         constructor: View::constructor
@@ -30,9 +32,11 @@ define 'view/home', ['jquery', 'mcore/view'], ($, View)->
  * @module view/show
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'view/show', ['jquery', 'mcore/view'], ($, View)->
+define 'view/show', ['jquery', 'mcore'], ($, mcore)->
     
     "use strict"
+
+    View = mcore.View
 
     View.subclass
         constructor: View::constructor
@@ -41,10 +45,13 @@ define 'view/show', ['jquery', 'mcore/view'], ($, View)->
 
 
 define 'case/app',
-['describe', 'it', 'mcore/view', 'assert', 'jquery', 'mcore/app'],
-(describe, it, View, assert, $, App)->
+['describe', 'it', 'mcore', 'assert', 'jquery'],
+(describe, it, mcore, assert, $)->
     
     "use strict"
+
+    View = mcore.View
+    App = mcore.App
 
     describe 'app test', ->
 

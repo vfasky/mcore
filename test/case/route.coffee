@@ -4,10 +4,12 @@
  * @author vfasky <vfasky@gmail.com>
 ###
 define 'case/route',
-['describe', 'it', 'mcore/route', 'assert'],
-(describe, it, route, assert)->
+['describe', 'it', 'mcore', 'assert'],
+(describe, it, mcore, assert)->
     
     "use strict"
+
+    route = mcore.route
 
     describe 'route test pathToObject', ->
         it '?id=4&v=ttt', ->

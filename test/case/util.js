@@ -9,7 +9,10 @@
  */
 
 (function() {
-  define('case/util', ['describe', 'it', 'mcore/util', 'assert'], function(describe, it, util, assert) {
+  define('case/util', ['describe', 'it', 'mcore', 'assert'], function(describe, it, mcore, assert) {
+    "use strict";
+    var util;
+    util = mcore.util;
     describe('util isNumber', function() {
       it('123', function() {
         return assert.equal(true, util.isNumber(123));

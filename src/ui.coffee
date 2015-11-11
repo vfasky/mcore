@@ -3,32 +3,35 @@
  * @module mcore/ui
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'mcore/ui', ['jquery', 'mcore/template', 'stapes'], ($, Template, stapes)->
-    
-    "use strict"
 
-    $body = $ 'body'
+"use strict"
 
-    stapes.subclass
-        constructor: ($el, @options = {})->
-            @$el = $ '<div/>'
-            @$parent = $el or $body
+$ = require 'jquery'
+Template = require './template'
+Stapes = require 'stapes'
 
-            @on 'render', =>
-                @$el.appendTo @$parent
+$body = $ 'body'
 
-            @init()
-            @watch()
+exports = module.exports = Stapes.subclass
+    constructor: ($el, @options = {})->
+        @$el = $ '<div/>'
+        @$parent = $el or $body
 
-        destroy: ->
-            @tpl.destroy() if @tpl
-            @$el.remove()
+        @on 'render', =>
+            @$el.appendTo @$parent
 
-        render: (uri, data = {})->
-            Template.render uri, data, @
+        @init()
+        @watch()
 
-        renderString: (html, data = {})->
-            Template.renderString html, data, @
+    destroy: ->
+        @tpl.destroy() if @tpl
+        @$el.remove()
 
-        init: ->
-        watch: ->
+    render: (uri, data = {})->
+        Template.render uri, data, @
+
+    renderString: (html, data = {})->
+        Template.renderString html, data, @
+
+    init: ->
+    watch: ->

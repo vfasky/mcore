@@ -7,124 +7,132 @@
  */
 
 (function() {
-  define('mcore/app', ['jquery', 'stapes', 'mcore/route'], function($, Stapes, route) {
-    "use strict";
-    return Stapes.subclass({
-      constructor: function($el1, options) {
-        this.$el = $el1;
-        if (options == null) {
-          options = {};
-        }
-        this.options = $.extend({
-          viewClass: 'mcore-app-view',
-          routeChange: route.Route.changeByLocationHash
-        }, options);
-        this.router = new route.Route(this.options.routeChange);
-        this.curView = null;
-        this._onLoadViw = false;
-        this._middlewares = [];
-      },
-      route: function(path, viewName) {
-        var self;
-        self = this;
-        this.router.add(path, function() {
-          return self.runView(viewName, this, arguments);
-        });
-        return this;
-      },
-      use: function(middleware) {
-        this._middlewares.push(middleware);
-        return this;
-      },
-      _runView: function(done) {
-        if (done == null) {
-          done = function() {};
-        }
-        this.curView.instantiate.route = this.env.route;
-        this.curView.instantiate.context = this.env.context;
-        this.curView.instantiate.run.apply(this.curView.instantiate, this.env.args);
-        this.emit('runView', this.curView);
-        return done(this.curView.instantiate);
-      },
-      stack: function(ix, err, done) {
-        var middleware, next, nextIx;
-        if (ix == null) {
-          ix = 0;
-        }
-        if (err == null) {
-          err = null;
-        }
-        if (done == null) {
-          done = function() {};
-        }
-        if (ix === this._middlewares.length) {
-          return this._runView(done);
-        }
-        middleware = this._middlewares[ix];
-        nextIx = ix + 1;
-        next = (function(_this) {
-          return function(err) {
-            return _this.stack(nextIx, err, done);
-          };
-        })(this);
-        this.env.view = this.curView.instantiate;
-        return middleware.call(this.env, err, next);
-      },
-      runMiddlewares: function(done) {
-        if (done == null) {
-          done = function() {};
-        }
-        if (this._middlewares.length === 0) {
-          return this._runView(done);
-        }
-        return this.stack(0, null, done);
-      },
-      runView: function(viewName, route, args) {
-        if (this._onLoadViw) {
-          return;
-        }
-        this.env = {
-          route: route,
-          context: route.context,
-          args: args,
-          viewName: viewName,
-          app: this
-        };
-        if (this.curView) {
-          if (this.curView.name === viewName) {
-            this.runMiddlewares((function(_this) {
-              return function() {
-                return _this.curView.instantiate.afterRun();
-              };
-            })(this));
-            return;
-          } else {
-            this.emit('destroyView', this.curView);
-            this.curView.instantiate.destroy();
-            this.curView = null;
-          }
-        }
-        this._onLoadViw = true;
-        return requirejs([viewName], (function(_this) {
-          return function(View) {
-            var $el;
-            $el = $("<div class='" + _this.options.viewClass + "' />");
-            _this.curView = {
-              name: viewName,
-              instantiate: new View($el, _this)
-            };
-            return _this.runMiddlewares(function() {
-              _this.curView.instantiate.$el.appendTo(_this.$el);
-              _this.curView.instantiate.afterRun();
-              return _this._onLoadViw = false;
-            });
-          };
-        })(this));
-      },
-      run: function() {
-        return this.router.run();
+  "use strict";
+  var $, Stapes, config, exports, route;
+
+  $ = require('jquery');
+
+  Stapes = require('stapes');
+
+  route = require('./route');
+
+  config = require('./config')();
+
+  exports = module.exports = Stapes.subclass({
+    constructor: function($el1, options) {
+      this.$el = $el1;
+      if (options == null) {
+        options = {};
       }
-    });
+      this.options = $.extend({
+        viewClass: 'mcore-app-view',
+        routeChange: route.Route.changeByLocationHash
+      }, options);
+      this.router = new route.Route(this.options.routeChange);
+      this.curView = null;
+      this._onLoadViw = false;
+      this._middlewares = [];
+    },
+    route: function(path, viewName) {
+      var self;
+      self = this;
+      this.router.add(path, function() {
+        return self.runView(viewName, this, arguments);
+      });
+      return this;
+    },
+    use: function(middleware) {
+      this._middlewares.push(middleware);
+      return this;
+    },
+    _runView: function(done) {
+      if (done == null) {
+        done = function() {};
+      }
+      this.curView.instantiate.route = this.env.route;
+      this.curView.instantiate.context = this.env.context;
+      this.curView.instantiate.run.apply(this.curView.instantiate, this.env.args);
+      this.emit('runView', this.curView);
+      return done(this.curView.instantiate);
+    },
+    stack: function(ix, err, done) {
+      var middleware, next, nextIx;
+      if (ix == null) {
+        ix = 0;
+      }
+      if (err == null) {
+        err = null;
+      }
+      if (done == null) {
+        done = function() {};
+      }
+      if (ix === this._middlewares.length) {
+        return this._runView(done);
+      }
+      middleware = this._middlewares[ix];
+      nextIx = ix + 1;
+      next = (function(_this) {
+        return function(err) {
+          return _this.stack(nextIx, err, done);
+        };
+      })(this);
+      this.env.view = this.curView.instantiate;
+      return middleware.call(this.env, err, next);
+    },
+    runMiddlewares: function(done) {
+      if (done == null) {
+        done = function() {};
+      }
+      if (this._middlewares.length === 0) {
+        return this._runView(done);
+      }
+      return this.stack(0, null, done);
+    },
+    runView: function(viewName, route, args) {
+      if (this._onLoadViw) {
+        return;
+      }
+      this.env = {
+        route: route,
+        context: route.context,
+        args: args,
+        viewName: viewName,
+        app: this
+      };
+      if (this.curView) {
+        if (this.curView.name === viewName) {
+          this.runMiddlewares((function(_this) {
+            return function() {
+              return _this.curView.instantiate.afterRun();
+            };
+          })(this));
+          return;
+        } else {
+          this.emit('destroyView', this.curView);
+          this.curView.instantiate.destroy();
+          this.curView = null;
+        }
+      }
+      this._onLoadViw = true;
+      return config.AMDLoader([viewName], (function(_this) {
+        return function(View) {
+          var $el;
+          $el = $("<div class='" + _this.options.viewClass + "' />");
+          _this.curView = {
+            name: viewName,
+            instantiate: new View($el, _this)
+          };
+          return _this.runMiddlewares(function() {
+            _this.curView.instantiate.$el.appendTo(_this.$el);
+            _this.curView.instantiate.afterRun();
+            return _this._onLoadViw = false;
+          });
+        };
+      })(this));
+    },
+    run: function() {
+      return this.router.run();
+    }
   });
 
 }).call(this);

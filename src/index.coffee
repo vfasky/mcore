@@ -3,19 +3,25 @@
  * @module mcore
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'mcore',
-['mcore/util', 'mcore/template', 'mcore/view', 'mcore/route', 'mcore/ui', 'mcore/app'],
-(util, Template, View, Route, Ui, App)->
-    
-    "use strict"
+"use strict"
 
-    exports =
-        util: util
-        Template: Template
-        View: View
-        Route: Route
-        Ui: Ui
-        App: App
+util = require './util'
+route = require './route'
+config = require './config'
+Template = require './template'
+View = require './view'
+Ui = require './ui'
+App = require './app'
+Stapes = require 'stapes'
 
-    exports
+exports = module.exports =
+    util: util
+    route: route
+    config: config
+    Template: Template
+    View: View
+    Ui: Ui
+    App: App
+    Stapes: Stapes
+
 

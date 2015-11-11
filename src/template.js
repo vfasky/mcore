@@ -7,419 +7,468 @@
  */
 
 (function() {
-  var slice = [].slice;
+  "use strict";
+  var $, Stapes, Template, config, exports, rivets, util,
+    slice = [].slice;
 
-  define('mcore/template', ['jquery', 'rivets', 'mcore/util', 'stapes'], function($, rivets, util, Stapes) {
-    "use strict";
-    var Template;
-    rivets.adapters[':'] = {
-      observe: function(obj, keypath, callback) {
-        obj.on('change:' + keypath, callback);
-      },
-      unobserve: function(obj, keypath, callback) {
-        obj.off('change:' + keypath, callback);
-      },
-      get: function(obj, keypath) {
-        return obj.get(keypath);
-      },
-      set: function(obj, keypath, value) {
-        obj.set(keypath, value);
-      }
-    };
-    rivets.configure({
-      rootInterface: '.',
-      handler: function(target, event, binding) {
-        var ref;
-        ref = this.call(binding.view.models.self, target, event);
-        if (false !== ref) {
-          return;
-        }
-        if (event.stopPropagation && event.preventDefault) {
-          event.stopPropagation();
-          return event.preventDefault();
-        } else {
-          window.event.cancelBubble = true;
-          return window.event.returnValue = false;
-        }
-      }
-    });
+  $ = require('jquery');
 
-    /**
-     * Formatters
-     */
-    rivets.formatters['nl2br'] = function(value) {
-      if (!value) {
-        return '';
-      }
-      return String(value).trim().replace(/<[^>]+>/g, "").replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + '<br/>' + '$2');
-    };
-    rivets.formatters['link'] = function(value, join) {
-      if (!value) {
-        return '';
-      }
-      return String(value) + String(join);
-    };
-    rivets.formatters['and'] = function(value, show) {
-      if (!value) {
-        return value;
-      }
-      return show;
-    };
-    rivets.formatters['or'] = function(value, show) {
-      if (value) {
-        return value;
-      }
-      return show;
-    };
-    rivets.formatters['slice'] = function(value, start, end) {
-      if (false === Array.isArray(value)) {
-        return [];
-      }
-      return value.slice(start, end);
-    };
-    rivets.formatters['substr'] = function(value, start, end) {
-      if (!value) {
-        return '';
-      }
-      return String(value).substring(start, end);
-    };
-    rivets.formatters['len'] = function(value) {
-      if (Array.isArray(value)) {
-        return value.length;
-      }
-      if (!value) {
-        return 0;
-      }
-      return String(value).length;
-    };
-    rivets.formatters['%'] = util.format;
-    rivets.formatters['eq'] = function(value, x) {
-      return value === x;
-    };
-    rivets.formatters['<'] = function(value, x) {
-      return Number(value) < Number(x);
-    };
-    rivets.formatters['<='] = function(value, x) {
-      return Number(value) <= Number(x);
-    };
-    rivets.formatters['=='] = function(value, x) {
-      return Number(value) === Number(x);
-    };
-    rivets.formatters['>='] = function(value, x) {
-      return Number(value) >= Number(x);
-    };
-    rivets.formatters['>'] = function(value, x) {
-      return Number(value) > Number(x);
-    };
-    rivets.formatters['+'] = function(value, x) {
-      return Number(value) + Number(x);
-    };
-    rivets.formatters['-'] = function(value, x) {
-      return Number(value) - Number(x);
-    };
-    rivets.formatters['*'] = function(value, x) {
-      return Number(value) * Number(x);
-    };
-    rivets.formatters['/'] = function(value, x) {
-      return Number(value) / Number(x);
-    };
-    rivets.formatters['isArray'] = function(value) {
-      return Array.isArray(value);
-    };
-    rivets.formatters['eachObject'] = function(obj) {
-      var data, k, results, v;
-      if (false === util.isObject(obj)) {
-        return [];
-      }
-      data = [];
-      results = [];
-      for (k in obj) {
-        v = obj[k];
-        results.push(data.push({
-          key: k,
-          value: v
-        }));
-      }
-      return results;
-    };
-    rivets.formatters['toFixed'] = function(value, len) {
-      if (len == null) {
-        len = 1;
-      }
-      if (false === util.isNumber(value)) {
-        return 0;
-      }
-      return Number(value).toFixed(len);
-    };
-    rivets.formatters['in'] = function() {
-      var args, value;
-      args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-      if (args.length < 2) {
-        return false;
-      }
-      value = args[0];
-      args.splice(0, 1);
-      if (util.isNumber(value)) {
-        value = Number(value);
-      }
-      return args.indexOf(value) !== -1;
-    };
+  rivets = require('rivets');
 
-    /**
-     * 模板渲染
-     * @param {Object} view
-     * @param {jQuery} view.$el
-     * @param {Function} view.set
-     * @param {Object} data
-     */
-    Template = function(view, data1) {
-      this.view = view;
-      this.data = data1 != null ? data1 : {};
-      this.rv = false;
-    };
-    Template.prototype.init = function() {
-      var data, dtd, keys, rv;
-      data = this.data;
-      keys = Object.keys(data);
-      dtd = $.Deferred();
-      if (keys.length === 0) {
-        rv = rivets.bind(this.view.$el, {
-          self: this.view
-        });
-        this.rv = rv;
-        dtd.resolve(rv);
+  Stapes = require('stapes');
+
+  util = require('./util');
+
+  config = require('./config')();
+
+  rivets.adapters[':'] = {
+    observe: function(obj, keypath, callback) {
+      obj.on('change:' + keypath, callback);
+    },
+    unobserve: function(obj, keypath, callback) {
+      obj.off('change:' + keypath, callback);
+    },
+    get: function(obj, keypath) {
+      return obj.get(keypath);
+    },
+    set: function(obj, keypath, value) {
+      obj.set(keypath, value);
+    }
+  };
+
+  rivets.configure({
+    rootInterface: '.',
+    handler: function(target, event, binding) {
+      var ref;
+      ref = this.call(binding.view.models.self, target, event);
+      if (false !== ref) {
+        return;
+      }
+      if (event.stopPropagation && event.preventDefault) {
+        event.stopPropagation();
+        return event.preventDefault();
       } else {
-        Template.loadPromise(data).done((function(_this) {
-          return function(vData) {
-            keys.forEach(function(k) {
-              var v;
-              v = vData[k];
-              if (v != null) {
-                return _this.view.set(k, v);
-              }
-            });
-            rv = rivets.bind(_this.view.$el, {
-              self: _this.view
-            });
-            _this.rv = rv;
-            dtd.resolve(rv);
-          };
-        })(this)).fail(function() {
-          return dtd.reject('template render error');
-        });
+        window.event.cancelBubble = true;
+        return window.event.returnValue = false;
       }
-      return dtd.promise();
-    };
-    Template.prototype.set = function(key, promise) {
-      return promise.then((function(_this) {
-        return function(val) {
-          return _this.view.set(key, val);
+    }
+  });
+
+
+  /**
+   * Formatters
+   */
+
+  rivets.formatters['nl2br'] = function(value) {
+    if (!value) {
+      return '';
+    }
+    return String(value).trim().replace(/<[^>]+>/g, "").replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + '<br/>' + '$2');
+  };
+
+  rivets.formatters['link'] = function(value, join) {
+    if (!value) {
+      return '';
+    }
+    return String(value) + String(join);
+  };
+
+  rivets.formatters['and'] = function(value, show) {
+    if (!value) {
+      return value;
+    }
+    return show;
+  };
+
+  rivets.formatters['or'] = function(value, show) {
+    if (value) {
+      return value;
+    }
+    return show;
+  };
+
+  rivets.formatters['slice'] = function(value, start, end) {
+    if (false === Array.isArray(value)) {
+      return [];
+    }
+    return value.slice(start, end);
+  };
+
+  rivets.formatters['substr'] = function(value, start, end) {
+    if (!value) {
+      return '';
+    }
+    return String(value).substring(start, end);
+  };
+
+  rivets.formatters['len'] = function(value) {
+    if (Array.isArray(value)) {
+      return value.length;
+    }
+    if (!value) {
+      return 0;
+    }
+    return String(value).length;
+  };
+
+  rivets.formatters['%'] = util.format;
+
+  rivets.formatters['eq'] = function(value, x) {
+    return value === x;
+  };
+
+  rivets.formatters['<'] = function(value, x) {
+    return Number(value) < Number(x);
+  };
+
+  rivets.formatters['<='] = function(value, x) {
+    return Number(value) <= Number(x);
+  };
+
+  rivets.formatters['=='] = function(value, x) {
+    return Number(value) === Number(x);
+  };
+
+  rivets.formatters['>='] = function(value, x) {
+    return Number(value) >= Number(x);
+  };
+
+  rivets.formatters['>'] = function(value, x) {
+    return Number(value) > Number(x);
+  };
+
+  rivets.formatters['+'] = function(value, x) {
+    return Number(value) + Number(x);
+  };
+
+  rivets.formatters['-'] = function(value, x) {
+    return Number(value) - Number(x);
+  };
+
+  rivets.formatters['*'] = function(value, x) {
+    return Number(value) * Number(x);
+  };
+
+  rivets.formatters['/'] = function(value, x) {
+    return Number(value) / Number(x);
+  };
+
+  rivets.formatters['isArray'] = function(value) {
+    return Array.isArray(value);
+  };
+
+  rivets.formatters['eachObject'] = function(obj) {
+    var data, k, results, v;
+    if (false === util.isObject(obj)) {
+      return [];
+    }
+    data = [];
+    results = [];
+    for (k in obj) {
+      v = obj[k];
+      results.push(data.push({
+        key: k,
+        value: v
+      }));
+    }
+    return results;
+  };
+
+  rivets.formatters['toFixed'] = function(value, len) {
+    if (len == null) {
+      len = 1;
+    }
+    if (false === util.isNumber(value)) {
+      return 0;
+    }
+    return Number(value).toFixed(len);
+  };
+
+  rivets.formatters['in'] = function() {
+    var args, value;
+    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+    if (args.length < 2) {
+      return false;
+    }
+    value = args[0];
+    args.splice(0, 1);
+    if (util.isNumber(value)) {
+      value = Number(value);
+    }
+    return args.indexOf(value) !== -1;
+  };
+
+
+  /**
+   * 模板渲染
+   * @param {Object} view
+   * @param {jQuery} view.$el
+   * @param {Function} view.set
+   * @param {Object} data
+   */
+
+  Template = function(view, data1) {
+    this.view = view;
+    this.data = data1 != null ? data1 : {};
+    this.rv = false;
+  };
+
+  Template.prototype.init = function() {
+    var data, dtd, keys, rv;
+    data = this.data;
+    keys = Object.keys(data);
+    dtd = $.Deferred();
+    if (keys.length === 0) {
+      rv = rivets.bind(this.view.$el, {
+        self: this.view
+      });
+      this.rv = rv;
+      dtd.resolve(rv);
+    } else {
+      Template.loadPromise(data).done((function(_this) {
+        return function(vData) {
+          keys.forEach(function(k) {
+            var v;
+            v = vData[k];
+            if (v != null) {
+              return _this.view.set(k, v);
+            }
+          });
+          rv = rivets.bind(_this.view.$el, {
+            self: _this.view
+          });
+          _this.rv = rv;
+          dtd.resolve(rv);
+        };
+      })(this)).fail(function() {
+        return dtd.reject('template render error');
+      });
+    }
+    return dtd.promise();
+  };
+
+  Template.prototype.set = function(key, promise) {
+    return promise.then((function(_this) {
+      return function(val) {
+        return _this.view.set(key, val);
+      };
+    })(this));
+  };
+
+  Template.prototype.update = function(data) {
+    var dtd, keys;
+    if (data == null) {
+      data = {};
+    }
+    dtd = $.Deferred();
+    if (false === this.rv) {
+      dtd.reject('Template no init');
+    } else {
+      keys = Object.keys(data);
+      Template.loadPromise(data).done((function(_this) {
+        return function(vData) {
+          var newData;
+          newData = {};
+          keys.forEach(function(k) {
+            var v;
+            v = vData[k];
+            if (v != null) {
+              return newData[k] = v;
+            }
+          });
+          _this.view.set(newData);
+          dtd.resolve(vData);
+        };
+      })(this)).fail(function() {
+        return dtd.reject('template update error');
+      });
+    }
+    return dtd.promise();
+  };
+
+  Template.prototype.destroy = function() {
+    if (this.rv) {
+      return this.rv.unbind();
+    }
+  };
+
+  Template.loadPromise = function(data) {
+    var dtd, keys, promises;
+    dtd = $.Deferred();
+    keys = Object.keys(data);
+    if (keys.length === 0) {
+      dtd.resolve({});
+    } else {
+      promises = [];
+      keys.forEach((function(_this) {
+        return function(v) {
+          return promises.push(data[v]);
         };
       })(this));
-    };
-    Template.prototype.update = function(data) {
-      var dtd, keys;
-      if (data == null) {
-        data = {};
-      }
-      dtd = $.Deferred();
-      if (false === this.rv) {
-        dtd.reject('Template no init');
-      } else {
-        keys = Object.keys(data);
-        Template.loadPromise(data).done((function(_this) {
-          return function(vData) {
-            var newData;
-            newData = {};
-            keys.forEach(function(k) {
-              var v;
-              v = vData[k];
-              if (v != null) {
-                return newData[k] = v;
+      $.when.apply(null, promises).done(function() {
+        var args, vData;
+        args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+        vData = {};
+        args.forEach((function(_this) {
+          return function(v, k) {
+            var key;
+            key = keys[k];
+            if (key) {
+              if (Array.isArray(v) && v.length === 3 && v[2].promise) {
+                v = v[0];
               }
-            });
-            _this.view.set(newData);
-            dtd.resolve(vData);
-          };
-        })(this)).fail(function() {
-          return dtd.reject('template update error');
-        });
-      }
-      return dtd.promise();
-    };
-    Template.prototype.destroy = function() {
-      if (this.rv) {
-        return this.rv.unbind();
-      }
-    };
-    Template.loadPromise = function(data) {
-      var dtd, keys, promises;
-      dtd = $.Deferred();
-      keys = Object.keys(data);
-      if (keys.length === 0) {
-        dtd.resolve({});
-      } else {
-        promises = [];
-        keys.forEach((function(_this) {
-          return function(v) {
-            return promises.push(data[v]);
+              return vData[key] = v;
+            }
           };
         })(this));
-        $.when.apply(null, promises).done(function() {
-          var args, vData;
-          args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-          vData = {};
-          args.forEach((function(_this) {
-            return function(v, k) {
-              var key;
-              key = keys[k];
-              if (key) {
-                if (Array.isArray(v) && v.length === 3 && v[2].promise) {
-                  v = v[0];
-                }
-                return vData[key] = v;
-              }
-            };
-          })(this));
-          return dtd.resolve(vData);
-        }).fail(function(err) {
-          console.log(err);
-          return dtd.reject(err);
-        });
-      }
-      return dtd.promise();
-    };
+        return dtd.resolve(vData);
+      }).fail(function(err) {
+        console.log(err);
+        return dtd.reject(err);
+      });
+    }
+    return dtd.promise();
+  };
 
-    /**
-     * 加载amd规范的模板，
-     * 包名必须为 tpl/ 前缀
-     */
-    Template.loadTpl = function(uri) {
-      var dtd, info;
-      dtd = $.Deferred();
-      info = String(uri).split('/');
-      if (info.length === 2) {
-        requirejs(["tpl/" + info[0]], function(tpl) {
-          var html;
-          html = tpl[info[1]];
-          if (html) {
-            return dtd.resolve(html);
-          } else {
-            return dtd.reject('url data map error');
-          }
-        });
-      } else {
-        dtd.reject('uri error: ' + uri);
-      }
-      return dtd.promise();
-    };
-    Template.bind = function(data, model) {
-      if (data == null) {
-        data = {};
-      }
-      model.tpl = new Template(model, data);
-      return model.tpl.init().then(function() {
-        model.emit('render');
+
+  /**
+   * 加载amd规范的模板，
+   * 包名必须为 tpl/ 前缀
+   */
+
+  Template.loadTpl = function(uri) {
+    var dtd, info;
+    dtd = $.Deferred();
+    info = String(uri).split('/');
+    if (info.length === 2) {
+      config.AMDLoader(["tpl/" + info[0]], function(tpl) {
+        var html;
+        html = tpl[info[1]];
+        if (html) {
+          return dtd.resolve(html);
+        } else {
+          return dtd.reject('url data map error');
+        }
+      });
+    } else {
+      dtd.reject('uri error: ' + uri);
+    }
+    return dtd.promise();
+  };
+
+  Template.bind = function(data, model) {
+    if (data == null) {
+      data = {};
+    }
+    model.tpl = new Template(model, data);
+    return model.tpl.init().then(function() {
+      model.emit('render');
+      return model.tpl;
+    });
+  };
+
+  Template.renderString = function(html, data, model) {
+    var $parent, defTplVal, isHasParent, keys;
+    if (data == null) {
+      data = {};
+    }
+    keys = Object.keys(data);
+    if (keys.length > 0 && !model.tpl) {
+      defTplVal = {};
+      keys.forEach((function(_this) {
+        return function(k) {
+          return defTplVal[k] = {};
+        };
+      })(this));
+      model.set(defTplVal);
+    }
+    $parent = model.$el.parent();
+    isHasParent = $parent.length > 0;
+    if (isHasParent) {
+      model.$el.detach();
+    }
+    if (model.tpl) {
+      model.emit('tplBeforeUpdate');
+      return model.tpl.update(data).then(function() {
+        if (isHasParent) {
+          model.$el.appendTo($parent);
+        }
+        model.emit('tplUpdate');
         return model.tpl;
       });
-    };
-    Template.renderString = function(html, data, model) {
-      var $parent, defTplVal, isHasParent, keys;
-      if (data == null) {
-        data = {};
-      }
-      keys = Object.keys(data);
-      if (keys.length > 0 && !model.tpl) {
-        defTplVal = {};
-        keys.forEach((function(_this) {
-          return function(k) {
-            return defTplVal[k] = {};
-          };
-        })(this));
-        model.set(defTplVal);
-      }
-      $parent = model.$el.parent();
-      isHasParent = $parent.length > 0;
-      if (isHasParent) {
-        model.$el.detach();
-      }
-      if (model.tpl) {
-        model.emit('tplBeforeUpdate');
-        return model.tpl.update(data).then(function() {
-          if (isHasParent) {
-            model.$el.appendTo($parent);
-          }
-          model.emit('tplUpdate');
-          return model.tpl;
-        });
-      } else {
-        model.$el.append(html);
-        model.emit('beforeRender');
-        return Template.bind(data, model).then(function(res) {
-          if (isHasParent) {
-            model.$el.appendTo($parent);
-          }
-          return res;
-        });
-      }
-    };
-    Template.render = function(uri, data, model) {
-      if (data == null) {
-        data = {};
-      }
-      return Template.loadTpl(uri).then(function(html) {
-        return Template.renderString(html, data, model);
-      });
-    };
-    Template.formatters = function(name, fun) {
-      return rivets.formatters[name] = fun;
-    };
-    Template.Attr = Stapes.subclass({
-      constructor: function(name1, rv1, el1) {
-        this.name = name1;
-        this.rv = rv1;
-        this.el = el1;
-        this.$el = $(this.el);
-        this.init(this.el);
-        return this.watch();
-      },
-      sync: function(value) {
-        return this.rv.observer.setValue(value);
-      },
-      init: function(el) {},
-      update: function(value, el) {},
-      destroy: function(el) {},
-      watch: function() {}
-    });
-    Template.regAttr = function(name, Attr) {
-      var attr;
-      attr = null;
-      return rivets.binders[name] = {
-        bind: function(el) {
-          return attr = new Attr(name, this, el);
-        },
-        unbind: function(el) {
-          return attr.destroy(el);
-        },
-        routine: function(el, value) {
-          return attr.update(value, el);
+    } else {
+      model.$el.append(html);
+      model.emit('beforeRender');
+      return Template.bind(data, model).then(function(res) {
+        if (isHasParent) {
+          model.$el.appendTo($parent);
         }
-      };
-    };
-    Template.regTag = function(name, options) {
-      if (options == null) {
-        options = {};
-      }
-      return rivets.components[name] = {
-        "static": options["static"] || [],
-        attributes: options.attr || [],
-        template: options.template || function() {
-          return '';
-        },
-        initialize: options.init || function() {}
-      };
-    };
-    return Template;
+        return res;
+      });
+    }
+  };
+
+  Template.render = function(uri, data, model) {
+    if (data == null) {
+      data = {};
+    }
+    return Template.loadTpl(uri).then(function(html) {
+      return Template.renderString(html, data, model);
+    });
+  };
+
+  Template.formatters = function(name, fun) {
+    return rivets.formatters[name] = fun;
+  };
+
+  Template.Attr = Stapes.subclass({
+    constructor: function(name1, rv1, el1) {
+      this.name = name1;
+      this.rv = rv1;
+      this.el = el1;
+      this.$el = $(this.el);
+      this.init(this.el);
+      return this.watch();
+    },
+    sync: function(value) {
+      return this.rv.observer.setValue(value);
+    },
+    init: function(el) {},
+    update: function(value, el) {},
+    destroy: function(el) {},
+    watch: function() {}
   });
+
+  Template.regAttr = function(name, Attr) {
+    var attr;
+    attr = null;
+    return rivets.binders[name] = {
+      bind: function(el) {
+        return attr = new Attr(name, this, el);
+      },
+      unbind: function(el) {
+        return attr.destroy(el);
+      },
+      routine: function(el, value) {
+        return attr.update(value, el);
+      }
+    };
+  };
+
+  Template.regTag = function(name, options) {
+    if (options == null) {
+      options = {};
+    }
+    return rivets.components[name] = {
+      "static": options["static"] || [],
+      attributes: options.attr || [],
+      template: options.template || function() {
+        return '';
+      },
+      initialize: options.init || function() {}
+    };
+  };
+
+  exports = module.exports = Template;
 
 }).call(this);

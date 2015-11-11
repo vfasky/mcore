@@ -9,13 +9,16 @@
   <body>
     <div id="mocha"></div>
     <script src="mocha.js"></script>
-    <script src="require.js"></script>
+    <!--<script src="require.js"></script>-->
+    <script src="http://cdn.staticfile.org/curl/0.7.3/curl/curl.min.js"></script>
     <script>
-      requirejs.config({
+      curl.config({
           paths: {
               mcore: '../dist/mcore',
-              mcoreExt: '../dist/mcore.ext',
               chai: 'chai',
+              sightglass: '../dist/mcore',
+              rivets: '../dist/mcore',
+              stapes: '../dist/mcore',
               jquery: '../vendor/jquery-2.1.4.min'
           }
           
@@ -35,12 +38,16 @@
           return chai.assert;
       });
 
-      requirejs(
-          ['case/util', 'case/route', 'case/view', 'case/app', 'case/attr'], 
-          function(){
+      curl(
+          ['mcore', 'case/util', 'case/route', 'case/view', 'case/app'], 
+          function(mcore){
+              mcore.config({
+                  AMDLoader: curl
+              });
               mocha.run(); 
           }
       );
     </script>
   </body>
 </html>
+

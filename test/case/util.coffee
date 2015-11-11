@@ -7,8 +7,11 @@
 ###
 
 define 'case/util',
-['describe', 'it', 'mcore/util', 'assert'],
-(describe, it, util, assert)->
+['describe', 'it', 'mcore', 'assert'],
+(describe, it, mcore, assert)->
+    "use strict"
+    
+    util = mcore.util
 
     describe 'util isNumber', ->
 

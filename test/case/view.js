@@ -7,8 +7,11 @@
  */
 
 (function() {
-  define('case/view', ['describe', 'it', 'mcore/view', 'assert', 'jquery', 'mcore/template'], function(describe, it, View, assert, $, Template) {
+  define('case/view', ['describe', 'it', 'mcore', 'assert', 'jquery'], function(describe, it, mcore, assert, $) {
     "use strict";
+    var Template, View;
+    View = mcore.View;
+    Template = mcore.Template;
     return describe('test view and template', function() {
       it('hello', function(done) {
         var $el, TestView, testView;
