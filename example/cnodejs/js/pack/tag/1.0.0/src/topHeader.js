@@ -8,17 +8,19 @@
  */
 
 (function() {
-  define('tag/topHeader', ['mcore'], function(mcore) {
-    "use strict";
-    return mcore.Template.regTag('top-header', {
-      attr: ['title', 'back'],
-      template: function() {
-        return '<div class="bar bar-header bar-royal">\n    <button rv-on-click="back" class="button button-icon icon ion-ios-arrow-thin-left"></button>\n\n    <h1 class="title" rv-text="title | substr 0 13"></h1>\n</div>';
-      },
-      init: function(el, data) {
-        return data;
-      }
-    });
+  "use strict";
+  var mcore;
+
+  mcore = require('mcore');
+
+  mcore.Template.regTag('top-header', {
+    attr: ['title', 'back'],
+    template: function() {
+      return '<div class="bar bar-header bar-royal">\n    <button rv-on-click="back" class="button button-icon icon ion-ios-arrow-thin-left"></button>\n\n    <h1 class="title" rv-text="title | substr 0 13"></h1>\n</div>';
+    },
+    init: function(el, data) {
+      return data;
+    }
   });
 
 }).call(this);

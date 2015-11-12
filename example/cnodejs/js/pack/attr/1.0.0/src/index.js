@@ -7,8 +7,9 @@
  */
 
 (function() {
-  define('attr', ['attr/linkToBlank'], function() {
-    "use strict";
-  });
+  "use strict";
+  require('./linkToBlank');
+
+  require('./userLink');
 
 }).call(this);

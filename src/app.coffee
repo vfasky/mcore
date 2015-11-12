@@ -8,6 +8,7 @@
 $ = require 'jquery'
 Stapes = require 'stapes'
 route = require './route'
+util = require './util'
 config = require('./config')()
 
 exports = module.exports = Stapes.subclass
@@ -70,10 +71,27 @@ exports = module.exports = Stapes.subclass
 
         @stack 0, null, done
 
+    _initView: (View, viewName)->
+        $el = $ "<div class='#{@options.viewClass}' />"
+
+        @curView =
+            name: viewName
+            instantiate: new View $el, @
+
+        @runMiddlewares =>
+            @curView.instantiate.$el.appendTo @$el
+            @curView.instantiate.afterRun()
+            @_onLoadViw = false
+
 
     # 启动view
     runView: (viewName, route, args)->
         return if @_onLoadViw
+
+        View = false
+        if false == util.isString(viewName)
+            View = viewName
+            viewName = View.viewName
 
         # ENV
         @env =
@@ -97,18 +115,11 @@ exports = module.exports = Stapes.subclass
 
         @_onLoadViw = true
     
-        config.AMDLoader [viewName], (View)=>
-            $el = $ "<div class='#{@options.viewClass}' />"
-
-            @curView =
-                name: viewName
-                instantiate: new View $el, @
-
-            @runMiddlewares =>
-                @curView.instantiate.$el.appendTo @$el
-                @curView.instantiate.afterRun()
-                @_onLoadViw = false
-
+        if View
+            @_initView View, viewName
+        else
+            config.AMDLoader [viewName], (View)=>
+                @_initView View, viewName
 
     run: ->
         @router.run()

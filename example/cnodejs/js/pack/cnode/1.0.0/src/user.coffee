@@ -3,15 +3,16 @@
  * @module cnode/user
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'cnode/user', ['jquery', 'cnode/view', 'cnode/formatters', 'mcore-attr/scroller'],
-($, View)->
-    
-    "use strict"
+"use strict"
 
-    View.subclass
-        constructor: View::constructor
-        run: (userName)->
-           @render 'cnode/user.html',
-               user: @api.user userName
+View = require './view'
+require './formatters'
+require 'mcoreExt'
 
+module.exports = View.subclass
+    constructor: View::constructor
+    run: (userName)->
+       @render 'cnode/user.html',
+           user: @api.user userName
 
+module.exports.viewName = 'user'

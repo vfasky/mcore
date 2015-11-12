@@ -7,14 +7,18 @@
  */
 
 (function() {
-  define('cnode/view', ['jquery', 'mcore', 'cnode/api'], function($, mcore, api) {
-    "use strict";
-    return mcore.View.subclass({
-      constructor: mcore.View.prototype.constructor,
-      beforeInit: function() {
-        return this.api = api;
-      }
-    });
+  "use strict";
+  var api, mcore;
+
+  mcore = require('mcoreExt');
+
+  api = require('./api');
+
+  module.exports = mcore.View.subclass({
+    constructor: mcore.View.prototype.constructor,
+    beforeInit: function() {
+      return this.api = api;
+    }
   });
 
 }).call(this);

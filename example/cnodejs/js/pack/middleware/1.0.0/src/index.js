@@ -7,12 +7,11 @@
  */
 
 (function() {
-  define('middleware', ['middleware/loader'], function(loader) {
-    "use strict";
-    var exports;
-    return exports = {
-      loader: loader
-    };
-  });
+  "use strict";
+  var exports;
+
+  exports = module.exports = {
+    loader: require('./loader')
+  };
 
 }).call(this);

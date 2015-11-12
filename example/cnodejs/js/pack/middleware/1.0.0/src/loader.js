@@ -7,29 +7,32 @@
  */
 
 (function() {
-  define('middleware/loader', ['jquery'], function($) {
-    "use strict";
-    var $el;
-    $el = $('<div class="loader-wrap">\n    <div class="flower-loader">\n        Loading…\n    </div>\n</div>');
-    $el.hide().appendTo('body');
-    return function(err, next) {
-      if (err) {
-        return next(err);
-      }
-      this.view.on('beforeRender', function() {
-        return $el.show();
-      });
-      this.view.on('tplBeforeUpdate', function() {
-        return $el.show();
-      });
-      this.view.on('render', function() {
-        return $el.hide();
-      });
-      this.view.on('tplUpdate', function() {
-        return $el.hide();
-      });
-      return next();
-    };
-  });
+  "use strict";
+  var $, $el;
+
+  $ = require('jquery');
+
+  $el = $('<div class="loader-wrap">\n    <div class="flower-loader">\n        Loading…\n    </div>\n</div>');
+
+  $el.hide().appendTo('body');
+
+  module.exports = function(err, next) {
+    if (err) {
+      return next(err);
+    }
+    this.view.on('beforeRender', function() {
+      return $el.show();
+    });
+    this.view.on('tplBeforeUpdate', function() {
+      return $el.show();
+    });
+    this.view.on('render', function() {
+      return $el.hide();
+    });
+    this.view.on('tplUpdate', function() {
+      return $el.hide();
+    });
+    return next();
+  };
 
 }).call(this);

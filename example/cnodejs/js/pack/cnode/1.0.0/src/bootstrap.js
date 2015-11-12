@@ -7,23 +7,33 @@
  */
 
 (function() {
-  define('cnode', ['jquery', 'mcore', 'middleware', 'tag', 'attr'], function($, mcore, middleware) {
-    "use strict";
-    var init;
-    init = false;
-    return function(select, loadSelect) {
-      var app;
-      app = new mcore.App($(select));
-      app.use(middleware.loader);
-      app.route('/topic/:id', 'cnode/topic').route('/user/:userName', 'cnode/user').route('*', 'cnode/index');
-      app.on('runView', function() {
-        if (init === false) {
-          init = true;
-          return $(loadSelect).remove();
-        }
-      });
-      return app.run();
-    };
-  });
+  "use strict";
+  var $, init, mcore, middleware;
+
+  $ = require('jquery');
+
+  mcore = require('mcoreExt');
+
+  middleware = require('middleware');
+
+  require('tag');
+
+  require('attr');
+
+  init = false;
+
+  module.exports = function(select, loadSelect) {
+    var app;
+    app = new mcore.App($(select));
+    app.use(middleware.loader);
+    app.route('/topic/:id', require('./topic')).route('/user/:userName', require('./user')).route('*', require('./index'));
+    app.on('runView', function() {
+      if (init === false) {
+        init = true;
+        return $(loadSelect).remove();
+      }
+    });
+    return app.run();
+  };
 
 }).call(this);

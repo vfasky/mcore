@@ -3,25 +3,27 @@
  * @module attr/linkToBlank
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'attr/linkToBlank', ['jquery', 'mcore'], ($, mcore)->
-    
-    "use strict"
 
-    origin = window.location.origin
+"use strict"
 
-    mcore.Template.regAttr 'link-to-blank', mcore.Template.Attr.subclass
-        constructor: mcore.Template.Attr::constructor
-        init: ->
-            @.$el.on 'click', 'a', ->
-                href = String @.href
+$ = require 'jquery'
+mcore = require 'mcore'
 
-                # 转换topic 连接
-                if href.indexOf('cnodejs.org/topic/') != -1
-                    id = href.split('cnodejs.org/topic/').pop()
-                    window.location.href = '#/topic/' + id
-                    return false
+origin = window.location.origin
 
-                if href.indexOf(origin) != 0
-                    window.open href
-                    return false
+mcore.Template.regAttr 'link-to-blank', mcore.Template.Attr.subclass
+    constructor: mcore.Template.Attr::constructor
+    init: ->
+        @.$el.on 'click', 'a', ->
+            href = String @.href
+
+            # 转换topic 连接
+            if href.indexOf('cnodejs.org/topic/') != -1
+                id = href.split('cnodejs.org/topic/').pop()
+                window.location.href = '#/topic/' + id
+                return false
+
+            if href.indexOf(origin) != 0
+                window.open href
+                return false
 

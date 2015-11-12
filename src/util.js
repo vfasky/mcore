@@ -26,6 +26,10 @@
     return Object.prototype.toString.call(x) === '[object Object]';
   };
 
+  exports.isString = function(x) {
+    return Object.prototype.toString.call(x) === '[object String]';
+  };
+
   exports.clone = function(value) {
     return JSON.parse(JSON.stringify(value));
   };

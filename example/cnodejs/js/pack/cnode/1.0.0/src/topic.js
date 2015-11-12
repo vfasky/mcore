@@ -7,40 +7,52 @@
  */
 
 (function() {
-  define('cnode/topic', ['jquery', 'cnode/view', 'mcore-attr/scroller', 'cnode/formatters', 'attr/userLink'], function($, View) {
-    "use strict";
-    return View.subclass({
-      constructor: View.prototype.constructor,
-      run: function(id) {
-        return this.render('cnode/topic.html', {
-          replieEnd: 5,
-          topic: this.api.topic(id).then(function(res) {
-            res.data.replies.forEach(function(v, k) {
-              return v.ix = k;
-            });
-            return res;
-          })
-        });
-      },
-      watch: function() {
-        return this.$el.on('scrollend', (function(_this) {
-          return function() {
-            var replieEnd, topic, topicCount, total;
-            topic = _this.get('topic');
-            replieEnd = _this.get('replieEnd');
-            total = replieEnd + 5;
-            topicCount = Number(topic.data.reply_count);
-            if (total > topicCount) {
-              total = topicCount;
-            }
-            if (total === replieEnd) {
-              return;
-            }
-            return _this.set('replieEnd', total);
-          };
-        })(this));
-      }
-    });
+  "use strict";
+  var $, View, mcore;
+
+  $ = require('jquery');
+
+  mcore = require('mcoreExt');
+
+  View = require('./view');
+
+  require('./formatters');
+
+  require('../../../attr/1.0.0/src/index.js');
+
+  module.exports = View.subclass({
+    constructor: View.prototype.constructor,
+    run: function(id) {
+      return this.render('cnode/topic.html', {
+        replieEnd: 5,
+        topic: this.api.topic(id).then(function(res) {
+          res.data.replies.forEach(function(v, k) {
+            return v.ix = k;
+          });
+          return res;
+        })
+      });
+    },
+    watch: function() {
+      return this.$el.on('scrollend', (function(_this) {
+        return function() {
+          var replieEnd, topic, topicCount, total;
+          topic = _this.get('topic');
+          replieEnd = _this.get('replieEnd');
+          total = replieEnd + 5;
+          topicCount = Number(topic.data.reply_count);
+          if (total > topicCount) {
+            total = topicCount;
+          }
+          if (total === replieEnd) {
+            return;
+          }
+          return _this.set('replieEnd', total);
+        };
+      })(this));
+    }
   });
+
+  module.exports.viewName = 'topic';
 
 }).call(this);

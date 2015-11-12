@@ -7,16 +7,24 @@
  */
 
 (function() {
-  define('cnode/user', ['jquery', 'cnode/view', 'cnode/formatters', 'mcore-attr/scroller'], function($, View) {
-    "use strict";
-    return View.subclass({
-      constructor: View.prototype.constructor,
-      run: function(userName) {
-        return this.render('cnode/user.html', {
-          user: this.api.user(userName)
-        });
-      }
-    });
+  "use strict";
+  var View;
+
+  View = require('./view');
+
+  require('./formatters');
+
+  require('mcoreExt');
+
+  module.exports = View.subclass({
+    constructor: View.prototype.constructor,
+    run: function(userName) {
+      return this.render('cnode/user.html', {
+        user: this.api.user(userName)
+      });
+    }
   });
+
+  module.exports.viewName = 'user';
 
 }).call(this);

@@ -118,6 +118,10 @@ define(["jquery"], function(__WEBPACK_EXTERNAL_MODULE_4__) { return /******/ (fu
 	    return Object.prototype.toString.call(x) === '[object Object]';
 	  };
 
+	  exports.isString = function(x) {
+	    return Object.prototype.toString.call(x) === '[object String]';
+	  };
+
 	  exports.clone = function(value) {
 	    return JSON.parse(JSON.stringify(value));
 	  };
@@ -3632,13 +3636,15 @@ define(["jquery"], function(__WEBPACK_EXTERNAL_MODULE_4__) { return /******/ (fu
 
 	(function() {
 	  "use strict";
-	  var $, Stapes, config, exports, route;
+	  var $, Stapes, config, exports, route, util;
 
 	  $ = __webpack_require__(4);
 
 	  Stapes = __webpack_require__(9);
 
 	  route = __webpack_require__(2);
+
+	  util = __webpack_require__(1);
 
 	  config = __webpack_require__(3)();
 
@@ -3712,9 +3718,30 @@ define(["jquery"], function(__WEBPACK_EXTERNAL_MODULE_4__) { return /******/ (fu
 	      }
 	      return this.stack(0, null, done);
 	    },
+	    _initView: function(View, viewName) {
+	      var $el;
+	      $el = $("<div class='" + this.options.viewClass + "' />");
+	      this.curView = {
+	        name: viewName,
+	        instantiate: new View($el, this)
+	      };
+	      return this.runMiddlewares((function(_this) {
+	        return function() {
+	          _this.curView.instantiate.$el.appendTo(_this.$el);
+	          _this.curView.instantiate.afterRun();
+	          return _this._onLoadViw = false;
+	        };
+	      })(this));
+	    },
 	    runView: function(viewName, route, args) {
+	      var View;
 	      if (this._onLoadViw) {
 	        return;
+	      }
+	      View = false;
+	      if (false === util.isString(viewName)) {
+	        View = viewName;
+	        viewName = View.viewName;
 	      }
 	      this.env = {
 	        route: route,
@@ -3738,21 +3765,15 @@ define(["jquery"], function(__WEBPACK_EXTERNAL_MODULE_4__) { return /******/ (fu
 	        }
 	      }
 	      this._onLoadViw = true;
-	      return config.AMDLoader([viewName], (function(_this) {
-	        return function(View) {
-	          var $el;
-	          $el = $("<div class='" + _this.options.viewClass + "' />");
-	          _this.curView = {
-	            name: viewName,
-	            instantiate: new View($el, _this)
+	      if (View) {
+	        return this._initView(View, viewName);
+	      } else {
+	        return config.AMDLoader([viewName], (function(_this) {
+	          return function(View) {
+	            return _this._initView(View, viewName);
 	          };
-	          return _this.runMiddlewares(function() {
-	            _this.curView.instantiate.$el.appendTo(_this.$el);
-	            _this.curView.instantiate.afterRun();
-	            return _this._onLoadViw = false;
-	          });
-	        };
-	      })(this));
+	        })(this));
+	      }
 	    },
 	    run: function() {
 	      return this.router.run();

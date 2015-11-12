@@ -7,50 +7,56 @@
  */
 
 (function() {
-  define('attr/userLink', ['jquery', 'mcore', 'cnode/formatters'], function($, mcore, format) {
-    "use strict";
-    return mcore.Template.regAttr('user-link', mcore.Template.Attr.subclass({
-      constructor: mcore.Template.Attr.prototype.constructor,
-      init: function() {
-        this.ix = this.$el.attr('data-ix');
-        return this.$el.on('click', 'a', function() {
-          var href;
-          href = String($(this).attr('href'));
-          if (href.indexOf('/user/') === 0) {
-            window.location.href = '#' + href;
+  "use strict";
+  var $, format, mcore;
+
+  $ = require('jquery');
+
+  mcore = require('mcore');
+
+  format = require('../../../cnode/1.0.0/src/formatters.js');
+
+  mcore.Template.regAttr('user-link', mcore.Template.Attr.subclass({
+    constructor: mcore.Template.Attr.prototype.constructor,
+    init: function() {
+      this.ix = this.$el.attr('data-ix');
+      return this.$el.on('click', 'a', function() {
+        var href;
+        href = String($(this).attr('href'));
+        if (href.indexOf('/user/') === 0) {
+          window.location.href = '#' + href;
+          return false;
+        }
+      });
+    },
+    update: function(replies) {
+      var self;
+      this.replies = JSON.parse(JSON.stringify(replies));
+      self = this;
+      return this.$el.find('a').each(function() {
+        var $el, $quote, href, quote, txt, userName;
+        $el = $(this);
+        txt = $el.text();
+        href = $el.attr('href');
+        if (txt.indexOf('@') !== 0 || href.indexOf('/user/') !== 0) {
+          return;
+        }
+        userName = txt.replace('@', '');
+        replies = self.replies.slice(0, self.ix);
+        replies.reverse();
+        quote = '';
+        $.each(replies, function(k, v) {
+          if (v.author.loginname === userName) {
+            quote = v;
             return false;
           }
         });
-      },
-      update: function(replies) {
-        var self;
-        this.replies = JSON.parse(JSON.stringify(replies));
-        self = this;
-        return this.$el.find('a').each(function() {
-          var $el, $quote, href, quote, txt, userName;
-          $el = $(this);
-          txt = $el.text();
-          href = $el.attr('href');
-          if (txt.indexOf('@') !== 0 || href.indexOf('/user/') !== 0) {
-            return;
-          }
-          userName = txt.replace('@', '');
-          replies = self.replies.slice(0, self.ix);
-          replies.reverse();
-          quote = '';
-          $.each(replies, function(k, v) {
-            if (v.author.loginname === userName) {
-              quote = v;
-              return false;
-            }
-          });
-          if (quote) {
-            $quote = $("<blockquote>\n    " + (format.markdown(quote.content)) + "\n</blockquote>");
-            return $quote.insertBefore($el);
-          }
-        });
-      }
-    }));
-  });
+        if (quote) {
+          $quote = $("<blockquote>\n    " + (format.markdown(quote.content)) + "\n</blockquote>");
+          return $quote.insertBefore($el);
+        }
+      });
+    }
+  }));
 
 }).call(this);

@@ -17,34 +17,27 @@
         </div>
     </div>
 
-    <script src="//dn-cdnjscn.qbox.me/ajax/libs/require.js/2.1.18/require.min.js"></script>
+    <script src="http://cdn.staticfile.org/curl/0.7.3/curl/curl.min.js"></script>
 
-    <script src="./js/config.dev.js"></script>
     <script>
-        //dev
-        requirejs.config({
+        curl.config({
             paths: {
-              sightglass: '../../vendor/sightglass',
-              rivets: '../../vendor/rivets',
-              stapes: '../../vendor/stapes',
-              formSerializer: '../../attr/vendor/formSerializer', 
-              scroller: '../../attr/vendor/scroller', 
-            },
-            packages: [
-              {
-                  name: 'mcore',
-                  location: '../../src',
-                  main: 'index'
-              },
-              {
-                  name: 'mcore-attr',
-                  location: '../../attr/src',
-                  main: 'index'
-              }
-            ]
+              mcore: '../../dist/mcore.js',
+              mcoreExt: '../../dist/mcore.ext.js',
+              cnode: './js/cnode.7817cb4713c8289d9ee7.min.js',
+              "tpl/cnode": "./js/tpl/cnode.232e97.js",
+              "hljs": "//dn-cdnjscn.qbox.me/ajax/libs/highlight.js/8.6/highlight.min.js",
+              "markdown-it": "//dn-cdnjscn.qbox.me/ajax/libs/markdown-it/4.2.2/markdown-it.min.js",
+              "jquery": "//dn-cdnjscn.qbox.me/ajax/libs/jquery/2.1.4/jquery.min.js",
+              "moment": "//dn-cdnjscn.qbox.me/ajax/libs/moment.js/2.10.3/moment.min.js"
+            }
         });
 
-        requirejs(['cnode'], function(bootstrap){
+        curl(['mcore', 'cnode'], function(mcore, bootstrap){
+            mcore.config({
+              AMDLoader: curl
+            });
+
             bootstrap('#app-view', '#app-load');
         });
     </script>

@@ -18,10 +18,11 @@ _memoryStorage = {}
 exports.isNumber = (x)->
     _isNumberReg.test x
     
-
 exports.isObject = (x)->
     Object::toString.call(x) == '[object Object]'
 
+exports.isString = (x)->
+    Object::toString.call(x) == '[object String]'
 
 exports.clone = (value)->
     JSON.parse JSON.stringify(value)

@@ -3,10 +3,9 @@
  * @module middleware
  * @author vfasky <vfasky@gmail.com>
 ###
-define 'middleware', ['middleware/loader'], (loader)->
-    
-    "use strict"
 
-    exports =
-        loader: loader
+"use strict"
+
+exports = module.exports =
+    loader: require './loader'
 

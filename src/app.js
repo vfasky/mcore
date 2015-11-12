@@ -8,13 +8,15 @@
 
 (function() {
   "use strict";
-  var $, Stapes, config, exports, route;
+  var $, Stapes, config, exports, route, util;
 
   $ = require('jquery');
 
   Stapes = require('stapes');
 
   route = require('./route');
+
+  util = require('./util');
 
   config = require('./config')();
 
@@ -88,9 +90,30 @@
       }
       return this.stack(0, null, done);
     },
+    _initView: function(View, viewName) {
+      var $el;
+      $el = $("<div class='" + this.options.viewClass + "' />");
+      this.curView = {
+        name: viewName,
+        instantiate: new View($el, this)
+      };
+      return this.runMiddlewares((function(_this) {
+        return function() {
+          _this.curView.instantiate.$el.appendTo(_this.$el);
+          _this.curView.instantiate.afterRun();
+          return _this._onLoadViw = false;
+        };
+      })(this));
+    },
     runView: function(viewName, route, args) {
+      var View;
       if (this._onLoadViw) {
         return;
+      }
+      View = false;
+      if (false === util.isString(viewName)) {
+        View = viewName;
+        viewName = View.viewName;
       }
       this.env = {
         route: route,
@@ -114,21 +137,15 @@
         }
       }
       this._onLoadViw = true;
-      return config.AMDLoader([viewName], (function(_this) {
-        return function(View) {
-          var $el;
-          $el = $("<div class='" + _this.options.viewClass + "' />");
-          _this.curView = {
-            name: viewName,
-            instantiate: new View($el, _this)
+      if (View) {
+        return this._initView(View, viewName);
+      } else {
+        return config.AMDLoader([viewName], (function(_this) {
+          return function(View) {
+            return _this._initView(View, viewName);
           };
-          return _this.runMiddlewares(function() {
-            _this.curView.instantiate.$el.appendTo(_this.$el);
-            _this.curView.instantiate.afterRun();
-            return _this._onLoadViw = false;
-          });
-        };
-      })(this));
+        })(this));
+      }
     },
     run: function() {
       return this.router.run();

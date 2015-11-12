@@ -7,8 +7,7 @@
  */
 
 (function() {
-  define('tag', ['tag/topHeader'], function() {
-    "use strict";
-  });
+  "use strict";
+  require('./topHeader');
 
 }).call(this);
