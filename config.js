@@ -1,1 +1,0 @@
-requirejs.config({"paths":{"mcore":"./dist/mcore","mcore.ext":"./dist/mcore.ext"}});

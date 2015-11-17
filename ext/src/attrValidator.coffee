@@ -8,7 +8,7 @@
 
 $ = require 'jquery'
 mcore = require 'mcore'
-require '../vendor/formSerializer'
+require 'formSerializer'
 
 Template = mcore.Template
 util = mcore.util

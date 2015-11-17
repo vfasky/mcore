@@ -7,7 +7,7 @@
 "use strict"
 
 $ = require 'jquery'
-scroller = require '../vendor/scroller'
+scroller = require 'scroller'
 mcore = require 'mcore'
 Template = mcore.Template
 
@@ -305,4 +305,4 @@ Template.regAttr 'scroller', Template.Attr.subclass
             sHeight
         )
 
-return
+

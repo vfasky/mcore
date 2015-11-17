@@ -1,13 +1,13 @@
 ###*
  * attr ext
- * @module mcore-attr
+ * @module mcore.ext
  * @author vfasky <vfasky@gmail.com>
 ###
 "use strict"
 
-validator = require './validator'
+validator = require './attrValidator'
+require './attrScroller'
 mcore = require 'mcore'
-require './scroller'
 
 mcore.ext =
     validator: validator

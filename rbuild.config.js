@@ -42,10 +42,12 @@ module.exports = {
       alias: {
         stapes: __dirname + '/vendor/stapes.js',
         rivets: __dirname + '/vendor/rivets.js',
-        sightglass: __dirname + '/vendor/sightglass.js'
+        sightglass: __dirname + '/vendor/sightglass.js',
+        scroller: __dirname + '/ext/vendor/scroller.js',
+        formSerializer: __dirname + '/ext/vendor/formSerializer.js',
       }
     },
-    externals: ['jquery', 'mcore', 'mcoreExt']
+    externals: ['jquery', 'mcore', 'mcoreExt', 'mcore.ext']
   }
 };
 
