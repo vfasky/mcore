@@ -1,4 +1,14 @@
-define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_14__) { return /******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("jquery"), require("mcore"));
+	else if(typeof define === 'function' && define.amd)
+		define(["jquery", "mcore"], factory);
+	else {
+		var a = typeof exports === 'object' ? factory(require("jquery"), require("mcore")) : factory(root["jquery"], root["mcore"]);
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_14__) {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -2535,4 +2545,6 @@ define(["jquery","mcore"], function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXT
 
 
 /***/ }
-/******/ ])});;
+/******/ ])
+});
+;
