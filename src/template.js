@@ -419,7 +419,9 @@ Template.Attr = Stapes.subclass({
     return this.watch();
   },
   sync: function(value) {
-    return this.rv.observer.setValue(value);
+    if (this.rv.observer && this.rv.observer.setValue) {
+      return this.rv.observer.setValue(value);
+    }
   },
   init: function(el) {},
   update: function(value, el) {},

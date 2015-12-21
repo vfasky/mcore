@@ -373,7 +373,7 @@ Template.Attr = Stapes.subclass
         @watch()
 
     sync: (value)->
-        @rv.observer.setValue value
+        @rv.observer.setValue value if @rv.observer and @rv.observer.setValue
         
     init: (el)->
     update: (value, el)->
