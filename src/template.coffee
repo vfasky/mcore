@@ -329,18 +329,18 @@ Template.renderString = (html, data = {}, model)->
 
         model.set defTplVal
 
-    $parent = model.$el.parent()
-    isHasParent = $parent.length > 0
+    #$parent = model.$el.parent()
+    #isHasParent = $parent.length > 0
 
     # 移出 dom tree
-    model.$el.detach() if isHasParent
+    #model.$el.detach() if isHasParent
             
     # 模板已经初始化，更新
     if model.tpl
         model.emit 'tplBeforeUpdate'
         
         return model.tpl.update(data).then ->
-            model.$el.appendTo $parent if isHasParent
+            #model.$el.appendTo $parent if isHasParent
 
             model.emit 'tplUpdate'
             model.tpl
@@ -349,7 +349,7 @@ Template.renderString = (html, data = {}, model)->
         model.emit 'beforeRender'
 
         return Template.bind(data, model).then (res)->
-            model.$el.appendTo $parent if isHasParent
+            #model.$el.appendTo $parent if isHasParent
             res
 
 

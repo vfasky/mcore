@@ -366,7 +366,7 @@ Template.bind = function(data, model) {
 };
 
 Template.renderString = function(html, data, model) {
-  var $parent, defTplVal, isHasParent, keys;
+  var defTplVal, keys;
   if (data == null) {
     data = {};
   }
@@ -380,17 +380,9 @@ Template.renderString = function(html, data, model) {
     })(this));
     model.set(defTplVal);
   }
-  $parent = model.$el.parent();
-  isHasParent = $parent.length > 0;
-  if (isHasParent) {
-    model.$el.detach();
-  }
   if (model.tpl) {
     model.emit('tplBeforeUpdate');
     return model.tpl.update(data).then(function() {
-      if (isHasParent) {
-        model.$el.appendTo($parent);
-      }
       model.emit('tplUpdate');
       return model.tpl;
     });
@@ -398,9 +390,6 @@ Template.renderString = function(html, data, model) {
     model.$el.append(html);
     model.emit('beforeRender');
     return Template.bind(data, model).then(function(res) {
-      if (isHasParent) {
-        model.$el.appendTo($parent);
-      }
       return res;
     });
   }

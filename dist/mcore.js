@@ -994,7 +994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Template.renderString = function(html, data, model) {
-	  var $parent, defTplVal, isHasParent, keys;
+	  var defTplVal, keys;
 	  if (data == null) {
 	    data = {};
 	  }
@@ -1008,17 +1008,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })(this));
 	    model.set(defTplVal);
 	  }
-	  $parent = model.$el.parent();
-	  isHasParent = $parent.length > 0;
-	  if (isHasParent) {
-	    model.$el.detach();
-	  }
 	  if (model.tpl) {
 	    model.emit('tplBeforeUpdate');
 	    return model.tpl.update(data).then(function() {
-	      if (isHasParent) {
-	        model.$el.appendTo($parent);
-	      }
 	      model.emit('tplUpdate');
 	      return model.tpl;
 	    });
@@ -1026,9 +1018,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    model.$el.append(html);
 	    model.emit('beforeRender');
 	    return Template.bind(data, model).then(function(res) {
-	      if (isHasParent) {
-	        model.$el.appendTo($parent);
-	      }
 	      return res;
 	    });
 	  }
