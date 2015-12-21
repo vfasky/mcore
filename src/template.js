@@ -387,9 +387,14 @@ Template.renderString = function(html, data, model) {
       return model.tpl;
     });
   } else {
-    model.$el.append(html);
+    model.$el.css({
+      visibility: 'hidden'
+    }).append(html);
     model.emit('beforeRender');
     return Template.bind(data, model).then(function(res) {
+      model.$el.css({
+        visibility: 'visible'
+      });
       return res;
     });
   }

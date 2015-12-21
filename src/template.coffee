@@ -345,10 +345,14 @@ Template.renderString = (html, data = {}, model)->
             model.emit 'tplUpdate'
             model.tpl
     else
-        model.$el.append html
+        model.$el.css
+            visibility: 'hidden'
+        .append html
         model.emit 'beforeRender'
 
         return Template.bind(data, model).then (res)->
+            model.$el.css
+                visibility: 'visible'
             #model.$el.appendTo $parent if isHasParent
             res
 
