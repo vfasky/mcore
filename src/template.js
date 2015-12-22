@@ -109,7 +109,16 @@ rivets.formatters['len'] = function(value) {
   return String(value).length;
 };
 
-rivets.formatters['%'] = util.format;
+rivets.formatters['%'] = function() {
+  var args, len, str;
+  args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+  len = args.length;
+  if (len > 1 && String(args[0]).indexOf('%') === -1 && String(args[len - 1]).indexOf('%') !== -1) {
+    str = args.pop();
+    args.splice(0, 0, str);
+  }
+  return util.format.apply(this, args);
+};
 
 rivets.formatters['eq'] = function(value, x) {
   return value === x;
@@ -190,9 +199,6 @@ rivets.formatters['in'] = function() {
   }
   value = args[0];
   args.splice(0, 1);
-  if (util.isNumber(value)) {
-    value = Number(value);
-  }
   return args.indexOf(value) !== -1;
 };
 

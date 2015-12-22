@@ -99,8 +99,14 @@ rivets.formatters['len'] = (value)->
     
     String(value).length
 
-# sprintf
-rivets.formatters['%'] = util.format
+# sprintf (表达式可以是后至）
+rivets.formatters['%'] = (args...)->
+    len = args.length
+    if len > 1 and String(args[0]).indexOf('%') == -1 and String(args[len-1]).indexOf('%') != -1
+        str = args.pop()
+        args.splice 0, 0, str
+
+    util.format.apply @, args
 
 
 # 判断两个值是否绝对相等
@@ -175,7 +181,7 @@ rivets.formatters['in'] = (args...)->
     value = args[0]
     args.splice(0, 1)
 
-    value = Number value if util.isNumber(value)
+    #value = Number value if util.isNumber(value)
 
     args.indexOf(value) != -1
 
