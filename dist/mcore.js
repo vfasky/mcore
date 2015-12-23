@@ -3579,6 +3579,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.init();
 	    return this.watch();
 	  },
+	  asyncSet: function(key, promise) {
+	    return promise.then((function(_this) {
+	      return function(val) {
+	        _this.set(key, val);
+	        return val;
+	      };
+	    })(this));
+	  },
 	  destroy: function() {
 	    if (this.tpl) {
 	      this.tpl.destroy();

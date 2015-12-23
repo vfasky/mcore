@@ -23,6 +23,11 @@ exports = module.exports = Stapes.subclass
         @init()
         @watch()
 
+    asyncSet: (key, promise)->
+        promise.then (val)=>
+            @set key, val
+            val
+
     destroy: ->
         @tpl.destroy() if @tpl
         @$el.remove()
