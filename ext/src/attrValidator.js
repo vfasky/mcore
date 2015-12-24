@@ -90,7 +90,7 @@ rule = {
     return String(x).trim().length > 0;
   },
   isAlphabet: function(x) {
-    return _isAlphabetReg.test(x);
+    return _isAlphabetReg.test(String(x));
   },
   minlength: function(x, len) {
     len = Number(len);
@@ -103,7 +103,7 @@ rule = {
     return x.length < len;
   },
   isNumber: function(x) {
-    return $.isNumeric(x);
+    return $.isNumeric(String(x));
   },
   isInteger: function(x) {
     return Number(x) % 1 === 0;
@@ -124,14 +124,14 @@ rule = {
     return String(x) === String(value);
   },
   isEmail: function(x) {
-    return _isEmailReg.test(x);
+    return _isEmailReg.test(String(x));
   },
   isDate: function(x) {
     var d, day, month, taste, year;
-    if (_isDateReg.test(x)) {
+    if (_isDateReg.test(String(x))) {
       return false;
     }
-    taste = _isDateReg.exec(x);
+    taste = _isDateReg.exec(String(x));
     year = Number(taste[1]);
     month = Number(taste[3] - 1);
     day = Number(taste[5]);
@@ -139,10 +139,10 @@ rule = {
     return year === d.getFullYear() && month === d.getMonth() && day === d.getDate();
   },
   isMobile: function(x) {
-    return _isMobileReg.test(x);
+    return _isMobileReg.test(String(x));
   },
   isTel: function(x) {
-    return _isTelReg.test(x);
+    return _isTelReg.test(String(x));
   },
   isIdentityCode: function(x) {
     var ai, cisy, code, factor, i, j, last, parity, sum, wi;
@@ -210,7 +210,7 @@ rule = {
     return true;
   },
   isUrl: function(x) {
-    return urlCheck(x);
+    return urlCheck(String(x));
   }
 };
 
@@ -250,12 +250,22 @@ ValidatorAttr = Template.Attr.subclass({
     errFun = null;
     $form = this.$el;
     $.each(this.rules, function(k, v) {
-      var $el;
+      var $el, _value, value;
       if (v.type !== 'required' && (data[v.name] === '' || data[v.name] === void 0)) {
         return;
       }
+      _value = data[v.name];
       $el = v.args[0];
-      v.args[0] = data[v.name];
+      value = {
+        toString: function() {
+          return String(_value);
+        },
+        toNumber: function() {
+          return parseInt(_value);
+        },
+        $el: $el
+      };
+      v.args[0] = value;
       if (false === v.rule.apply(null, v.args)) {
         errFun = function() {
           return {

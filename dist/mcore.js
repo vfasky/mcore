@@ -115,7 +115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	_memoryStorage = {};
 
 	exports.isNumber = function(x) {
-	  return _isNumberReg.test(x);
+	  return _isNumberReg.test(String(x));
 	};
 
 	exports.isObject = function(x) {

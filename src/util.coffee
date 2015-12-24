@@ -16,7 +16,7 @@ _localStorage = window.localStorage
 _memoryStorage = {}
 
 exports.isNumber = (x)->
-    _isNumberReg.test x
+    _isNumberReg.test String(x)
     
 exports.isObject = (x)->
     Object::toString.call(x) == '[object Object]'

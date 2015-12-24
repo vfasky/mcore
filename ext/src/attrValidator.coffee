@@ -80,7 +80,7 @@ rule =
     required: (x = '')->
         String(x).trim().length > 0
     # 是否字母
-    isAlphabet: (x)-> _isAlphabetReg.test x
+    isAlphabet: (x)-> _isAlphabetReg.test String(x)
     # 最小长度
     minlength: (x, len)->
         len = Number len
@@ -92,7 +92,7 @@ rule =
         x = String(x).trim()
         x.length < len
     # 只能是数字
-    isNumber: (x)-> $.isNumeric x
+    isNumber: (x)-> $.isNumeric String(x)
     # 是否为整数
     isInteger: (x)-> Number(x) % 1 == 0
     # 最小值
@@ -107,11 +107,11 @@ rule =
         x = x.val() if x instanceof $
         String(x) == String(value)
     # 是否邮箱
-    isEmail: (x) -> _isEmailReg.test x
+    isEmail: (x) -> _isEmailReg.test String(x)
     # 检查日期
     isDate: (x) ->
-        return false if _isDateReg.test x
-        taste = _isDateReg.exec x
+        return false if _isDateReg.test String(x)
+        taste = _isDateReg.exec String(x)
 
         year = Number taste[1]
         month = Number taste[3] - 1
@@ -120,9 +120,9 @@ rule =
 
         year == d.getFullYear() and month == d.getMonth() and day == d.getDate()
     # 是否手机
-    isMobile: (x) -> _isMobileReg.test x
+    isMobile: (x) -> _isMobileReg.test String(x)
     # 是否座机
-    isTel: (x) -> _isTelReg.test x
+    isTel: (x) -> _isTelReg.test String(x)
     # 检查身份证
     isIdentityCode: (x)->
         x = String(x).replace('x', 'X')
@@ -189,7 +189,7 @@ rule =
         true
 
     # url
-    isUrl: (x)-> urlCheck x
+    isUrl: (x)-> urlCheck String(x)
 
 
 ###*
@@ -225,8 +225,16 @@ ValidatorAttr = Template.Attr.subclass
             if v.type != 'required' and (data[v.name] == '' or data[v.name] == undefined)
                 return
 
+            _value = data[v.name]
+
             $el = v.args[0]
-            v.args[0] = data[v.name]
+
+            value =
+                toString: -> String _value
+                toNumber: -> parseInt _value
+                $el: $el
+
+            v.args[0] = value
 
             if false == v.rule.apply(null, v.args)
                 errFun = ->
