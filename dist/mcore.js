@@ -1057,6 +1057,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.rv.observer.setValue(value);
 	    }
 	  },
+	  asyncSet: function(key, promise) {
+	    return promise.then((function(_this) {
+	      return function(val) {
+	        _this.set(key, val);
+	        return val;
+	      };
+	    })(this));
+	  },
 	  init: function(el) {},
 	  update: function(value, el) {},
 	  destroy: function(el) {},

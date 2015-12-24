@@ -380,6 +380,11 @@ Template.Attr = Stapes.subclass
 
     sync: (value)->
         @rv.observer.setValue value if @rv.observer and @rv.observer.setValue
+
+    asyncSet: (key, promise)->
+        promise.then (val)=>
+            @set key, val
+            val
         
     init: (el)->
     update: (value, el)->
