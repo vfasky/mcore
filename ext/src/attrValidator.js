@@ -261,7 +261,7 @@ ValidatorAttr = Template.Attr.subclass({
           return String(_value);
         },
         toNumber: function() {
-          return parseInt(_value);
+          return Number(_value);
         },
         $el: $el
       };

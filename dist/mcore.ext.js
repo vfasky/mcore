@@ -361,7 +361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return String(_value);
 	        },
 	        toNumber: function() {
-	          return parseInt(_value);
+	          return Number(_value);
 	        },
 	        $el: $el
 	      };

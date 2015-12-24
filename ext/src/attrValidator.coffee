@@ -231,7 +231,7 @@ ValidatorAttr = Template.Attr.subclass
 
             value =
                 toString: -> String _value
-                toNumber: -> parseInt _value
+                toNumber: -> Number _value
                 $el: $el
 
             v.args[0] = value
