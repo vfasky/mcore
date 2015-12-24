@@ -243,41 +243,50 @@ ValidatorAttr = Template.Attr.subclass({
       return this.$el.removeAttr('validator');
     }
   },
+  getNameValue: function(data, name, $el) {
+    name = String(name);
+    if (-1 === name.indexOf('[')) {
+      return data[name] || '';
+    }
+    return $el.val().trim();
+  },
   check: function() {
     var $form, data, errFun, isPass;
     isPass = true;
     data = this.$el.serializeObject();
     errFun = null;
     $form = this.$el;
-    $.each(this.rules, function(k, v) {
-      var $el, _value, value;
-      if (v.type !== 'required' && (data[v.name] === '' || data[v.name] === void 0)) {
-        return;
-      }
-      _value = data[v.name];
-      $el = v.args[0];
-      value = {
-        toString: function() {
-          return String(_value);
-        },
-        toNumber: function() {
-          return Number(_value);
-        },
-        $el: $el
-      };
-      v.args[0] = value;
-      if (false === v.rule.apply(null, v.args)) {
-        errFun = function() {
-          return {
-            $el: $el,
-            err: v.err,
-            $form: $form
-          };
+    $.each(this.rules, (function(_this) {
+      return function(k, v) {
+        var $el, _value, value;
+        $el = v.args[0];
+        _value = _this.getNameValue(data, v.name, $el);
+        if (v.type !== 'required' && (_value === '' || _value === void 0)) {
+          return;
+        }
+        value = {
+          toString: function() {
+            return String(_value);
+          },
+          toNumber: function() {
+            return Number(_value);
+          },
+          $el: $el
         };
-        isPass = false;
-        return false;
-      }
-    });
+        v.args[0] = value;
+        if (false === v.rule.apply(null, v.args)) {
+          errFun = function() {
+            return {
+              $el: $el,
+              err: v.err,
+              $form: $form
+            };
+          };
+          isPass = false;
+          return false;
+        }
+      };
+    })(this));
     return isPass && data || errFun;
   },
   initRules: function() {

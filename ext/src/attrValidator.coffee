@@ -214,20 +214,28 @@ ValidatorAttr = Template.Attr.subclass
         else
             @$el.removeAttr 'validator'
 
-            
+    # 取对应name的值
+    getNameValue: (data, name, $el)->
+        name = String(name)
+        if -1 == name.indexOf('[')
+            return data[name] or ''
+
+        $el.val().trim()
+        
+
     check: ->
         isPass = true
         data = @$el.serializeObject()
         errFun = null
         $form = @$el
 
-        $.each @rules, (k, v)->
-            if v.type != 'required' and (data[v.name] == '' or data[v.name] == undefined)
+        $.each @rules, (k, v)=>
+            $el = v.args[0]
+            _value = @getNameValue data, v.name, $el
+
+            if v.type != 'required' and (_value == '' or _value == undefined)
                 return
 
-            _value = data[v.name]
-
-            $el = v.args[0]
 
             value =
                 toString: -> String _value
