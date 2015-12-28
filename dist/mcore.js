@@ -1072,16 +1072,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	Template.regAttr = function(name, Attr) {
-	  var attr;
-	  attr = null;
 	  return rivets.binders[name] = {
 	    bind: function(el) {
-	      return attr = new Attr(name, this, el);
+	      var $el, attr;
+	      $el = $(el);
+	      attr = new Attr(name, this, el);
+	      return $el.data('__mcore_attr', attr);
 	    },
 	    unbind: function(el) {
+	      var $el, attr;
+	      $el = $(el);
+	      attr = $el.data('__mcore_attr');
 	      return attr.destroy(el);
 	    },
 	    routine: function(el, value) {
+	      var $el, attr;
+	      $el = $(el);
+	      attr = $el.data('__mcore_attr');
 	      return attr.update(value, el);
 	    }
 	  };

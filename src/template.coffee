@@ -394,15 +394,20 @@ Template.Attr = Stapes.subclass
 
 # 注册自定义属性
 Template.regAttr = (name, Attr)->
-    attr = null
     rivets.binders[name] =
         bind: (el)->
+            $el = $ el
             attr = new Attr name, @, el
+            $el.data '__mcore_attr', attr
             
         unbind: (el)->
+            $el = $ el
+            attr = $el.data '__mcore_attr'
             attr.destroy el
 
         routine: (el, value)->
+            $el = $ el
+            attr = $el.data '__mcore_attr'
             attr.update value, el
 
 
