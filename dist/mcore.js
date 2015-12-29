@@ -830,6 +830,95 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return args.indexOf(value) !== -1;
 	};
 
+	rivets.formatters['script'] = function() {
+	  var args, code, context, error, error1, error2, fn, keys, values;
+	  code = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+	  if (!code || args.length === 0) {
+	    return null;
+	  }
+	  code = String(code);
+	  code = 'return ' + code.replace(/\sor\s/g, ' || ').replace(/\sand\s/g, ' && ');
+	  if (args.length === 1) {
+	    context = args[0];
+	    fn = new Function('self', code);
+	    try {
+	      return fn(context);
+	    } catch (error1) {
+	      error = error1;
+	    }
+	  } else {
+	    keys = [];
+	    values = [];
+	    args.forEach(function(v, k) {
+	      if (k % 2 === 0) {
+	        return keys.push(v);
+	      } else {
+	        return values.push(v);
+	      }
+	    });
+	    keys.push(code);
+	    fn = Function.apply(null, keys);
+	    try {
+	      return fn.apply(null, values);
+	    } catch (error2) {
+	      error = error2;
+	    }
+	  }
+	  return null;
+	};
+
+	rivets.formatters['firstUpperCase'] = function(x) {
+	  if (!x) {
+	    return '';
+	  }
+	  return String(x).replace(/^\S/, function(s) {
+	    return s.toUpperCase();
+	  });
+	};
+
+	rivets.formatters['upperCase'] = function(x) {
+	  if (!x) {
+	    return '';
+	  }
+	  return String(x).toUpperCase();
+	};
+
+	rivets.formatters['arrayAddIx'] = function(arr, ixName) {
+	  if (arr == null) {
+	    arr = [];
+	  }
+	  if (ixName == null) {
+	    ixName = 'ix';
+	  }
+	  if (arr != null) {
+	    arr.forEach(function(v, k) {
+	      return v[ixName] = k;
+	    });
+	  }
+	  return arr;
+	};
+
+	rivets.formatters['param'] = function(obj) {
+	  if (obj == null) {
+	    obj = {};
+	  }
+	  return $.param(obj);
+	};
+
+	rivets.formatters['toString'] = function(x) {
+	  if (x == null) {
+	    x = '';
+	  }
+	  return String(x);
+	};
+
+	rivets.formatters['toNumber'] = function(x) {
+	  if (util.isNumber(x)) {
+	    return Number(x);
+	  }
+	  return 0;
+	};
+
 
 	/**
 	 * 模板渲染

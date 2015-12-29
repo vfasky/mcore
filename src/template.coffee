@@ -186,6 +186,75 @@ rivets.formatters['in'] = (args...)->
     args.indexOf(value) != -1
 
 
+# 执行 function
+rivets.formatters['script'] = (code, args...)->
+    if !code or args.length == 0
+        return null
+
+    code = String code
+    code = 'return ' + code.replace(/\sor\s/g, ' || ').replace(/\sand\s/g, ' && ')
+
+    if args.length == 1
+        context = args[0]
+        fn = new Function 'self', code
+        try
+            return fn context
+        catch error
+    else
+        keys = []
+        values = []
+        args.forEach (v, k)->
+            if k % 2 == 0
+                keys.push v
+            else
+                values.push v
+
+        keys.push code
+        fn = Function.apply null, keys
+
+        try
+            #console.log fn, values, fn.apply null, values
+            return fn.apply null, values
+        catch error
+
+    null
+
+# 首字母大写
+rivets.formatters['firstUpperCase'] = (x)->
+    return '' if !x
+    String(x).replace /^\S/, (s)-> s.toUpperCase()
+
+    
+# 大写
+rivets.formatters['upperCase'] = (x)->
+    return '' if !x
+    String(x).toUpperCase()
+
+    
+# 组数组添加索引
+rivets.formatters['arrayAddIx'] = (arr = [], ixName = 'ix')->
+    arr?.forEach (v, k)->
+        v[ixName] = k
+    arr
+
+    
+# obj to url
+rivets.formatters['param'] = (obj = {})->
+    $.param obj
+
+
+# toNumber
+rivets.formatters['toString'] = (x = '')->
+    String x
+
+
+# toNumber
+rivets.formatters['toNumber'] = (x)->
+    if util.isNumber(x)
+        return Number x
+    return 0
+
+
 ###*
  * 模板渲染
  * @param {Object} view
