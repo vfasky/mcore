@@ -209,7 +209,10 @@ rivets.formatters['script'] = function() {
     return null;
   }
   code = String(code);
-  code = 'return ' + code.replace(/\sor\s/g, ' || ').replace(/\sand\s/g, ' && ');
+  code = code.replace(/\sor\s/g, ' || ').replace(/\sand\s/g, ' && ').replace(/\sthen\s/g, ' { \n').replace(/\send\s/g, ' } \n');
+  if (code.indexOf('return') === -1) {
+    code = 'return ' + code;
+  }
   if (args.length === 1) {
     context = args[0];
     fn = new Function('self', code);
@@ -234,6 +237,7 @@ rivets.formatters['script'] = function() {
       return fn.apply(null, values);
     } catch (error2) {
       error = error2;
+      console.log(error);
     }
   }
   return null;

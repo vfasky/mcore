@@ -192,7 +192,13 @@ rivets.formatters['script'] = (code, args...)->
         return null
 
     code = String code
-    code = 'return ' + code.replace(/\sor\s/g, ' || ').replace(/\sand\s/g, ' && ')
+    code = code.replace(/\sor\s/g, ' || ')
+               .replace(/\sand\s/g, ' && ')
+               .replace(/\sthen\s/g, ' { \n')
+               .replace(/\send\s/g, ' } \n')
+               
+    if code.indexOf('return') == -1
+        code = 'return ' + code
 
     if args.length == 1
         context = args[0]
@@ -216,6 +222,7 @@ rivets.formatters['script'] = (code, args...)->
             #console.log fn, values, fn.apply null, values
             return fn.apply null, values
         catch error
+            console.log error
 
     null
 
