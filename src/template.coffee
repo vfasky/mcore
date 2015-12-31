@@ -196,6 +196,8 @@ rivets.formatters['script'] = (code, args...)->
                .replace(/\sand\s/g, ' && ')
                .replace(/\sthen\s/g, ' { \n')
                .replace(/\send\s/g, ' } \n')
+               .replace /\sstr\(([^\)]*)\)/g, (key)->
+                    key.replace('str(', '"').replace(')', '"')
                
     if code.indexOf('return') == -1
         code = 'return ' + code
