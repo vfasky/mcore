@@ -329,7 +329,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.$el.data('check', (function(_this) {
 	      return function() {
 	        _this.initRules();
-	        console.log(_this.rules);
 	        return _this.check();
 	      };
 	    })(this));
