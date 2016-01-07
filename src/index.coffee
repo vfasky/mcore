@@ -1,27 +1,12 @@
 ###*
- * @version 1.1.0
- * @module mcore
- * @author vfasky <vfasky@gmail.com>
+# mcore simple MVVM
+# @date 2016-01-07 21:46:45
+# @author vfasky <vfasky@gmail.com>
+# @link http://vfasky.com
 ###
-"use strict"
+'use strict'
 
-util = require './util'
-route = require './route'
-config = require './config'
-Template = require './template'
-View = require './view'
-Ui = require './ui'
-App = require './app'
-Stapes = require 'stapes'
-
-exports = module.exports =
-    util: util
-    route: route
-    config: config
-    Template: Template
-    View: View
-    Ui: Ui
-    App: App
-    Stapes: Stapes
-
-
+module.exports =
+    virtualDom: require './virtualDom'
+    EventEmitter: require './eventEmitter'
+    version: '2.0.0'

@@ -1,20 +1,28 @@
 {
   "name": "mcore",
-  "version": "1.1.0",
-  "description": "mcove mvvm",
+  "version": "2.0.0",
+  "description": "simple MVVM",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vfasky/mcore.git"
+  },
   "keywords": [
+    "vfasky",
     "mcore"
   ],
   "author": "vfasky@gmail.com",
-  "license": "BSD",
-  "devDependencies": {},
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/vfasky/mcore/issues"
+  },
+  "homepage": "https://github.com/vfasky/mcore#readme",
   "dependencies": {
-    "q-io": "^1.13.1",
-    "uglify-js": "^2.4.24",
-    "webpack": "^1.12.3"
+    "eventemitter3": "^1.1.1",
+    "simple-virtual-dom": "^0.1.7",
+    "webpack": "^1.12.10"
   }
 }
