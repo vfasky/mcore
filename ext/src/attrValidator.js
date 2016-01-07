@@ -83,11 +83,20 @@ errMsg = {
 };
 
 rule = {
-  required: function(x) {
+  required: function(x, rule) {
     if (x == null) {
       x = '';
     }
-    return String(x).trim().length > 0;
+    if (rule == null) {
+      rule = null;
+    }
+    if (rule === null) {
+      return String(x).trim().length > 0;
+    }
+    if (x.$form.find(rule).val()) {
+      return String(x).trim().length > 0;
+    }
+    return true;
   },
   isAlphabet: function(x) {
     return _isAlphabetReg.test(String(x));
@@ -271,7 +280,8 @@ ValidatorAttr = Template.Attr.subclass({
           toNumber: function() {
             return Number(_value);
           },
-          $el: $el
+          $el: $el,
+          $form: $form
         };
         v.args[0] = value;
         if (false === v.rule.apply(null, v.args)) {

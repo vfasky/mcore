@@ -77,8 +77,13 @@ errMsg =
 
 rule =
     # 不能为空
-    required: (x = '')->
-        String(x).trim().length > 0
+    required: (x = '', rule = null)->
+        return String(x).trim().length > 0 if rule == null
+
+        if x.$form.find(rule).val()
+            return String(x).trim().length > 0
+        true
+
     # 是否字母
     isAlphabet: (x)-> _isAlphabetReg.test String(x)
     # 最小长度
@@ -241,6 +246,7 @@ ValidatorAttr = Template.Attr.subclass
                 toString: -> String _value
                 toNumber: -> Number _value
                 $el: $el
+                $form: $form
 
             v.args[0] = value
 
