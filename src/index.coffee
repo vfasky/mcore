@@ -9,4 +9,5 @@
 module.exports =
     virtualDom: require './virtualDom'
     EventEmitter: require './eventEmitter'
+    htmlParser: require './htmlParser'
     version: '2.0.0'
