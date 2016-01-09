@@ -7,52 +7,58 @@
  * @link http://vfasky.com
  */
 'use strict';
-var buildNamespace, domToScript, forId, htmlparser, parseDom, parseTree, parserAttr, parserAttrFor;
+var _forId, _preNS, bNS, domToScript, htmlparser, parseDom, parseTree, parserAttr, parserAttrFor;
 
 htmlparser = require('htmlparser2');
 
-buildNamespace = function(len) {
+_forId = 0;
+
+_preNS = '__mc__';
+
+bNS = function(len) {
   var i;
   return ((function() {
     var j, ref, results;
     results = [];
-    for (i = j = 0, ref = len; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+    for (i = j = 0, ref = len * 4; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
       results.push('');
     }
     return results;
   })()).join(' ');
 };
 
-forId = 0;
-
 
 /* 
- * 解释 for
+ * 解释 <div mc-for="v, k in scope.list"></div>
  */
 
 parserAttrFor = function(code, dom, ix, children) {
-  var _arr, _ix, _vName, fid, script;
-  fid = forId++;
+  var _arr, _ix, _key, _obj, _vName, fid, script;
+  fid = _forId++;
+  delete dom.attribs['mc-for'];
   script = '';
   if (code.indexOf(' in ') !== -1) {
-    _ix = '__mc__$ix_';
+    _ix = _preNS + '$ix_';
     _arr = code.split(' in ').pop();
     _vName = code.split(' ')[0].replace(',', '');
     if (code.indexOf(',') !== -1) {
       _ix = code.split(',').pop().split(' in')[0].trim();
     }
-    delete dom.attribs['mc-for'];
-    script = (buildNamespace((ix + 1) * 4)) + "// for\n" + (buildNamespace((ix + 1) * 4)) + "var __mc__arr = " + _arr + " || [];\n" + (buildNamespace((ix + 1) * 4)) + "for(var " + _ix + "=0, len=__mc__arr.length; " + _ix + " < len; " + _ix + "++){\n" + (buildNamespace((ix + 1) * 4)) + "    var children_for_" + fid + " = [], attr = {};\n" + (buildNamespace((ix + 1) * 4)) + "    var " + _vName + " = __mc__arr[" + _ix + "];\n" + (buildNamespace((ix + 1) * 4)) + "    " + (parserAttr(dom.attribs, ix));
+    script = (bNS(ix + 1)) + "// for\n" + (bNS(ix + 1)) + "var " + _preNS + "arr = " + _arr + " || [];\n" + (bNS(ix + 1)) + "for(var " + _ix + "=0, len=" + _preNS + "arr.length; " + _ix + " < len; " + _ix + "++){\n" + (bNS(ix + 1)) + "    var children_for_" + fid + " = [], attr = {};\n" + (bNS(ix + 1)) + "    var " + _vName + " = " + _preNS + "_arr[" + _ix + "];\n" + (bNS(ix + 1)) + "    " + (parserAttr(dom.attribs, ix));
+  } else if (code.indexOf(' of ') !== -1) {
+    _key = code.split(' of ')[0];
+    _obj = code.split(' of ').pop();
+    script = (bNS(ix + 1)) + "// for\n" + (bNS(ix + 1)) + "var " + _preNS + "obj = " + _obj + " || {};\n" + (bNS(ix + 1)) + "for(var " + _key + " in " + _preNS + "obj){\n" + (bNS(ix + 1)) + "    var children_for_" + fid + " = [], attr = {};\n" + (bNS(ix + 1)) + "    " + (parserAttr(dom.attribs, ix));
   }
   if (dom.children && dom.children.length > 0) {
     script += parseTree(dom.children, ix + 1, "children_for_" + fid);
   }
-  return script += (buildNamespace((ix + 2) * 4)) + "tree.push( el('" + dom.name + "', attr, children_for_" + fid + ") );\n" + (buildNamespace((ix + 1) * 4)) + "}// end for \n";
+  return script += (bNS(ix + 1)) + "   tree.push( el('" + dom.name + "', attr, children_for_" + fid + ") );\n" + (bNS(ix + 1)) + "}\n" + (bNS(ix + 1)) + "// endFor \n";
 };
 
 
 /* 
- * 解释 for
+ * 解释属性
  */
 
 parserAttr = function(attribs, ix) {
@@ -64,9 +70,9 @@ parserAttr = function(attribs, ix) {
     val = attribs[key];
     if (key.indexOf('mc-') === 0) {
       key = key.replace('mc-', '');
-      return script += (buildNamespace((ix + 1) * 4)) + "attr['" + key + "'] = " + val + ";";
+      return script += (bNS(ix + 1)) + "attr['" + key + "'] = " + val + ";";
     } else {
-      return script += (buildNamespace((ix + 1) * 4)) + "attr['" + key + "'] = '" + val + "';";
+      return script += (bNS(ix + 1)) + "attr['" + key + "'] = '" + val + "';";
     }
   });
   return script + '\n';
@@ -74,15 +80,12 @@ parserAttr = function(attribs, ix) {
 
 
 /*
- * 解释dom结构，生成
- * (function(children){
- *     children.push(el('h1', {style: 'color: blue'}, ['simple virtal dom']));
- * }(children);
+ * 解释dom结构
  */
 
 parseDom = function(dom, ix, id) {
   var code, script, text;
-  script = "\n" + (buildNamespace((ix + 1) * 4)) + "var children_" + id + " = [], attr = {};\n";
+  script = "\n" + (bNS(ix + 1)) + "var children_" + id + " = [], attr = {};\n";
   if (dom.attribs && dom.attribs['mc-for']) {
     script += parserAttrFor(dom.attribs['mc-for'], dom, ix, "children_" + id);
     return script;
@@ -94,15 +97,15 @@ parseDom = function(dom, ix, id) {
     script += parseTree(dom.children, ix, "children_" + id);
   }
   if (dom.name) {
-    script += "\n" + (buildNamespace((ix + 1) * 4)) + "tree.push( el('" + dom.name + "', attr, children_" + id + ") );";
+    script += "\n" + (bNS(ix + 1)) + "tree.push( el('" + dom.name + "', attr, children_" + id + ") );";
   } else if (dom.type === 'text') {
-    text = dom.data.trim();
-    if (text.indexOf('{') === 0 && text[text.length - 1] === '}') {
+    text = dom.data;
+    if (text.indexOf('{') !== -1 && text.indexOf('}') !== -1) {
       code = text.replace(/\{/g, '" + (').replace(/\}/g, ') + "');
       code = '"' + code + '"';
-      script += "\n" + (buildNamespace((ix + 1) * 4)) + "tree.push( " + code + " );";
+      script += "\n" + (bNS(ix + 1)) + "tree.push( " + code + " );";
     } else {
-      script += "\n" + (buildNamespace((ix + 1) * 4)) + "tree.push( '" + dom.data + "' );";
+      script += "\n" + (bNS(ix + 1)) + "tree.push( '" + dom.data + "' );";
     }
   }
   return script;
@@ -116,13 +119,13 @@ parseTree = function(tree, ix, children) {
   if (children == null) {
     children = 'children_0';
   }
-  script = "\n" + (buildNamespace((ix + 1) * 4)) + "(function(scope, tree){ //[start tree " + ix + "]\n";
+  script = "\n" + (bNS(ix + 1)) + "(function(scope, tree){ // startTree " + ix + "\n";
   tree.forEach(function(dom, id) {
     if (dom.type !== 'text' || (dom.type === 'text' && dom.data.trim().length > 0)) {
       return script += "" + (parseDom(dom, ix + 1, id));
     }
   });
-  script += "\n" + (buildNamespace((ix + 1) * 4)) + "})(scope, " + children + "); //[end tree " + ix + "]\n";
+  script += "\n" + (bNS(ix + 1)) + "})(scope, " + children + "); // endTree " + ix + "\n";
   return script;
 };
 
@@ -131,7 +134,8 @@ domToScript = function(tree) {
   script = "var mcore = require('mcore');\nvar el = mcore.virtualDom.el;\n \nmodule.exports = function(scope){\n    var children_0 = [];";
   script += "\n    " + (parseTree(tree));
   script += "\n    return el('div', {'class': 'mc-vd'}, children_0);\n};";
-  return console.log(script);
+  console.log(script);
+  return script;
 };
 
 module.exports = function(html) {
