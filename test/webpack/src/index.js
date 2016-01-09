@@ -8,5 +8,5 @@
  */
 'use strict';
 module.exports = {
-  tpl: require('h2svd!./tpl/test.html')
+  tpl: require('./tpl/test.html')
 };

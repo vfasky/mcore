@@ -16,6 +16,14 @@ module.exports = {
         filename: 'test.js',
         libraryTarget: 'umd'
     },
-    plugins: [
-    ]
+    module: {
+        loaders: [
+            { test: /\/tpl\/.*(\.html)$/, loader: 'h2svd-loader' }
+        ]
+    },
+    resolve: {
+        alias: {
+            mcore: __dirname + '/../../src/index.js'
+        }
+    }
 };
