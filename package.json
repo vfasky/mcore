@@ -22,6 +22,7 @@
   "homepage": "https://github.com/vfasky/mcore#readme",
   "dependencies": {
     "eventemitter3": "^1.1.1",
+    "h2svd-loader": "^1.0.0",
     "htmlparser2": "^3.9.0",
     "loader-utils": "^0.2.12",
     "simple-virtual-dom": "^0.1.7",
