@@ -10,6 +10,7 @@
 
 exports.test = ->
     tpl = new Template
+    
     tpl.render require('./tpl/test.html'),
        id: 'test2'
        list: [
@@ -23,9 +24,13 @@ exports.test = ->
     , ->
         document.body.appendChild tpl.refs
 
+        setInterval ->
+            tpl.set 'time', (new Date()).getTime()
+            books = tpl.get 'books'
+            books.change =
+                id: 'v'
+                name: (new Date())
 
-        setTimeout ->
-            tpl.scope.id = 'test33333'
-
+            tpl.set 'books', books
         , 1000
 

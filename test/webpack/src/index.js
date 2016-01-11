@@ -35,8 +35,15 @@ exports.test = function() {
     }
   }, function() {
     document.body.appendChild(tpl.refs);
-    return setTimeout(function() {
-      return tpl.scope.id = 'test33333';
+    return setInterval(function() {
+      var books;
+      tpl.set('time', (new Date()).getTime());
+      books = tpl.get('books');
+      books.change = {
+        id: 'v',
+        name: new Date()
+      };
+      return tpl.set('books', books);
     }, 1000);
   });
 };

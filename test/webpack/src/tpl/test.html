@@ -1,7 +1,12 @@
+<h2>{scope.time}</h2>
+
 <div mc-data-id="scope.id">
+    
     <ul>
         <li mc-for="v in scope.list">
-            {v.name}
+            {v.name} 
+            <span>{scope.time}</span>
+            <a href="#">t1</a>
         </li>
     </ul>
     <ul>
@@ -10,5 +15,6 @@
         </li>
     </ul>
 
-    <a mc-for="k, v of scope.books" mc-href="v.id">{v.name} - {k}</a>
+
+    <a mc-for="k, v of scope.books" mc-href="v.id">{v.name} - {k} <br></a>
 </div>

@@ -7,11 +7,9 @@
 'use strict'
 
 EventEmitter = require './eventEmitter'
-requestAnimationFrame = require './requestAnimationFrame'
+{clone, nextTick} = require './util'
 
 {diff, patch} = require './virtualDom'
-
-require './objectWatch'
 
 class Template extends EventEmitter
     constructor: ->
@@ -49,21 +47,28 @@ class Template extends EventEmitter
         @init()
 
 
-    # 观察 @scope 的变化，更新dom
-    watchScope: ->
-        return if @_initWatchObject or @_status == 0
+    # 将 @scope 的变化，更新dom
+    set: (args...)->
+        if args.length == 1 and util.isObject(args[0])
+            @scope = args[0]
+        else if args.length == 2
+            @scope[args[0]] = args[1]
+        else
+            return
 
-        @_initWatchObject = true
+        return if @_status == 0
 
-        Object::watch @, 'scope', (id, oldval, newval)=>
-            @email 'changeScope', oldval, newval
-            @renderQueue @
+        @emit 'changeScope', @scope
+        @renderQueue @
 
+    # 取值
+    get: (key, defaultVal = null)->
+        if @scope.hasOwnProperty(key)
+            return @scope[key]
+        return defaultVal
 
     # 销毁
     destroy: ->
-        if @_initWatchObject
-            Object::unwatch @, 'scope'
         if @refs and @refs.parentNode and @refs.parentNode.removeChild
             @refs.parentNode.removeChild @refs
 
@@ -71,9 +76,12 @@ class Template extends EventEmitter
     # 预留接口 , new 时调用
     init: ->
 
+
     # 渲染操作
     _render: (data, done)->
-        virtualDom = @virtualDomDefine data.scope
+        scope = clone data.scope
+        
+        virtualDom = @virtualDomDefine scope
         # 未渲染，不用对比
         if @virtualDom == null
             @virtualDom = virtualDom
@@ -81,6 +89,7 @@ class Template extends EventEmitter
         else
             # 对比
             patches = diff @virtualDom, virtualDom
+            @virtualDom = virtualDom
 
             # 更新dom
             patch @refs, patches
@@ -92,14 +101,14 @@ class Template extends EventEmitter
 
     # 渲染队列
     renderQueue: (data, doneOrAsync)->
-        requestAnimationFrame.clear @_queueId
+        nextTick.clear @_queueId
 
         # 马上渲染，不进队列
         if true == doneOrAsync
             @_render data
         else
             @_status = 1
-            @_queueId = requestAnimationFrame =>
+            @_queueId = nextTick =>
                 @_render data, doneOrAsync
 
         
@@ -107,8 +116,8 @@ class Template extends EventEmitter
     render: (@virtualDomDefine, @scope = {}, doneOrAsync = ->)->
         @_status = 1
         @emit 'beforeRender'
-        @renderQueue @, doneOrAsync
-        requestAnimationFrame => @watchScope()
+        @renderQueue @, true
+        doneOrAsync() if doneOrAsync
 
 
 module.exports = Template

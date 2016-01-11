@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.test = function() {
 	  var tpl;
 	  tpl = new Template;
-	  return tpl.render(__webpack_require__(15), {
+	  return tpl.render(__webpack_require__(14), {
 	    id: 'test2',
 	    list: [
 	      {
@@ -91,8 +91,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, function() {
 	    document.body.appendChild(tpl.refs);
-	    return setTimeout(function() {
-	      return tpl.scope.id = 'test33333';
+	    return setInterval(function() {
+	      var books;
+	      tpl.set('time', (new Date()).getTime());
+	      books = tpl.get('books');
+	      books.change = {
+	        id: 'v',
+	        name: new Date()
+	      };
+	      return tpl.set('books', books);
 	    }, 1000);
 	  });
 	};
@@ -954,17 +961,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var EventEmitter, Template, diff, patch, ref, requestAnimationFrame,
+	var EventEmitter, Template, clone, diff, nextTick, patch, ref, ref1,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-	  hasProp = {}.hasOwnProperty;
+	  hasProp = {}.hasOwnProperty,
+	  slice = [].slice;
 
 	EventEmitter = __webpack_require__(10);
 
-	requestAnimationFrame = __webpack_require__(13);
+	ref = __webpack_require__(13), clone = ref.clone, nextTick = ref.nextTick;
 
-	ref = __webpack_require__(2), diff = ref.diff, patch = ref.patch;
-
-	__webpack_require__(14);
+	ref1 = __webpack_require__(2), diff = ref1.diff, patch = ref1.patch;
 
 	Template = (function(superClass) {
 	  extend(Template, superClass);
@@ -979,23 +985,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.init();
 	  }
 
-	  Template.prototype.watchScope = function() {
-	    if (this._initWatchObject || this._status === 0) {
+	  Template.prototype.set = function() {
+	    var args;
+	    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+	    if (args.length === 1 && util.isObject(args[0])) {
+	      this.scope = args[0];
+	    } else if (args.length === 2) {
+	      this.scope[args[0]] = args[1];
+	    } else {
 	      return;
 	    }
-	    this._initWatchObject = true;
-	    return Object.prototype.watch(this, 'scope', (function(_this) {
-	      return function(id, oldval, newval) {
-	        _this.email('changeScope', oldval, newval);
-	        return _this.renderQueue(_this);
-	      };
-	    })(this));
+	    if (this._status === 0) {
+	      return;
+	    }
+	    this.emit('changeScope', this.scope);
+	    return this.renderQueue(this);
+	  };
+
+	  Template.prototype.get = function(key, defaultVal) {
+	    if (defaultVal == null) {
+	      defaultVal = null;
+	    }
+	    if (this.scope.hasOwnProperty(key)) {
+	      return this.scope[key];
+	    }
+	    return defaultVal;
 	  };
 
 	  Template.prototype.destroy = function() {
-	    if (this._initWatchObject) {
-	      Object.prototype.unwatch(this, 'scope');
-	    }
 	    if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
 	      return this.refs.parentNode.removeChild(this.refs);
 	    }
@@ -1004,13 +1021,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Template.prototype.init = function() {};
 
 	  Template.prototype._render = function(data, done) {
-	    var patches, virtualDom;
-	    virtualDom = this.virtualDomDefine(data.scope);
+	    var patches, scope, virtualDom;
+	    scope = clone(data.scope);
+	    virtualDom = this.virtualDomDefine(scope);
 	    if (this.virtualDom === null) {
 	      this.virtualDom = virtualDom;
 	      this.refs = this.virtualDom.render();
 	    } else {
 	      patches = diff(this.virtualDom, virtualDom);
+	      this.virtualDom = virtualDom;
 	      patch(this.refs, patches);
 	    }
 	    this._status = 2;
@@ -1021,12 +1040,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Template.prototype.renderQueue = function(data, doneOrAsync) {
-	    requestAnimationFrame.clear(this._queueId);
+	    nextTick.clear(this._queueId);
 	    if (true === doneOrAsync) {
 	      return this._render(data);
 	    } else {
 	      this._status = 1;
-	      return this._queueId = requestAnimationFrame((function(_this) {
+	      return this._queueId = nextTick((function(_this) {
 	        return function() {
 	          return _this._render(data, doneOrAsync);
 	        };
@@ -1034,20 +1053,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Template.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
+	  Template.prototype.render = function(virtualDomDefine, scope1, doneOrAsync) {
 	    this.virtualDomDefine = virtualDomDefine;
-	    this.scope = scope != null ? scope : {};
+	    this.scope = scope1 != null ? scope1 : {};
 	    if (doneOrAsync == null) {
 	      doneOrAsync = function() {};
 	    }
 	    this._status = 1;
 	    this.emit('beforeRender');
-	    this.renderQueue(this, doneOrAsync);
-	    return requestAnimationFrame((function(_this) {
-	      return function() {
-	        return _this.watchScope();
-	      };
-	    })(this));
+	    this.renderQueue(this, true);
+	    if (doneOrAsync) {
+	      return doneOrAsync();
+	    }
 	  };
 
 	  return Template;
@@ -1062,93 +1079,69 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	// Generated by CoffeeScript 1.10.0
-	'use strict';
 
 	/**
-	 * 放到下一帧执行
-	 * @author vfasky <vfasky@gmail.com>
-	 */
-	if (window.requestAnimationFrame) {
-	  module.exports = function(fun) {
-	    return window.requestAnimationFrame(function() {
-	      return fun();
-	    });
-	  };
-	  module.exports.clear = function(id) {
-	    if (id) {
-	      return window.cancelAnimationFrame(id);
-	    }
-	  };
-	} else {
-	  module.exports = function(fun) {
-	    return setTimeout(fun, 0);
-	  };
-	  module.exports.clear = function(id) {
-	    if (id) {
-	      return clearTimeout(id);
-	    }
-	  };
-	}
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	// Generated by CoffeeScript 1.10.0
-
-	/**
-	 * object.watch polyfill
-	 * @date 2016-01-09 17:22:29
+	 * 
+	 * @date 2016-01-11 20:41:14
 	 * @author vfasky <vfasky@gmail.com>
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	if (!Object.prototype.watch) {
-	  Object.defineProperty(Object.prototype, 'watch', {
-	    enumerable: false,
-	    configurable: true,
-	    writable: false,
-	    value: function(prop, handler) {
-	      var getter, newval, oldval, setter;
-	      oldval = this[prop];
-	      newval = oldval;
-	      getter = function() {
-	        return newval;
-	      };
-	      setter = function(val) {
-	        oldval = newval;
-	        return newval = handler.callback(this, prop, oldval, val);
-	      };
-	      if (delete this[prop]) {
-	        return Object.defineProperty(this, prop, {
-	          get: getter,
-	          set: setter,
-	          enumerable: true,
-	          configurable: true
-	        });
-	      }
-	    }
-	  });
-	}
+	var _isNumberReg;
 
-	if (!Object.prototype.unwatch) {
-	  Object.defineProperty(Object.prototype, 'unwatch', {
-	    enumerable: false,
-	    configurable: true,
-	    writable: false,
-	    value: function(prop) {
-	      var val;
-	      val = this[prop];
-	      delete this[prop];
-	      return this[prop] = val;
+	_isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/;
+
+	exports.isNumber = function(x) {
+	  return _isNumberReg.test(x);
+	};
+
+	exports.isObject = function(x) {
+	  return Object.prototype.toString.call(x) === '[object Object]';
+	};
+
+	exports.isString = function(x) {
+	  return Object.prototype.toString.call(x) === '[object String]';
+	};
+
+	exports.clone = function(src) {
+	  var dest, key, val;
+	  dest = {};
+	  for (key in src) {
+	    val = src[key];
+	    if (src.hasOwnProperty(key)) {
+	      dest[key] = val;
 	    }
-	  });
-	}
+	  }
+	  return dest;
+	};
+
+	(function() {
+	  if (window.requestAnimationFrame) {
+	    exports.nextTick = function(fun) {
+	      return window.requestAnimationFrame(function() {
+	        return fun();
+	      });
+	    };
+	    return exports.nextTick.clear = function(id) {
+	      if (id) {
+	        return window.cancelAnimationFrame(id);
+	      }
+	    };
+	  } else {
+	    exports.nextTick = function(fun) {
+	      return setTimeout(fun, 0);
+	    };
+	    return exports.nextTick.clear = function(id) {
+	      if (id) {
+	        return clearTimeout(id);
+	      }
+	    };
+	  }
+	})();
 
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var mcore = __webpack_require__(1);
@@ -1160,6 +1153,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	   (function(scope, tree){ // startTree 0
 
 	       var children_0 = [], attr = {};
+
+
+	       (function(scope, tree){ // startTree 1
+
+	           var children_0 = [], attr = {};
+
+	           tree.push( "" + ( scope.time || '' ) + "" );
+	       })(scope, children_0); // endTree 1
+
+	       tree.push( el('h2', attr, children_0) );
+	       var children_2 = [], attr = {};
 	       attr['data-id'] = scope.id;
 
 	       (function(scope, tree){ // startTree 1
@@ -1173,7 +1177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	               // for
 	               var __mc__arr = scope.list || [];
 	               for(var __mc__$ix_=0, len=__mc__arr.length; __mc__$ix_ < len; __mc__$ix_++){
-	                   var children_for_0 = [], attr = {};
+	                   var children_for_6 = [], attr = {};
 	                   var v = __mc__arr[__mc__$ix_];
 	                   
 
@@ -1181,9 +1185,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                       var children_0 = [], attr = {};
 
-	                       tree.push( "             " + (v.name) + "         " );
-	                   })(scope, children_for_0); // endTree 4
-	                  tree.push( el('li', attr, children_for_0) );
+	                       tree.push( "             " + ( v.name || '' ) + "              " );
+	                       var children_1 = [], attr = {};
+
+
+	                       (function(scope, tree){ // startTree 5
+
+	                           var children_0 = [], attr = {};
+
+	                           tree.push( "" + ( scope.time || '' ) + "" );
+	                       })(scope, children_1); // endTree 5
+
+	                       tree.push( el('span', attr, children_1) );
+	                       var children_3 = [], attr = {};
+	                       attr['href'] = '#';
+
+	                       (function(scope, tree){ // startTree 5
+
+	                           var children_0 = [], attr = {};
+
+	                           tree.push( 't1' );
+	                       })(scope, children_3); // endTree 5
+
+	                       tree.push( el('a', attr, children_3) );
+	                   })(scope, children_for_6); // endTree 4
+	                  tree.push( el('li', attr, children_for_6) );
 	               }
 	               // endFor 
 
@@ -1199,7 +1225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	               // for
 	               var __mc__arr = scope.list || [];
 	               for(var k=0, len=__mc__arr.length; k < len; k++){
-	                   var children_for_1 = [], attr = {};
+	                   var children_for_7 = [], attr = {};
 	                   var v = __mc__arr[k];
 	                   
 
@@ -1207,9 +1233,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                       var children_0 = [], attr = {};
 
-	                       tree.push( "             " + (v.name) + " " + (k) + "         " );
-	                   })(scope, children_for_1); // endTree 4
-	                  tree.push( el('li', attr, children_for_1) );
+	                       tree.push( "             " + ( v.name || '' ) + " " + ( k || '' ) + "         " );
+	                   })(scope, children_for_7); // endTree 4
+	                  tree.push( el('li', attr, children_for_7) );
 	               }
 	               // endFor 
 
@@ -1220,7 +1246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	           // for
 	           var __mc__obj = scope.books || {};
 	           for(var k in __mc__obj){
-	               var children_for_2 = [], attr = {};
+	               var children_for_8 = [], attr = {};
 	               var  v = __mc__obj[k] || {};
 	                          attr['href'] = v.id;
 
@@ -1228,15 +1254,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                   var children_0 = [], attr = {};
 
-	                   tree.push( "" + (v.name) + " - " + (k) + "" );
-	               })(scope, children_for_2); // endTree 3
-	              tree.push( el('a', attr, children_for_2) );
+	                   tree.push( "" + ( v.name || '' ) + " - " + ( k || '' ) + " " );
+	                   var children_1 = [], attr = {};
+
+
+	                   tree.push( el('br', attr, children_1) );
+	               })(scope, children_for_8); // endTree 3
+	              tree.push( el('a', attr, children_for_8) );
 	           }
 	           // endFor 
 
-	       })(scope, children_0); // endTree 1
+	       })(scope, children_2); // endTree 1
 
-	       tree.push( el('div', attr, children_0) );
+	       tree.push( el('div', attr, children_2) );
 	   })(scope, children_0); // endTree 0
 
 	    return el('div', {'class': 'mc-vd'}, children_0);

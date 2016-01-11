@@ -7,17 +7,16 @@
  * @link http://vfasky.com
  */
 'use strict';
-var EventEmitter, Template, diff, patch, ref, requestAnimationFrame,
+var EventEmitter, Template, clone, diff, nextTick, patch, ref, ref1,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-  hasProp = {}.hasOwnProperty;
+  hasProp = {}.hasOwnProperty,
+  slice = [].slice;
 
 EventEmitter = require('./eventEmitter');
 
-requestAnimationFrame = require('./requestAnimationFrame');
+ref = require('./util'), clone = ref.clone, nextTick = ref.nextTick;
 
-ref = require('./virtualDom'), diff = ref.diff, patch = ref.patch;
-
-require('./objectWatch');
+ref1 = require('./virtualDom'), diff = ref1.diff, patch = ref1.patch;
 
 Template = (function(superClass) {
   extend(Template, superClass);
@@ -32,23 +31,34 @@ Template = (function(superClass) {
     this.init();
   }
 
-  Template.prototype.watchScope = function() {
-    if (this._initWatchObject || this._status === 0) {
+  Template.prototype.set = function() {
+    var args;
+    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+    if (args.length === 1 && util.isObject(args[0])) {
+      this.scope = args[0];
+    } else if (args.length === 2) {
+      this.scope[args[0]] = args[1];
+    } else {
       return;
     }
-    this._initWatchObject = true;
-    return Object.prototype.watch(this, 'scope', (function(_this) {
-      return function(id, oldval, newval) {
-        _this.email('changeScope', oldval, newval);
-        return _this.renderQueue(_this);
-      };
-    })(this));
+    if (this._status === 0) {
+      return;
+    }
+    this.emit('changeScope', this.scope);
+    return this.renderQueue(this);
+  };
+
+  Template.prototype.get = function(key, defaultVal) {
+    if (defaultVal == null) {
+      defaultVal = null;
+    }
+    if (this.scope.hasOwnProperty(key)) {
+      return this.scope[key];
+    }
+    return defaultVal;
   };
 
   Template.prototype.destroy = function() {
-    if (this._initWatchObject) {
-      Object.prototype.unwatch(this, 'scope');
-    }
     if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
       return this.refs.parentNode.removeChild(this.refs);
     }
@@ -57,13 +67,15 @@ Template = (function(superClass) {
   Template.prototype.init = function() {};
 
   Template.prototype._render = function(data, done) {
-    var patches, virtualDom;
-    virtualDom = this.virtualDomDefine(data.scope);
+    var patches, scope, virtualDom;
+    scope = clone(data.scope);
+    virtualDom = this.virtualDomDefine(scope);
     if (this.virtualDom === null) {
       this.virtualDom = virtualDom;
       this.refs = this.virtualDom.render();
     } else {
       patches = diff(this.virtualDom, virtualDom);
+      this.virtualDom = virtualDom;
       patch(this.refs, patches);
     }
     this._status = 2;
@@ -74,12 +86,12 @@ Template = (function(superClass) {
   };
 
   Template.prototype.renderQueue = function(data, doneOrAsync) {
-    requestAnimationFrame.clear(this._queueId);
+    nextTick.clear(this._queueId);
     if (true === doneOrAsync) {
       return this._render(data);
     } else {
       this._status = 1;
-      return this._queueId = requestAnimationFrame((function(_this) {
+      return this._queueId = nextTick((function(_this) {
         return function() {
           return _this._render(data, doneOrAsync);
         };
@@ -87,20 +99,18 @@ Template = (function(superClass) {
     }
   };
 
-  Template.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
+  Template.prototype.render = function(virtualDomDefine, scope1, doneOrAsync) {
     this.virtualDomDefine = virtualDomDefine;
-    this.scope = scope != null ? scope : {};
+    this.scope = scope1 != null ? scope1 : {};
     if (doneOrAsync == null) {
       doneOrAsync = function() {};
     }
     this._status = 1;
     this.emit('beforeRender');
-    this.renderQueue(this, doneOrAsync);
-    return requestAnimationFrame((function(_this) {
-      return function() {
-        return _this.watchScope();
-      };
-    })(this));
+    this.renderQueue(this, true);
+    if (doneOrAsync) {
+      return doneOrAsync();
+    }
   };
 
   return Template;
