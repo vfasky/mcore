@@ -8,7 +8,8 @@
  */
 'use strict';
 module.exports = {
+  version: '2.0.0',
   virtualDom: require('./virtualDom'),
   EventEmitter: require('./eventEmitter'),
-  version: '2.0.0'
+  Template: require('./template')
 };

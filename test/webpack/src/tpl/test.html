@@ -10,5 +10,5 @@
         </li>
     </ul>
 
-    <a mc-for="v of scope.books" mc-href="v.id">{v.name}</a>
+    <a mc-for="k, v of scope.books" mc-href="v.id">{v.name} - {k}</a>
 </div>

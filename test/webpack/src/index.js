@@ -7,6 +7,36 @@
  * @link http://vfasky.com
  */
 'use strict';
-module.exports = {
-  tpl: require('./tpl/test.html')
+var Template;
+
+Template = require('mcore').Template;
+
+exports.test = function() {
+  var tpl;
+  tpl = new Template;
+  return tpl.render(require('./tpl/test.html'), {
+    id: 'test2',
+    list: [
+      {
+        name: 'ok1'
+      }, {
+        name: 'ok2'
+      }
+    ],
+    books: {
+      '1': {
+        id: 0,
+        name: 'book1'
+      },
+      '2': {
+        id: 1,
+        name: 'book2'
+      }
+    }
+  }, function() {
+    document.body.appendChild(tpl.refs);
+    return setTimeout(function() {
+      return tpl.scope.id = 'test33333';
+    }, 1000);
+  });
 };
