@@ -5,12 +5,13 @@
 ###
 "use strict"
 
-validator = require './attrValidator'
 require './attrScroller'
+
 mcore = require 'mcore'
 
 mcore.ext =
-    validator: validator
+    validator: require './attrValidator'
+    http: require './http'
 
 exports = module.exports = mcore
 

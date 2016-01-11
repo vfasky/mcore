@@ -6,16 +6,15 @@
  * @author vfasky <vfasky@gmail.com>
  */
 "use strict";
-var exports, mcore, validator;
-
-validator = require('./attrValidator');
+var exports, mcore;
 
 require('./attrScroller');
 
 mcore = require('mcore');
 
 mcore.ext = {
-  validator: validator
+  validator: require('./attrValidator'),
+  http: require('./http')
 };
 
 exports = module.exports = mcore;
