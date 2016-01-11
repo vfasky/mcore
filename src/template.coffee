@@ -35,12 +35,12 @@ class Template extends EventEmitter
         # @type { Function | null }
         @virtualDomDefine = null
 
-        # virtual dom 定义
+        # virtual dom
         # @public
         # @type { Object | null }
         @virtualDom = null
 
-        # watch object
+        # object, 必须是可被序列化成JSON的值
         # 如果对象的值变更，更新dom
         @scope = {}
 
