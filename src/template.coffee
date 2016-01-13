@@ -7,9 +7,12 @@
 'use strict'
 
 EventEmitter = require './eventEmitter'
-{clone, nextTick} = require './util'
+util = require './util'
+#observe = require './observe'
 
+{clone, nextTick} = require './util'
 {diff, patch} = require './virtualDom'
+
 
 class Template extends EventEmitter
     constructor: ->
@@ -46,20 +49,31 @@ class Template extends EventEmitter
 
         @init()
 
+    # 观察 scope
+    watchScope: ->
+        return if @__initWatch
+        @__initWatch = true
+        #observe @scope, (args...)=>
+            #@renderQueue @
+            #console.log args
+
 
     # 将 @scope 的变化，更新dom
     set: (args...)->
-        if args.length == 1 and util.isObject(args[0])
-            @scope = args[0]
-        else if args.length == 2
-            @scope[args[0]] = args[1]
+        doneOrAsync = null
+        if args.length > 1
+            key = args[0]
+            val = args[1]
+            @scope[key] = val
+            doneOrAsync = args[2] if args.length == 3
         else
             return
 
         return if @_status == 0
 
-        @emit 'changeScope', @scope
-        @renderQueue @
+        @emit 'changeScope', @scope, key, val
+        @renderQueue doneOrAsync
+
 
     # 取值
     get: (key, defaultVal = null)->
@@ -67,8 +81,12 @@ class Template extends EventEmitter
             return @scope[key]
         return defaultVal
 
+
     # 销毁
     destroy: ->
+        if @__initWatch
+            Object.unobserve @scope
+
         if @refs and @refs.parentNode and @refs.parentNode.removeChild
             @refs.parentNode.removeChild @refs
 
@@ -78,8 +96,9 @@ class Template extends EventEmitter
 
 
     # 渲染操作
-    _render: (data, done)->
-        scope = clone data.scope
+    _render: (done)->
+        scope = util.extend true, @scope
+        #scope = data.scope
         
         virtualDom = @virtualDomDefine scope
         # 未渲染，不用对比
@@ -96,28 +115,50 @@ class Template extends EventEmitter
 
         @_status = 2
         @emit 'rendered'
-        done() if done
+        done() if util.isFunction done
 
 
     # 渲染队列
-    renderQueue: (data, doneOrAsync)->
+    renderQueue: (doneOrAsync)->
         nextTick.clear @_queueId
 
         # 马上渲染，不进队列
         if true == doneOrAsync
-            @_render data
+            @_render()
         else
             @_status = 1
             @_queueId = nextTick =>
-                @_render data, doneOrAsync
+                @_render doneOrAsync
 
         
     # 渲染
-    render: (@virtualDomDefine, @scope = {}, doneOrAsync = ->)->
+    render: (@virtualDomDefine, scope = {}, doneOrAsync = ->)->
         @_status = 1
         @emit 'beforeRender'
-        @renderQueue @, true
-        doneOrAsync() if doneOrAsync
+
+        scopeKeys = Object.keys scope
+        scopeLen = scopeKeys.length
+
+        if scopeLen == 0
+            @renderQueue doneOrAsync
+        else
+            ix = scopeLen - 1
+            scopeKeys.forEach (v, k)=>
+                @set v, scope[v], k == ix and doneOrAsync or null
+
+        @watchScope()
+        this
+
+
+# 过滤函数
+Template.formatters = require './formatters'
+
+# 组件
+Template.components = {}
+
+# 属性
+Template.binders = {}
+
 
 
 module.exports = Template

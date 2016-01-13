@@ -92,14 +92,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, function() {
 	    document.body.appendChild(tpl.refs);
 	    return setInterval(function() {
-	      var books;
 	      tpl.set('time', (new Date()).getTime());
-	      books = tpl.get('books');
-	      books.change = {
+	      return tpl.scope.books.change = {
 	        id: 'v',
 	        name: new Date()
 	      };
-	      return tpl.set('books', books);
 	    }, 1000);
 	  });
 	};
@@ -961,12 +958,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var EventEmitter, Template, clone, diff, nextTick, patch, ref, ref1,
+	var EventEmitter, Template, clone, diff, nextTick, patch, ref, ref1, util,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
 	  slice = [].slice;
 
 	EventEmitter = __webpack_require__(10);
+
+	util = __webpack_require__(13);
 
 	ref = __webpack_require__(13), clone = ref.clone, nextTick = ref.nextTick;
 
@@ -985,21 +984,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.init();
 	  }
 
+	  Template.prototype.watchScope = function() {
+	    if (this.__initWatch) {
+	      return;
+	    }
+	    return this.__initWatch = true;
+	  };
+
 	  Template.prototype.set = function() {
-	    var args;
+	    var args, doneOrAsync, key, val;
 	    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-	    if (args.length === 1 && util.isObject(args[0])) {
-	      this.scope = args[0];
-	    } else if (args.length === 2) {
-	      this.scope[args[0]] = args[1];
+	    doneOrAsync = null;
+	    if (args.length > 1) {
+	      key = args[0];
+	      val = args[1];
+	      this.scope[key] = val;
+	      if (args.length === 3) {
+	        doneOrAsync = args[2];
+	      }
 	    } else {
 	      return;
 	    }
 	    if (this._status === 0) {
 	      return;
 	    }
-	    this.emit('changeScope', this.scope);
-	    return this.renderQueue(this);
+	    this.emit('changeScope', this.scope, key, val);
+	    return this.renderQueue(doneOrAsync);
 	  };
 
 	  Template.prototype.get = function(key, defaultVal) {
@@ -1013,6 +1023,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Template.prototype.destroy = function() {
+	    if (this.__initWatch) {
+	      Object.unobserve(this.scope);
+	    }
 	    if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
 	      return this.refs.parentNode.removeChild(this.refs);
 	    }
@@ -1020,9 +1033,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Template.prototype.init = function() {};
 
-	  Template.prototype._render = function(data, done) {
+	  Template.prototype._render = function(done) {
 	    var patches, scope, virtualDom;
-	    scope = clone(data.scope);
+	    scope = util.extend(true, this.scope);
 	    virtualDom = this.virtualDomDefine(scope);
 	    if (this.virtualDom === null) {
 	      this.virtualDom = virtualDom;
@@ -1034,42 +1047,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    this._status = 2;
 	    this.emit('rendered');
-	    if (done) {
+	    if (util.isFunction(done)) {
 	      return done();
 	    }
 	  };
 
-	  Template.prototype.renderQueue = function(data, doneOrAsync) {
+	  Template.prototype.renderQueue = function(doneOrAsync) {
 	    nextTick.clear(this._queueId);
 	    if (true === doneOrAsync) {
-	      return this._render(data);
+	      return this._render();
 	    } else {
 	      this._status = 1;
 	      return this._queueId = nextTick((function(_this) {
 	        return function() {
-	          return _this._render(data, doneOrAsync);
+	          return _this._render(doneOrAsync);
 	        };
 	      })(this));
 	    }
 	  };
 
-	  Template.prototype.render = function(virtualDomDefine, scope1, doneOrAsync) {
+	  Template.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
+	    var ix, scopeKeys, scopeLen;
 	    this.virtualDomDefine = virtualDomDefine;
-	    this.scope = scope1 != null ? scope1 : {};
+	    if (scope == null) {
+	      scope = {};
+	    }
 	    if (doneOrAsync == null) {
 	      doneOrAsync = function() {};
 	    }
 	    this._status = 1;
 	    this.emit('beforeRender');
-	    this.renderQueue(this, true);
-	    if (doneOrAsync) {
-	      return doneOrAsync();
+	    scopeKeys = Object.keys(scope);
+	    scopeLen = scopeKeys.length;
+	    if (scopeLen === 0) {
+	      this.renderQueue(doneOrAsync);
+	    } else {
+	      ix = scopeLen - 1;
+	      scopeKeys.forEach((function(_this) {
+	        return function(v, k) {
+	          return _this.set(v, scope[v], k === ix && doneOrAsync || null);
+	        };
+	      })(this));
 	    }
+	    this.watchScope();
+	    return this;
 	  };
 
 	  return Template;
 
 	})(EventEmitter);
+
+	Template.formatters = __webpack_require__(15);
+
+	Template.components = {};
+
+	Template.binders = {};
 
 	module.exports = Template;
 
@@ -1095,6 +1127,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return _isNumberReg.test(x);
 	};
 
+	exports.isArray = function(x) {
+	  if (Array.isArray) {
+	    return Array.isArray(x);
+	  }
+	  return Object.prototype.toString.call(x) === '[object Array]';
+	};
+
 	exports.isObject = function(x) {
 	  return Object.prototype.toString.call(x) === '[object Object]';
 	};
@@ -1103,16 +1142,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Object.prototype.toString.call(x) === '[object String]';
 	};
 
-	exports.clone = function(src) {
-	  var dest, key, val;
-	  dest = {};
-	  for (key in src) {
-	    val = src[key];
-	    if (src.hasOwnProperty(key)) {
-	      dest[key] = val;
+	exports.isFunction = function(x) {
+	  return Object.prototype.toString.call(x) === '[object Function]';
+	};
+
+	exports.isPlainObject = function(x) {
+	  var hasIsPropertyOfMethod, hasOwnConstructor, key, lastKey;
+	  if (!x || Object.prototype.toString.call(x) !== '[object Object]' || x.nodeType || x.setInterval) {
+	    return false;
+	  }
+	  hasOwnConstructor = Object.hasOwnProperty.call(x, 'constructor');
+	  hasIsPropertyOfMethod = Object.hasOwnProperty.call(x.constructor.prototype, 'isPrototypeOf');
+	  if (x.constructor && !hasOwnConstructor && !hasIsPropertyOfMethod) {
+	    return false;
+	  }
+	  for (key in x) {
+	    lastKey = key;
+	  }
+	  return typeof lastKey === 'undefined' || Object.hasOwnProperty.call(x, lastKey);
+	};
+
+	exports.extend = function() {
+	  var clone, copy, deep, i, j, length, name, options, ref, ref1, src, start, target;
+	  target = arguments[0] || {};
+	  length = arguments.length;
+	  deep = false;
+	  start = 1;
+	  if (typeof target === 'boolean') {
+	    deep = target;
+	    target = arguments[1] || {};
+	    start = 2;
+	  }
+	  if (typeof target !== 'object' && typeof target !== 'function') {
+	    target = {};
+	  }
+	  for (i = j = ref = start, ref1 = length; ref <= ref1 ? j < ref1 : j > ref1; i = ref <= ref1 ? ++j : --j) {
+	    if ((options = arguments[i]) !== null) {
+	      for (name in options) {
+	        src = target[name];
+	        copy = options[name];
+	        if (target === copy) {
+	          continue;
+	        }
+	        if (deep && copy && (exports.isPlainObject(copy) || exports.isArray(copy))) {
+	          clone = {};
+	          if (src && (exports.isPlainObject(src) || exports.isArray(src))) {
+	            clone = exports.isArray(copy) && [] || {};
+	          }
+	          target[name] = exports.extend(deep, clone, copy);
+	        } else if (typeof copy !== 'undefined') {
+	          target[name] = copy;
+	        }
+	      }
 	    }
 	  }
-	  return dest;
+	  return target;
 	};
 
 	(function() {
@@ -1146,131 +1230,209 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var mcore = __webpack_require__(1);
 	var el = mcore.virtualDom.el;
+	var formatters = mcore.Template.formatters;
 	 
 	module.exports = function(scope){
 	    var children_0 = [];
 	    
-	   (function(scope, tree){ // startTree 0
+	    (function(scope, tree){ // startTree 0
 
-	       var children_0 = [], attr = {};
-
-
-	       (function(scope, tree){ // startTree 1
-
-	           var children_0 = [], attr = {};
-
-	           tree.push( "" + ( scope.time || '' ) + "" );
-	       })(scope, children_0); // endTree 1
-
-	       tree.push( el('h2', attr, children_0) );
-	       var children_2 = [], attr = {};
-	       attr['data-id'] = scope.id;
-
-	       (function(scope, tree){ // startTree 1
-
-	           var children_1 = [], attr = {};
+	        var children_0 = [], attr = {};
 
 
-	           (function(scope, tree){ // startTree 2
+	        (function(scope, tree){ // startTree 1
 
-	               var children_1 = [], attr = {};
-	               // for
-	               var __mc__arr = scope.list || [];
-	               for(var __mc__$ix_=0, len=__mc__arr.length; __mc__$ix_ < len; __mc__$ix_++){
-	                   var children_for_6 = [], attr = {};
-	                   var v = __mc__arr[__mc__$ix_];
-	                   
+	            var children_1 = [], attr = {};
 
-	                   (function(scope, tree){ // startTree 4
+	            tree.push( "" + (scope.time) + "" );
+	        })(scope, children_0); // endTree 1
 
-	                       var children_0 = [], attr = {};
-
-	                       tree.push( "             " + ( v.name || '' ) + "              " );
-	                       var children_1 = [], attr = {};
+	        tree.push( el('h2', attr, children_0) );
+	        var children_2 = [], attr = {};
+	        attr['data-id'] = scope.id; 
 
 
-	                       (function(scope, tree){ // startTree 5
+	        (function(scope, tree){ // startTree 3
 
-	                           var children_0 = [], attr = {};
-
-	                           tree.push( "" + ( scope.time || '' ) + "" );
-	                       })(scope, children_1); // endTree 5
-
-	                       tree.push( el('span', attr, children_1) );
-	                       var children_3 = [], attr = {};
-	                       attr['href'] = '#';
-
-	                       (function(scope, tree){ // startTree 5
-
-	                           var children_0 = [], attr = {};
-
-	                           tree.push( 't1' );
-	                       })(scope, children_3); // endTree 5
-
-	                       tree.push( el('a', attr, children_3) );
-	                   })(scope, children_for_6); // endTree 4
-	                  tree.push( el('li', attr, children_for_6) );
-	               }
-	               // endFor 
-
-	           })(scope, children_1); // endTree 2
-
-	           tree.push( el('ul', attr, children_1) );
-	           var children_3 = [], attr = {};
+	            var children_3 = [], attr = {};
 
 
-	           (function(scope, tree){ // startTree 2
+	            (function(scope, tree){ // startTree 4
 
-	               var children_1 = [], attr = {};
-	               // for
-	               var __mc__arr = scope.list || [];
-	               for(var k=0, len=__mc__arr.length; k < len; k++){
-	                   var children_for_7 = [], attr = {};
-	                   var v = __mc__arr[k];
-	                   
-
-	                   (function(scope, tree){ // startTree 4
-
-	                       var children_0 = [], attr = {};
-
-	                       tree.push( "             " + ( v.name || '' ) + " " + ( k || '' ) + "         " );
-	                   })(scope, children_for_7); // endTree 4
-	                  tree.push( el('li', attr, children_for_7) );
-	               }
-	               // endFor 
-
-	           })(scope, children_3); // endTree 2
-
-	           tree.push( el('ul', attr, children_3) );
-	           var children_5 = [], attr = {};
-	           // for
-	           var __mc__obj = scope.books || {};
-	           for(var k in __mc__obj){
-	               var children_for_8 = [], attr = {};
-	               var  v = __mc__obj[k] || {};
-	                          attr['href'] = v.id;
-
-	               (function(scope, tree){ // startTree 3
-
-	                   var children_0 = [], attr = {};
-
-	                   tree.push( "" + ( v.name || '' ) + " - " + ( k || '' ) + " " );
-	                   var children_1 = [], attr = {};
+	                // for v, k in scope.list
+	                var __mc__arr = scope.list || [];
+	                for(var k=0, len=__mc__arr.length; k < len; k++){
+	                    var v = __mc__arr[k];
+	                    
+	                    // if scope.time
+	                    if( scope.time ){
+	                       
+	                        var children_6 = [], attr = {};
 
 
-	                   tree.push( el('br', attr, children_1) );
-	               })(scope, children_for_8); // endTree 3
-	              tree.push( el('a', attr, children_for_8) );
-	           }
-	           // endFor 
+	                        (function(scope, tree){ // startTree 7
 
-	       })(scope, children_2); // endTree 1
+	                            var children_7 = [], attr = {};
 
-	       tree.push( el('div', attr, children_2) );
-	   })(scope, children_0); // endTree 0
+	                            tree.push( "             " + (v.name) + "              " );
+	                            var children_8 = [], attr = {};
+
+
+	                            (function(scope, tree){ // startTree 9
+
+	                                var children_9 = [], attr = {};
+
+	                                tree.push( "" + (scope.time) + "  " + ((k + 2) / 6) + "" );
+	                            })(scope, children_8); // endTree 9
+
+	                            tree.push( el('span', attr, children_8) );
+	                            var children_10 = [], attr = {};
+	                            attr['href'] = '#';
+
+	                            (function(scope, tree){ // startTree 11
+
+	                                var children_11 = [], attr = {};
+
+	                                tree.push( "t1 " + ( (new Date()).toString() ) + "" );
+	                            })(scope, children_10); // endTree 11
+
+	                            tree.push( el('a', attr, children_10) );
+	                        })(scope, children_6); // endTree 7
+
+	                        tree.push( el('li', attr, children_6) );
+	                    }// endif 
+
+	                } // endFor 
+
+	            })(scope, children_3); // endTree 4
+
+	            tree.push( el('ul', attr, children_3) );
+	            var children_12 = [], attr = {};
+
+
+	            (function(scope, tree){ // startTree 13
+
+	                // for v, k in scope.list
+	                var __mc__arr = scope.list || [];
+	                for(var k=0, len=__mc__arr.length; k < len; k++){
+	                    var v = __mc__arr[k];
+	                    
+	                    // if scope.time
+	                    if( !(scope.time) ){
+	                       
+	                        var children_15 = [], attr = {};
+
+
+	                        (function(scope, tree){ // startTree 16
+
+	                            var children_16 = [], attr = {};
+
+	                            tree.push( "             " + (v.name) + " " + (k) + "         " );
+	                        })(scope, children_15); // endTree 16
+
+	                        tree.push( el('li', attr, children_15) );
+	                    }// endif 
+
+	                } // endFor 
+
+	            })(scope, children_12); // endTree 13
+
+	            tree.push( el('ul', attr, children_12) );
+	            // each mc-each-v = scope.list
+	            var __mc__arr = scope.list || [];
+	            for(var __mc__$ix_=0, len=__mc__arr.length; __mc__$ix_ < len; __mc__$ix_++){
+	                var v = __mc__arr[__mc__$ix_];
+	                
+	                var children_18 = [], attr = {};
+
+
+	                (function(scope, tree){ // startTree 19
+
+	                    var children_19 = [], attr = {};
+
+	                    tree.push( " " + (v.name) + " " );
+	                })(scope, children_18); // endTree 19
+
+	                tree.push( el('h5', attr, children_18) );
+	            }// endEach
+
+	            var children_20 = [], attr = {};
+
+
+	            tree.push( el('br', attr, children_20) );
+	            var children_21 = [], attr = {};
+	            attr['type'] = 'button';    
+	            attr['value'] = (function(x){
+	                    // toNumber
+	                if( formatters.hasOwnProperty('toNumber') ) {
+	                    x = formatters.toNumber(x);
+	                } // end toNumber 
+	                // toFixed
+	                if( formatters.hasOwnProperty('toFixed') ) {
+	                    x = formatters.toFixed(x,2);
+	                } // end toFixed 
+	                return x;
+	            })(v.name);
+
+
+	            tree.push( el('input', attr, children_21) );
+	            // for k, v of scope.books
+	            var __mc__obj = scope.books || {};
+	            for(var k in __mc__obj){
+	                var  v = __mc__obj[k] || {};
+	                
+	                var children_23 = [], attr = {};
+	                attr['href'] = v.id; 
+
+
+	                (function(scope, tree){ // startTree 24
+
+	                    var children_24 = [], attr = {};
+
+	                    tree.push( "" + (v.name) + " - " + (k) + " " );
+	                    var children_25 = [], attr = {};
+
+
+	                    tree.push( el('br', attr, children_25) );
+	                })(scope, children_23); // endTree 24
+
+	                tree.push( el('a', attr, children_23) );
+	            } // endFor 
+
+	        })(scope, children_2); // endTree 3
+
+	        tree.push( el('div', attr, children_2) );
+	    })(scope, children_0); // endTree 0
 
 	    return el('div', {'class': 'mc-vd'}, children_0);
 	};
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Generated by CoffeeScript 1.10.0
+
+	/**
+	 * 过滤函数
+	 * @date 2016-01-13 18:07:10
+	 * @author vfasky <vfasky@gmail.com>
+	 * @link http://vfasky.com
+	 */
+	'use strict';
+	var Template, util;
+
+	Template = __webpack_require__(12);
+
+	util = __webpack_require__(13);
+
+	module.exports['toNumber'] = function(x) {
+	  if (false === util.isNumber(x)) {
+	    return 0;
+	  }
+	  return Number(x);
+	};
+
 
 /***/ }
 /******/ ])

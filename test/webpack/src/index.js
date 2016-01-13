@@ -36,14 +36,11 @@ exports.test = function() {
   }, function() {
     document.body.appendChild(tpl.refs);
     return setInterval(function() {
-      var books;
       tpl.set('time', (new Date()).getTime());
-      books = tpl.get('books');
-      books.change = {
+      return tpl.scope.books.change = {
         id: 'v',
         name: new Date()
       };
-      return tpl.set('books', books);
     }, 1000);
   });
 };

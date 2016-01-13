@@ -7,12 +7,14 @@
  * @link http://vfasky.com
  */
 'use strict';
-var EventEmitter, Template, clone, diff, nextTick, patch, ref, ref1,
+var EventEmitter, Template, clone, diff, nextTick, patch, ref, ref1, util,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
   slice = [].slice;
 
 EventEmitter = require('./eventEmitter');
+
+util = require('./util');
 
 ref = require('./util'), clone = ref.clone, nextTick = ref.nextTick;
 
@@ -31,21 +33,32 @@ Template = (function(superClass) {
     this.init();
   }
 
+  Template.prototype.watchScope = function() {
+    if (this.__initWatch) {
+      return;
+    }
+    return this.__initWatch = true;
+  };
+
   Template.prototype.set = function() {
-    var args;
+    var args, doneOrAsync, key, val;
     args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-    if (args.length === 1 && util.isObject(args[0])) {
-      this.scope = args[0];
-    } else if (args.length === 2) {
-      this.scope[args[0]] = args[1];
+    doneOrAsync = null;
+    if (args.length > 1) {
+      key = args[0];
+      val = args[1];
+      this.scope[key] = val;
+      if (args.length === 3) {
+        doneOrAsync = args[2];
+      }
     } else {
       return;
     }
     if (this._status === 0) {
       return;
     }
-    this.emit('changeScope', this.scope);
-    return this.renderQueue(this);
+    this.emit('changeScope', this.scope, key, val);
+    return this.renderQueue(doneOrAsync);
   };
 
   Template.prototype.get = function(key, defaultVal) {
@@ -59,6 +72,9 @@ Template = (function(superClass) {
   };
 
   Template.prototype.destroy = function() {
+    if (this.__initWatch) {
+      Object.unobserve(this.scope);
+    }
     if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
       return this.refs.parentNode.removeChild(this.refs);
     }
@@ -66,9 +82,9 @@ Template = (function(superClass) {
 
   Template.prototype.init = function() {};
 
-  Template.prototype._render = function(data, done) {
+  Template.prototype._render = function(done) {
     var patches, scope, virtualDom;
-    scope = clone(data.scope);
+    scope = util.extend(true, this.scope);
     virtualDom = this.virtualDomDefine(scope);
     if (this.virtualDom === null) {
       this.virtualDom = virtualDom;
@@ -80,41 +96,60 @@ Template = (function(superClass) {
     }
     this._status = 2;
     this.emit('rendered');
-    if (done) {
+    if (util.isFunction(done)) {
       return done();
     }
   };
 
-  Template.prototype.renderQueue = function(data, doneOrAsync) {
+  Template.prototype.renderQueue = function(doneOrAsync) {
     nextTick.clear(this._queueId);
     if (true === doneOrAsync) {
-      return this._render(data);
+      return this._render();
     } else {
       this._status = 1;
       return this._queueId = nextTick((function(_this) {
         return function() {
-          return _this._render(data, doneOrAsync);
+          return _this._render(doneOrAsync);
         };
       })(this));
     }
   };
 
-  Template.prototype.render = function(virtualDomDefine, scope1, doneOrAsync) {
+  Template.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
+    var ix, scopeKeys, scopeLen;
     this.virtualDomDefine = virtualDomDefine;
-    this.scope = scope1 != null ? scope1 : {};
+    if (scope == null) {
+      scope = {};
+    }
     if (doneOrAsync == null) {
       doneOrAsync = function() {};
     }
     this._status = 1;
     this.emit('beforeRender');
-    this.renderQueue(this, true);
-    if (doneOrAsync) {
-      return doneOrAsync();
+    scopeKeys = Object.keys(scope);
+    scopeLen = scopeKeys.length;
+    if (scopeLen === 0) {
+      this.renderQueue(doneOrAsync);
+    } else {
+      ix = scopeLen - 1;
+      scopeKeys.forEach((function(_this) {
+        return function(v, k) {
+          return _this.set(v, scope[v], k === ix && doneOrAsync || null);
+        };
+      })(this));
     }
+    this.watchScope();
+    return this;
   };
 
   return Template;
 
 })(EventEmitter);
+
+Template.formatters = require('./formatters');
+
+Template.components = {};
+
+Template.binders = {};
 
 module.exports = Template;

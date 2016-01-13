@@ -15,6 +15,13 @@ exports.isNumber = function(x) {
   return _isNumberReg.test(x);
 };
 
+exports.isArray = function(x) {
+  if (Array.isArray) {
+    return Array.isArray(x);
+  }
+  return Object.prototype.toString.call(x) === '[object Array]';
+};
+
 exports.isObject = function(x) {
   return Object.prototype.toString.call(x) === '[object Object]';
 };
@@ -23,16 +30,61 @@ exports.isString = function(x) {
   return Object.prototype.toString.call(x) === '[object String]';
 };
 
-exports.clone = function(src) {
-  var dest, key, val;
-  dest = {};
-  for (key in src) {
-    val = src[key];
-    if (src.hasOwnProperty(key)) {
-      dest[key] = val;
+exports.isFunction = function(x) {
+  return Object.prototype.toString.call(x) === '[object Function]';
+};
+
+exports.isPlainObject = function(x) {
+  var hasIsPropertyOfMethod, hasOwnConstructor, key, lastKey;
+  if (!x || Object.prototype.toString.call(x) !== '[object Object]' || x.nodeType || x.setInterval) {
+    return false;
+  }
+  hasOwnConstructor = Object.hasOwnProperty.call(x, 'constructor');
+  hasIsPropertyOfMethod = Object.hasOwnProperty.call(x.constructor.prototype, 'isPrototypeOf');
+  if (x.constructor && !hasOwnConstructor && !hasIsPropertyOfMethod) {
+    return false;
+  }
+  for (key in x) {
+    lastKey = key;
+  }
+  return typeof lastKey === 'undefined' || Object.hasOwnProperty.call(x, lastKey);
+};
+
+exports.extend = function() {
+  var clone, copy, deep, i, j, length, name, options, ref, ref1, src, start, target;
+  target = arguments[0] || {};
+  length = arguments.length;
+  deep = false;
+  start = 1;
+  if (typeof target === 'boolean') {
+    deep = target;
+    target = arguments[1] || {};
+    start = 2;
+  }
+  if (typeof target !== 'object' && typeof target !== 'function') {
+    target = {};
+  }
+  for (i = j = ref = start, ref1 = length; ref <= ref1 ? j < ref1 : j > ref1; i = ref <= ref1 ? ++j : --j) {
+    if ((options = arguments[i]) !== null) {
+      for (name in options) {
+        src = target[name];
+        copy = options[name];
+        if (target === copy) {
+          continue;
+        }
+        if (deep && copy && (exports.isPlainObject(copy) || exports.isArray(copy))) {
+          clone = {};
+          if (src && (exports.isPlainObject(src) || exports.isArray(src))) {
+            clone = exports.isArray(copy) && [] || {};
+          }
+          target[name] = exports.extend(deep, clone, copy);
+        } else if (typeof copy !== 'undefined') {
+          target[name] = copy;
+        }
+      }
     }
   }
-  return dest;
+  return target;
 };
 
 (function() {

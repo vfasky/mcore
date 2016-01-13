@@ -24,13 +24,11 @@ exports.test = ->
     , ->
         document.body.appendChild tpl.refs
 
+
         setInterval ->
             tpl.set 'time', (new Date()).getTime()
-            books = tpl.get 'books'
-            books.change =
+            tpl.scope.books.change =
                 id: 'v'
                 name: (new Date())
-
-            tpl.set 'books', books
         , 1000
 

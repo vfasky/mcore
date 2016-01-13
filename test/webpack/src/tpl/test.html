@@ -3,18 +3,24 @@
 <div mc-data-id="scope.id">
     
     <ul>
-        <li mc-for="v in scope.list">
+        <li mc-for="v, k in scope.list" mc-if="scope.time">
             {v.name} 
-            <span>{scope.time}</span>
-            <a href="#">t1</a>
+            <span>{scope.time}  {(k + 2) / 6}</span>
+            <a href="#">t1 { (new Date()).toString() }</a>
         </li>
     </ul>
+    
     <ul>
-        <li mc-for="v, k in scope.list">
+        <li mc-for="v, k in scope.list" mc-unless="scope.time">
             {v.name} {k}
         </li>
     </ul>
 
+    <h5 mc-each-v="scope.list"> {v.name} </h5>
+
+    <br>
+    
+    <input type="button" mc-value="v.name | toNumber | toFixed 2">
 
     <a mc-for="k, v of scope.books" mc-href="v.id">{v.name} - {k} <br></a>
 </div>

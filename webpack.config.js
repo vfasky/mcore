@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * @date 2016-01-07 21:45:16
  * @author vfasky <vfasky@gmail.com>
  */
@@ -14,5 +14,10 @@ module.exports = {
     },
     plugins: [
         new webpack.IgnorePlugin(/jsdom$/)
-    ]
+    ],
+    resolve: {
+        alias: {
+            'object.observe': path.join(__dirname, './node_modules/object.observe/dist/object-observe-lite.js'),
+        }
+    }
 };
