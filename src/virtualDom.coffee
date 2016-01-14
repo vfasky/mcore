@@ -6,7 +6,14 @@
 
 {el, diff, patch} = require 'simple-virtual-dom'
 
+Element = el
+render = el.prototype.render
+Element::render = ->
+    el = render.call @
+    console.log el
+    el
+
 module.exports =
-    el: el
+    el: Element
     diff: diff
     patch: patch

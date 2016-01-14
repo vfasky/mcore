@@ -5,12 +5,22 @@
  * @date 2016-01-07 21:50:58
  */
 'use strict';
-var diff, el, patch, ref;
+var Element, diff, el, patch, ref, render;
 
 ref = require('simple-virtual-dom'), el = ref.el, diff = ref.diff, patch = ref.patch;
 
+Element = el;
+
+render = el.prototype.render;
+
+Element.prototype.render = function() {
+  el = render.call(this);
+  console.log(el);
+  return el;
+};
+
 module.exports = {
-  el: el,
+  el: Element,
   diff: diff,
   patch: patch
 };

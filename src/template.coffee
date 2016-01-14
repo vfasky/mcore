@@ -110,6 +110,7 @@ class Template extends EventEmitter
             patches = diff @virtualDom, virtualDom
             @virtualDom = virtualDom
 
+            console.log patches
             # 更新dom
             patch @refs, patches
 

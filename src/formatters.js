@@ -13,9 +13,16 @@ Template = require('./template');
 
 util = require('./util');
 
-module.exports['toNumber'] = function(x) {
+exports['toNumber'] = function(x) {
   if (false === util.isNumber(x)) {
     return 0;
   }
   return Number(x);
+};
+
+exports['toFixed'] = function(x, len) {
+  if (len == null) {
+    len = 1;
+  }
+  return Number(x).toFixed(len);
 };

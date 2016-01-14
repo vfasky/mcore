@@ -92,6 +92,7 @@ Template = (function(superClass) {
     } else {
       patches = diff(this.virtualDom, virtualDom);
       this.virtualDom = virtualDom;
+      console.log(patches);
       patch(this.refs, patches);
     }
     this._status = 2;

@@ -12,7 +12,11 @@
     
     <ul>
         <li mc-for="v, k in scope.list" mc-unless="scope.time">
-            {v.name} {k}
+            {
+            v.name
+            } {
+                k | toNumber | toFixed 2
+            }
         </li>
     </ul>
 
