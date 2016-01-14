@@ -5,19 +5,40 @@
  * @date 2016-01-07 21:50:58
  */
 'use strict';
-var Element, diff, el, patch, ref, render;
+var Element, diff, el, patch, ref,
+  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  hasProp = {}.hasOwnProperty;
 
 ref = require('simple-virtual-dom'), el = ref.el, diff = ref.diff, patch = ref.patch;
 
-Element = el;
+Element = (function(superClass) {
+  extend(Element, superClass);
 
-render = el.prototype.render;
+  function Element() {
+    return Element.__super__.constructor.apply(this, arguments);
+  }
 
-Element.prototype.render = function() {
-  el = render.call(this);
-  console.log(el);
-  return el;
-};
+  Element.prototype.render = function() {
+    this.el = Element.__super__.render.call(this);
+    if (this.observe) {
+      this.emitBinderObserve();
+    }
+    return this.el;
+  };
+
+  Element.prototype.emitBinderObserve = function() {
+    if (this.observe.binders) {
+      return this.observe.routineBinder(this);
+    }
+  };
+
+  Element.prototype.bindObserve = function(observe) {
+    this.observe = observe;
+  };
+
+  return Element;
+
+})(el);
 
 module.exports = {
   el: Element,

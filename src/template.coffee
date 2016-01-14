@@ -100,7 +100,7 @@ class Template extends EventEmitter
         scope = util.extend true, @scope
         #scope = data.scope
         
-        virtualDom = @virtualDomDefine scope
+        {virtualDom, @binders} = @virtualDomDefine scope, @
         # 未渲染，不用对比
         if @virtualDom == null
             @virtualDom = virtualDom
@@ -110,14 +110,22 @@ class Template extends EventEmitter
             patches = diff @virtualDom, virtualDom
             @virtualDom = virtualDom
 
-            console.log patches
             # 更新dom
             patch @refs, patches
+
+        #console.log @binders
 
         @_status = 2
         @emit 'rendered'
         done() if util.isFunction done
 
+    # 处理 dom 的 attr
+    routineBinder: (virtualDom)->
+        for attr, list of @binders
+            list.forEach (v)->
+                if virtualDom.props[v.attr] == v.id
+                    Template.binders[attr](virtualDom.el, v.val)
+        return
 
     # 渲染队列
     renderQueue: (doneOrAsync)->
@@ -158,7 +166,7 @@ Template.formatters = require './formatters'
 Template.components = {}
 
 # 属性
-Template.binders = {}
+Template.binders = require './binders'
 
 
 

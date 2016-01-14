@@ -24,7 +24,11 @@
 
     <br>
     
-    <input type="button" mc-value="v.name | toNumber | toFixed 2">
+    <input type="button" mc-show="v.name | toNumber">
+    <div mc-if="scope.time">
+        <input type="button" mc-show="v.name | toNumber">
+        <input type="button" mc-hide="v.name | toNumber">
+    </div>
 
     <a mc-for="k, v of scope.books" mc-href="v.id">{v.name} - {k} <br></a>
 </div>

@@ -83,22 +83,34 @@ Template = (function(superClass) {
   Template.prototype.init = function() {};
 
   Template.prototype._render = function(done) {
-    var patches, scope, virtualDom;
+    var patches, ref2, scope, virtualDom;
     scope = util.extend(true, this.scope);
-    virtualDom = this.virtualDomDefine(scope);
+    ref2 = this.virtualDomDefine(scope, this), virtualDom = ref2.virtualDom, this.binders = ref2.binders;
     if (this.virtualDom === null) {
       this.virtualDom = virtualDom;
       this.refs = this.virtualDom.render();
     } else {
       patches = diff(this.virtualDom, virtualDom);
       this.virtualDom = virtualDom;
-      console.log(patches);
       patch(this.refs, patches);
     }
     this._status = 2;
     this.emit('rendered');
     if (util.isFunction(done)) {
       return done();
+    }
+  };
+
+  Template.prototype.routineBinder = function(virtualDom) {
+    var attr, list, ref2;
+    ref2 = this.binders;
+    for (attr in ref2) {
+      list = ref2[attr];
+      list.forEach(function(v) {
+        if (virtualDom.props[v.attr] === v.id) {
+          return Template.binders[attr](virtualDom.el, v.val);
+        }
+      });
     }
   };
 
@@ -151,6 +163,6 @@ Template.formatters = require('./formatters');
 
 Template.components = {};
 
-Template.binders = {};
+Template.binders = require('./binders');
 
 module.exports = Template;

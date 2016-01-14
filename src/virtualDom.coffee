@@ -6,12 +6,22 @@
 
 {el, diff, patch} = require 'simple-virtual-dom'
 
-Element = el
-render = el.prototype.render
-Element::render = ->
-    el = render.call @
-    console.log el
-    el
+class Element extends el
+    render: ->
+        @el = super()
+        if @observe
+            @emitBinderObserve()
+            
+        @el
+
+    # 通知 binder
+    emitBinderObserve: ->
+        if @observe.binders
+            @observe.routineBinder @
+
+
+    bindObserve: (@observe)->
+
 
 module.exports =
     el: Element
