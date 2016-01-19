@@ -68,7 +68,9 @@ http = do ->
         xhr = $.ajax(
             url,
             options
-        ).then (res)->
+        )
+        
+        xhr.then (res)->
             if http.isSuccess(res, @)
                 dtd.resolve http.responseFormat res
             else

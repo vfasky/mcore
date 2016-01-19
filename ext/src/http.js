@@ -67,7 +67,8 @@ http = (function() {
       options.type = 'GET';
       options.dataType = 'jsonp';
     }
-    xhr = $.ajax(url, options).then(function(res) {
+    xhr = $.ajax(url, options);
+    xhr.then(function(res) {
       if (http.isSuccess(res, this)) {
         return dtd.resolve(http.responseFormat(res));
       } else {
