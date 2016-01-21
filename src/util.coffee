@@ -75,6 +75,39 @@ exports.extend = ->
 
     target
 
+exports.setElementAttr = (el, attrName, value, noHash)->
+    if attrName == 'style'
+        return el.style.cssText = value
+
+    tagName = (el.tagName or '').toLowerCase()
+
+    if attrName == 'value' and tagName in ['input', 'textarea']
+        return el.value = value
+
+    if el._element and el._element.setAttribute and !noHash
+        el._element.setAttribute el, attrName, value
+    else
+        el.setAttribute attrName, value
+
+exports.removeElementAttr = (el, attrName)->
+    if el._element and el._element.removeAttribute
+        el._element.removeAttribute attrName
+    else
+        el.removeAttribute attrName
+
+exports.toArray = (listLike)->
+    return [] if !listLike
+    list = []
+    for i in [0...listLike.length]
+        list.push listLike[i]
+    list
+
+exports.each = (arr, done)->
+    for v, k in arr
+        res = done v, k
+        return if false == res
+
+
 # 放到下一帧执行
 do ->
     if window.requestAnimationFrame

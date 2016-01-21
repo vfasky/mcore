@@ -10,9 +10,9 @@ EventEmitter = require './eventEmitter'
 util = require './util'
 #observe = require './observe'
 
-{clone, nextTick} = require './util'
-{diff, patch} = require './virtualDom'
-
+{clone, nextTick, each, isFunction} = require './util'
+diff = require './diff'
+patch = require './patch'
 
 class Template extends EventEmitter
     constructor: ->
@@ -27,6 +27,15 @@ class Template extends EventEmitter
 
         # 渲染队列id
         @_queueId = null
+
+        # 初始化 @refs 后，执行的队列
+        @_initTask = []
+
+        # 事件
+        @_events = {}
+
+        # 已经注册的事件
+        @_eventReged = []
 
         # 真实 dom 的引用
         # @public
@@ -49,6 +58,9 @@ class Template extends EventEmitter
 
         @init()
 
+    test: ->
+        alert 'hello'
+
     # 观察 scope
     watchScope: ->
         return if @__initWatch
@@ -59,19 +71,11 @@ class Template extends EventEmitter
 
 
     # 将 @scope 的变化，更新dom
-    set: (args...)->
-        doneOrAsync = null
-        if args.length > 1
-            key = args[0]
-            val = args[1]
-            @scope[key] = val
-            doneOrAsync = args[2] if args.length == 3
-        else
-            return
-
+    set: (key, value, doneOrAsync = null)->
+        @scope[key] = value
         return if @_status == 0
 
-        @emit 'changeScope', @scope, key, val
+        @emit 'changeScope', @scope, key, value
         @renderQueue doneOrAsync
 
 
@@ -100,11 +104,14 @@ class Template extends EventEmitter
         scope = util.extend true, @scope
         #scope = data.scope
         
-        {virtualDom, @binders} = @virtualDomDefine scope, @
+        {virtualDom} = @virtualDomDefine scope, @
         # 未渲染，不用对比
         if @virtualDom == null
             @virtualDom = virtualDom
             @refs = @virtualDom.render()
+
+            each @_initTask, (task)-> task()
+            @_initTask = []
         else
             # 对比
             patches = diff @virtualDom, virtualDom
@@ -119,14 +126,7 @@ class Template extends EventEmitter
         @emit 'rendered'
         done() if util.isFunction done
 
-    # 处理 dom 的 attr
-    routineBinder: (virtualDom)->
-        for attr, list of @binders
-            list.forEach (v)->
-                if virtualDom.props[v.attr] == v.id
-                    Template.binders[attr](virtualDom.el, v.val)
-        return
-
+    
     # 渲染队列
     renderQueue: (doneOrAsync)->
         nextTick.clear @_queueId
@@ -138,6 +138,58 @@ class Template extends EventEmitter
             @_status = 1
             @_queueId = nextTick =>
                 @_render doneOrAsync
+
+
+    # 注册事件
+    regEvent: (event, el, callback, id)->
+        event = event.toLowerCase()
+        @_events[event] or= []
+        isIn = false
+        each @_events[event], (e)->
+            if e.id == id
+                isIn = true
+                e.callback = callback
+                return false
+        if false == isIn
+            @_events[event].push
+                el: el
+                callback: callback
+                id: id
+
+        #console.log @_events
+
+        @addEventListener event
+
+        
+    # 注册事件
+    addEventListener: (event)->
+        if !@refs
+            @_initTask.push => @addEventListener event
+            return
+        if event not in @_eventReged
+            @_eventReged.push event
+            @refs.addEventListener event, (e)=>
+                tasks = @_events[event]
+                each tasks, (task)=>
+                    if task.el == e.target
+                        res = null
+                        if isFunction task.callback
+                            res = task.callback task.el, e
+
+                        else if isFunction @[task.callback]
+                            res = @[task.callback] task.el, e
+
+                        else
+                            throw new Error 'not callback :' + task.callback
+                        
+                        if false == res
+                            if e.stopPropagation and e.preventDefault
+                                e.stopPropagation()
+                                e.preventDefault()
+                            else
+                                window.event.cancelBubble = true
+                                window.event.returnValue = false
+                        return false
 
         
     # 渲染
@@ -152,7 +204,7 @@ class Template extends EventEmitter
             @renderQueue doneOrAsync
         else
             ix = scopeLen - 1
-            scopeKeys.forEach (v, k)=>
+            each scopeKeys, (v, k)=>
                 @set v, scope[v], k == ix and doneOrAsync or null
 
         @watchScope()

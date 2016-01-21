@@ -87,6 +87,53 @@ exports.extend = function() {
   return target;
 };
 
+exports.setElementAttr = function(el, attrName, value, noHash) {
+  var tagName;
+  if (attrName === 'style') {
+    return el.style.cssText = value;
+  }
+  tagName = (el.tagName || '').toLowerCase();
+  if (attrName === 'value' && (tagName === 'input' || tagName === 'textarea')) {
+    return el.value = value;
+  }
+  if (el._element && el._element.setAttribute && !noHash) {
+    return el._element.setAttribute(el, attrName, value);
+  } else {
+    return el.setAttribute(attrName, value);
+  }
+};
+
+exports.removeElementAttr = function(el, attrName) {
+  if (el._element && el._element.removeAttribute) {
+    return el._element.removeAttribute(attrName);
+  } else {
+    return el.removeAttribute(attrName);
+  }
+};
+
+exports.toArray = function(listLike) {
+  var i, j, list, ref;
+  if (!listLike) {
+    return [];
+  }
+  list = [];
+  for (i = j = 0, ref = listLike.length; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+    list.push(listLike[i]);
+  }
+  return list;
+};
+
+exports.each = function(arr, done) {
+  var j, k, len, res, v;
+  for (k = j = 0, len = arr.length; j < len; k = ++j) {
+    v = arr[k];
+    res = done(v, k);
+    if (false === res) {
+      return;
+    }
+  }
+};
+
 (function() {
   if (window.requestAnimationFrame) {
     exports.nextTick = function(fun) {

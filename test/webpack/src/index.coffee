@@ -17,6 +17,7 @@ exports.test = ->
            {name : 'ok1'}
            {name : 'ok2'}
        ]
+       isShow: false
        books: {
            '1': {id: 0, name: 'book1'}
            '2': {id: 1, name: 'book2'}
@@ -24,11 +25,11 @@ exports.test = ->
     , ->
         document.body.appendChild tpl.refs
 
-
-        setInterval ->
+        setTimeout ->
             tpl.set 'time', (new Date()).getTime()
-            tpl.scope.books.change =
-                id: 'v'
-                name: (new Date())
+         
+            setTimeout ->
+                tpl.set 'isShow', true
+            , 1000
         , 1000
 

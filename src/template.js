@@ -7,18 +7,20 @@
  * @link http://vfasky.com
  */
 'use strict';
-var EventEmitter, Template, clone, diff, nextTick, patch, ref, ref1, util,
+var EventEmitter, Template, clone, diff, each, isFunction, nextTick, patch, ref, util,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
-  slice = [].slice;
+  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 EventEmitter = require('./eventEmitter');
 
 util = require('./util');
 
-ref = require('./util'), clone = ref.clone, nextTick = ref.nextTick;
+ref = require('./util'), clone = ref.clone, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction;
 
-ref1 = require('./virtualDom'), diff = ref1.diff, patch = ref1.patch;
+diff = require('./diff');
+
+patch = require('./patch');
 
 Template = (function(superClass) {
   extend(Template, superClass);
@@ -26,12 +28,19 @@ Template = (function(superClass) {
   function Template() {
     this._status = 0;
     this._queueId = null;
+    this._initTask = [];
+    this._events = {};
+    this._eventReged = [];
     this.refs = null;
     this.virtualDomDefine = null;
     this.virtualDom = null;
     this.scope = {};
     this.init();
   }
+
+  Template.prototype.test = function() {
+    return alert('hello');
+  };
 
   Template.prototype.watchScope = function() {
     if (this.__initWatch) {
@@ -40,24 +49,15 @@ Template = (function(superClass) {
     return this.__initWatch = true;
   };
 
-  Template.prototype.set = function() {
-    var args, doneOrAsync, key, val;
-    args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-    doneOrAsync = null;
-    if (args.length > 1) {
-      key = args[0];
-      val = args[1];
-      this.scope[key] = val;
-      if (args.length === 3) {
-        doneOrAsync = args[2];
-      }
-    } else {
-      return;
+  Template.prototype.set = function(key, value, doneOrAsync) {
+    if (doneOrAsync == null) {
+      doneOrAsync = null;
     }
+    this.scope[key] = value;
     if (this._status === 0) {
       return;
     }
-    this.emit('changeScope', this.scope, key, val);
+    this.emit('changeScope', this.scope, key, value);
     return this.renderQueue(doneOrAsync);
   };
 
@@ -83,12 +83,16 @@ Template = (function(superClass) {
   Template.prototype.init = function() {};
 
   Template.prototype._render = function(done) {
-    var patches, ref2, scope, virtualDom;
+    var patches, scope, virtualDom;
     scope = util.extend(true, this.scope);
-    ref2 = this.virtualDomDefine(scope, this), virtualDom = ref2.virtualDom, this.binders = ref2.binders;
+    virtualDom = this.virtualDomDefine(scope, this).virtualDom;
     if (this.virtualDom === null) {
       this.virtualDom = virtualDom;
       this.refs = this.virtualDom.render();
+      each(this._initTask, function(task) {
+        return task();
+      });
+      this._initTask = [];
     } else {
       patches = diff(this.virtualDom, virtualDom);
       this.virtualDom = virtualDom;
@@ -101,19 +105,6 @@ Template = (function(superClass) {
     }
   };
 
-  Template.prototype.routineBinder = function(virtualDom) {
-    var attr, list, ref2;
-    ref2 = this.binders;
-    for (attr in ref2) {
-      list = ref2[attr];
-      list.forEach(function(v) {
-        if (virtualDom.props[v.attr] === v.id) {
-          return Template.binders[attr](virtualDom.el, v.val);
-        }
-      });
-    }
-  };
-
   Template.prototype.renderQueue = function(doneOrAsync) {
     nextTick.clear(this._queueId);
     if (true === doneOrAsync) {
@@ -123,6 +114,71 @@ Template = (function(superClass) {
       return this._queueId = nextTick((function(_this) {
         return function() {
           return _this._render(doneOrAsync);
+        };
+      })(this));
+    }
+  };
+
+  Template.prototype.regEvent = function(event, el, callback, id) {
+    var base, isIn;
+    event = event.toLowerCase();
+    (base = this._events)[event] || (base[event] = []);
+    isIn = false;
+    each(this._events[event], function(e) {
+      if (e.id === id) {
+        isIn = true;
+        e.callback = callback;
+        return false;
+      }
+    });
+    if (false === isIn) {
+      this._events[event].push({
+        el: el,
+        callback: callback,
+        id: id
+      });
+    }
+    return this.addEventListener(event);
+  };
+
+  Template.prototype.addEventListener = function(event) {
+    if (!this.refs) {
+      this._initTask.push((function(_this) {
+        return function() {
+          return _this.addEventListener(event);
+        };
+      })(this));
+      return;
+    }
+    if (indexOf.call(this._eventReged, event) < 0) {
+      this._eventReged.push(event);
+      return this.refs.addEventListener(event, (function(_this) {
+        return function(e) {
+          var tasks;
+          tasks = _this._events[event];
+          return each(tasks, function(task) {
+            var res;
+            if (task.el === e.target) {
+              res = null;
+              if (isFunction(task.callback)) {
+                res = task.callback(task.el, e);
+              } else if (isFunction(_this[task.callback])) {
+                res = _this[task.callback](task.el, e);
+              } else {
+                throw new Error('not callback :' + task.callback);
+              }
+              if (false === res) {
+                if (e.stopPropagation && e.preventDefault) {
+                  e.stopPropagation();
+                  e.preventDefault();
+                } else {
+                  window.event.cancelBubble = true;
+                  window.event.returnValue = false;
+                }
+              }
+              return false;
+            }
+          });
         };
       })(this));
     }
@@ -145,7 +201,7 @@ Template = (function(superClass) {
       this.renderQueue(doneOrAsync);
     } else {
       ix = scopeLen - 1;
-      scopeKeys.forEach((function(_this) {
+      each(scopeKeys, (function(_this) {
         return function(v, k) {
           return _this.set(v, scope[v], k === ix && doneOrAsync || null);
         };

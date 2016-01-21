@@ -23,6 +23,7 @@ exports.test = function() {
         name: 'ok2'
       }
     ],
+    isShow: false,
     books: {
       '1': {
         id: 0,
@@ -35,12 +36,11 @@ exports.test = function() {
     }
   }, function() {
     document.body.appendChild(tpl.refs);
-    return setInterval(function() {
+    return setTimeout(function() {
       tpl.set('time', (new Date()).getTime());
-      return tpl.scope.books.change = {
-        id: 'v',
-        name: new Date()
-      };
+      return setTimeout(function() {
+        return tpl.set('isShow', true);
+      }, 1000);
     }, 1000);
   });
 };
