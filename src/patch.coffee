@@ -1,5 +1,5 @@
 ###*
-# 扩展自 simple-virtual-dom
+# 修改自 simple-virtual-dom
 # @date 2016-01-21 19:39:03
 ###
 'use strict'

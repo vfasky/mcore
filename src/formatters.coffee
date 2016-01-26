@@ -6,9 +6,7 @@
 ###
 'use strict'
 
-Template = require './template'
 util = require './util'
-
 
 exports['toNumber'] = (x)->
     return 0 if false == util.isNumber(x)

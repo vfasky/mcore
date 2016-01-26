@@ -7,9 +7,7 @@
  * @link http://vfasky.com
  */
 'use strict';
-var Template, util;
-
-Template = require('./template');
+var util;
 
 util = require('./util');
 

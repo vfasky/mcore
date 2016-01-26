@@ -1,8 +1,6 @@
 ###*
-# 
+# 修改自 simple-virtual-dom 
 # @date 2016-01-21 19:34:48
-# @author vfasky <vfasky@gmail.com>
-# @link http://vfasky.com
 ###
 'use strict'
 

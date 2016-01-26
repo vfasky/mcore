@@ -125,11 +125,9 @@ class Template extends EventEmitter
             # 更新dom
             patch @refs, patches
 
-        #console.log @binders
-
         @_status = 2
         @emit 'rendered', @refs
-        done() if isFunction done
+        done @refs if isFunction done
 
     
     # 渲染队列

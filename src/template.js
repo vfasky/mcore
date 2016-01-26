@@ -105,7 +105,7 @@ Template = (function(superClass) {
     this._status = 2;
     this.emit('rendered', this.refs);
     if (isFunction(done)) {
-      return done();
+      return done(this.refs);
     }
   };
 

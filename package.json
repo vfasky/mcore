@@ -27,7 +27,6 @@
     "list-diff2": "^0.1.4",
     "loader-utils": "^0.2.12",
     "object.observe": "^0.2.6",
-    "simple-virtual-dom": "^0.1.7",
     "webpack": "^1.12.10"
   }
 }

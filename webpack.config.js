@@ -6,10 +6,13 @@
 var webpack = require('webpack');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: {
+        mcore: './src/index.js',
+        mcoreApp: './app/index.js',
+    },
     output: {
         path: __dirname + '/dist',
-        filename: 'mcore.js',
+        filename: '[name].js',
         libraryTarget: 'umd'
     },
     plugins: [
@@ -17,7 +20,7 @@ module.exports = {
     ],
     resolve: {
         alias: {
-            'object.observe': path.join(__dirname, './node_modules/object.observe/dist/object-observe-lite.js'),
         }
-    }
+    },
+    externals: ['jquery', 'mcore']
 };
