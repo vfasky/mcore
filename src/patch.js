@@ -100,11 +100,15 @@ reorderChildren = function(node, moves) {
     }
   });
   each(moves, function(move) {
-    var index, insertNode;
+    var el, index, insertNode;
     index = move.index;
     if (move.type === 0) {
       if (staticNodeList[index] === node.childNodes[index]) {
-        node.removeChild(node.childNodes[index]);
+        el = node.childNodes[index];
+        if (el._element && el._element.destroy) {
+          el._element.destroy();
+        }
+        node.removeChild(el);
       }
       staticNodeList.splice(index, 1);
     } else if (move.type === 1) {

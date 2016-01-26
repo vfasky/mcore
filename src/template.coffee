@@ -7,10 +7,9 @@
 'use strict'
 
 EventEmitter = require './eventEmitter'
-util = require './util'
 #observe = require './observe'
 
-{clone, nextTick, each, isFunction} = require './util'
+{extend, nextTick, each, isFunction, objectKeys, addEvent, removeEvent} = require './util'
 diff = require './diff'
 patch = require './patch'
 
@@ -34,8 +33,11 @@ class Template extends EventEmitter
         # 事件
         @_events = {}
 
-        # 已经注册的事件
+        # 已经注册的事件名称
         @_eventReged = []
+
+        # 已经注册的事件
+        @_eventListener = {}
 
         # 真实 dom 的引用
         # @public
@@ -58,17 +60,6 @@ class Template extends EventEmitter
 
         @init()
 
-    test: ->
-        alert 'hello'
-
-    # 观察 scope
-    watchScope: ->
-        return if @__initWatch
-        @__initWatch = true
-        #observe @scope, (args...)=>
-            #@renderQueue @
-            #console.log args
-
 
     # 将 @scope 的变化，更新dom
     set: (key, value, doneOrAsync = null)->
@@ -76,6 +67,18 @@ class Template extends EventEmitter
         return if @_status == 0
 
         @emit 'changeScope', @scope, key, value
+        @renderQueue doneOrAsync
+
+
+    # 删除 scope 的 key
+    remove: (key, doneOrAsync = null)->
+        if false == @scope.hasOwnProperty(key)
+            return
+
+        delete @scope[key]
+        return if @_status == 0
+
+        @emit 'removeScope', @scope, key
         @renderQueue doneOrAsync
 
 
@@ -88,11 +91,13 @@ class Template extends EventEmitter
 
     # 销毁
     destroy: ->
-        if @__initWatch
-            Object.unobserve @scope
-
         if @refs and @refs.parentNode and @refs.parentNode.removeChild
             @refs.parentNode.removeChild @refs
+            
+        @virtualDomDefine = null
+        @virtualDom = null
+        @scope = null
+        @refs = null
 
 
     # 预留接口 , new 时调用
@@ -101,7 +106,7 @@ class Template extends EventEmitter
 
     # 渲染操作
     _render: (done)->
-        scope = util.extend true, @scope
+        scope = extend true, @scope
         #scope = data.scope
         
         {virtualDom} = @virtualDomDefine scope, @
@@ -123,8 +128,8 @@ class Template extends EventEmitter
         #console.log @binders
 
         @_status = 2
-        @emit 'rendered'
-        done() if util.isFunction done
+        @emit 'rendered', @refs
+        done() if isFunction done
 
     
     # 渲染队列
@@ -141,7 +146,7 @@ class Template extends EventEmitter
 
 
     # 注册事件
-    regEvent: (event, el, callback, id)->
+    addEvent: (event, el, callback, id)->
         event = event.toLowerCase()
         @_events[event] or= []
         isIn = false
@@ -156,10 +161,23 @@ class Template extends EventEmitter
                 callback: callback
                 id: id
 
-        #console.log @_events
-
         @addEventListener event
 
+    # 移除事件
+    removeEvent: (event, el, id)->
+        return if !@refs
+
+        event = event.toLowerCase()
+        return if false == @_events.hasOwnProperty(event)
+
+        each @_events[event], (e, i)=>
+            if e.id == id
+                @_events[event].splice i, 1
+                return false
+
+        # 移除事件
+        if @_events[event].length == 0
+            removeEvent @refs, event, @_eventListener[event]
         
     # 注册事件
     addEventListener: (event)->
@@ -168,7 +186,7 @@ class Template extends EventEmitter
             return
         if event not in @_eventReged
             @_eventReged.push event
-            @refs.addEventListener event, (e)=>
+            @_eventListener[event] = (e)=>
                 tasks = @_events[event]
                 each tasks, (task)=>
                     if task.el == e.target
@@ -180,7 +198,7 @@ class Template extends EventEmitter
                             res = @[task.callback] task.el, e
 
                         else
-                            throw new Error 'not callback :' + task.callback
+                            throw new Error 'not callback : ' + task.callback
                         
                         if false == res
                             if e.stopPropagation and e.preventDefault
@@ -191,13 +209,15 @@ class Template extends EventEmitter
                                 window.event.returnValue = false
                         return false
 
+            addEvent @refs, event, @_eventListener[event]
+
         
     # 渲染
     render: (@virtualDomDefine, scope = {}, doneOrAsync = ->)->
         @_status = 1
         @emit 'beforeRender'
 
-        scopeKeys = Object.keys scope
+        scopeKeys = objectKeys scope
         scopeLen = scopeKeys.length
 
         if scopeLen == 0
@@ -207,7 +227,6 @@ class Template extends EventEmitter
             each scopeKeys, (v, k)=>
                 @set v, scope[v], k == ix and doneOrAsync or null
 
-        @watchScope()
         this
 
 
@@ -219,7 +238,6 @@ Template.components = {}
 
 # 属性
 Template.binders = require './binders'
-
 
 
 module.exports = Template

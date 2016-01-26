@@ -7,6 +7,7 @@
 'use strict'
 
 {Template} = require 'mcore'
+require './tagTime'
 
 exports.test = ->
     tpl = new Template

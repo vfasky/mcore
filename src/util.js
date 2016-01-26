@@ -134,6 +134,45 @@ exports.each = function(arr, done) {
   }
 };
 
+exports.objectKeys = function(obj) {
+  var key, keys;
+  if (obj == null) {
+    obj = {};
+  }
+  if (Object.keys) {
+    return Object.keys(obj);
+  }
+  keys = [];
+  for (key in obj) {
+    keys.push(key);
+  }
+  return keys;
+};
+
+exports.addEvent = function(node, type, callback) {
+  if (node.addEventListener) {
+    return node.addEventListener(type, callback);
+  } else if (node.attachEvent) {
+    node['e' + type + callback] = callback;
+    node[type + callback] = function() {
+      var event;
+      event = window.event;
+      event.target = event.srcElement;
+      return node['e' + type + callback](event);
+    };
+    return node.attachEvent('on' + type, node[type + callback]);
+  }
+};
+
+exports.removeEvent = function(node, type, callback) {
+  if (node.removeEventListener) {
+    return node.removeEventListener(type, callback);
+  } else if (node.detachEvent) {
+    node.detachEvent('on' + type, node[type + callback]);
+    return node[type + callback] = null;
+  }
+};
+
 (function() {
   if (window.requestAnimationFrame) {
     exports.nextTick = function(fun) {

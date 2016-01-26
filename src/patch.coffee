@@ -74,7 +74,9 @@ reorderChildren = (node, moves) ->
             # remove item
             if staticNodeList[index] == node.childNodes[index]
                 # maybe have been removed for inserting
-                node.removeChild node.childNodes[index]
+                el = node.childNodes[index]
+                el._element.destroy() if el._element and el._element.destroy
+                node.removeChild el
             staticNodeList.splice index, 1
         else if move.type == 1
             # insert item

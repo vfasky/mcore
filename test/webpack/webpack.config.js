@@ -23,8 +23,7 @@ module.exports = {
     },
     resolve: {
         alias: {
-            mcore: __dirname + '/../../src/index.js',
-            diff: __dirname + '/../../node_modules/simple-virtual-dom/lib/diff.js',
+            mcore: __dirname + '/../../src/index.js'
         }
     }
 };

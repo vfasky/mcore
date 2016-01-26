@@ -67,10 +67,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Template = __webpack_require__(1).Template;
 
+	__webpack_require__(15);
+
 	exports.test = function() {
 	  var tpl;
 	  tpl = new Template;
-	  return tpl.render(__webpack_require__(14), {
+	  return tpl.render(__webpack_require__(17), {
 	    id: 'test2',
 	    list: [
 	      {
@@ -118,8 +120,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 	  version: '2.0.0',
 	  virtualDom: __webpack_require__(2),
+	  util: __webpack_require__(7),
 	  EventEmitter: __webpack_require__(5),
-	  Template: __webpack_require__(4)
+	  Template: __webpack_require__(4),
+	  Component: __webpack_require__(14)
 	};
 
 
@@ -154,14 +158,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var Element, Template, _id, setElementAttr,
+	var Element, Template, _id, each, ref, setElementAttr,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	_id = 0;
 
 	Template = __webpack_require__(4);
 
-	setElementAttr = __webpack_require__(7).setElementAttr;
+	ref = __webpack_require__(7), setElementAttr = ref.setElementAttr, each = ref.each;
 
 	Element = (function() {
 	  function Element(tagName, props, children) {
@@ -172,9 +176,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._id = _id++;
 	    this._binders = [];
 	    this._bindersReg = [];
+	    this._component = null;
 	    this.key = this.props.key || void 0;
 	    count = 0;
-	    this.children.forEach((function(_this) {
+	    each(this.children, (function(_this) {
 	      return function(child, i) {
 	        if (child instanceof Element) {
 	          count += child.count;
@@ -188,20 +193,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  Element.prototype.render = function() {
-	    var attr, el, ref, value;
-	    el = this.bindComponents();
+	    var attr, el, ref1, value;
+	    el = this.bindComponent();
 	    if (false === el) {
 	      el = document.createElement(this.tagName);
 	      if (this.template) {
 	        el._element = this;
 	        this.el = el;
 	      }
-	      ref = this.props;
-	      for (attr in ref) {
-	        value = ref[attr];
+	      ref1 = this.props;
+	      for (attr in ref1) {
+	        value = ref1[attr];
 	        this.setAttribute(el, attr, value);
 	      }
-	      this.children.forEach(function(child) {
+	      each(this.children, function(child) {
 	        var childEl;
 	        if (child instanceof Element) {
 	          childEl = child.render();
@@ -215,11 +220,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Element.prototype.removeAttribute = function(attrName) {
-	    var binder, j, len, ref;
+	    var binder, j, len, ref1;
 	    attrName = attrName.toLowerCase();
-	    ref = this._binders;
-	    for (j = 0, len = ref.length; j < len; j++) {
-	      binder = ref[j];
+	    if (this._component) {
+	      this._component.update(attrName, null);
+	      return;
+	    }
+	    ref1 = this._binders;
+	    for (j = 0, len = ref1.length; j < len; j++) {
+	      binder = ref1[j];
 	      if (binder.attrName === attrName) {
 	        if (binder.binder.remove) {
 	          binder.binder.remove.call(this, this.el);
@@ -230,18 +239,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.el.removeAttribute(attrName);
 	  };
 
+	  Element.prototype.destroy = function() {
+	    var attrName, event, results;
+	    if (!this.template) {
+	      return;
+	    }
+	    if (this._component) {
+	      this._component.destroy();
+	    }
+	    results = [];
+	    for (attrName in this.props) {
+	      if (attrName.indexOf('on-') === 0) {
+	        event = attrName.replace('on-', '');
+	        results.push(this.template.removeEvent(event, this.el, this._id));
+	      } else {
+	        results.push(void 0);
+	      }
+	    }
+	    return results;
+	  };
+
 	  Element.prototype.setAttribute = function(el, attrName, value) {
-	    var binder, j, len, ref;
+	    var binder, j, len, ref1;
 	    attrName = String(attrName).toLowerCase();
 	    if (this.template) {
 	      if (attrName.indexOf('on-') === 0) {
-	        this.template.regEvent(attrName.replace('on-', ''), el, value, this._id);
+	        this.template.addEvent(attrName.replace('on-', ''), el, value, this._id);
 	        setElementAttr(el, '_mc', this._id, true);
 	        return;
 	      }
-	      ref = this._binders;
-	      for (j = 0, len = ref.length; j < len; j++) {
-	        binder = ref[j];
+	      if (this._component) {
+	        this._component.update(attrName, value);
+	        return;
+	      }
+	      ref1 = this._binders;
+	      for (j = 0, len = ref1.length; j < len; j++) {
+	        binder = ref1[j];
 	        if (binder.attrName === attrName) {
 	          if (indexOf.call(this._bindersReg, attrName) < 0) {
 	            this._bindersReg.push(attrName);
@@ -262,16 +295,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return setElementAttr(el, attrName, value, true);
 	  };
 
-	  Element.prototype.bindComponents = function() {
+	  Element.prototype.bindComponent = function() {
 	    var el;
-	    if (!this.template) {
-	      return false;
-	    }
 	    if (false === Template.components.hasOwnProperty(this.tagName)) {
 	      return false;
 	    }
 	    el = document.createElement(this.tagName);
-	    new Template.components[this.tagName](el, this);
+	    this._component = new Template.components[this.tagName](el, this);
 	    return el;
 	  };
 
@@ -309,23 +339,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var EventEmitter, Template, clone, diff, each, isFunction, nextTick, patch, ref, util,
-	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, objectKeys, patch, ref, removeEvent,
+	  extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	EventEmitter = __webpack_require__(5);
 
-	util = __webpack_require__(7);
-
-	ref = __webpack_require__(7), clone = ref.clone, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction;
+	ref = __webpack_require__(7), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent;
 
 	diff = __webpack_require__(8);
 
 	patch = __webpack_require__(9);
 
 	Template = (function(superClass) {
-	  extend(Template, superClass);
+	  extend1(Template, superClass);
 
 	  function Template() {
 	    this._status = 0;
@@ -333,23 +361,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._initTask = [];
 	    this._events = {};
 	    this._eventReged = [];
+	    this._eventListener = {};
 	    this.refs = null;
 	    this.virtualDomDefine = null;
 	    this.virtualDom = null;
 	    this.scope = {};
 	    this.init();
 	  }
-
-	  Template.prototype.test = function() {
-	    return alert('hello');
-	  };
-
-	  Template.prototype.watchScope = function() {
-	    if (this.__initWatch) {
-	      return;
-	    }
-	    return this.__initWatch = true;
-	  };
 
 	  Template.prototype.set = function(key, value, doneOrAsync) {
 	    if (doneOrAsync == null) {
@@ -360,6 +378,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    this.emit('changeScope', this.scope, key, value);
+	    return this.renderQueue(doneOrAsync);
+	  };
+
+	  Template.prototype.remove = function(key, doneOrAsync) {
+	    if (doneOrAsync == null) {
+	      doneOrAsync = null;
+	    }
+	    if (false === this.scope.hasOwnProperty(key)) {
+	      return;
+	    }
+	    delete this.scope[key];
+	    if (this._status === 0) {
+	      return;
+	    }
+	    this.emit('removeScope', this.scope, key);
 	    return this.renderQueue(doneOrAsync);
 	  };
 
@@ -374,19 +407,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Template.prototype.destroy = function() {
-	    if (this.__initWatch) {
-	      Object.unobserve(this.scope);
-	    }
 	    if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
-	      return this.refs.parentNode.removeChild(this.refs);
+	      this.refs.parentNode.removeChild(this.refs);
 	    }
+	    this.virtualDomDefine = null;
+	    this.virtualDom = null;
+	    this.scope = null;
+	    return this.refs = null;
 	  };
 
 	  Template.prototype.init = function() {};
 
 	  Template.prototype._render = function(done) {
 	    var patches, scope, virtualDom;
-	    scope = util.extend(true, this.scope);
+	    scope = extend(true, this.scope);
 	    virtualDom = this.virtualDomDefine(scope, this).virtualDom;
 	    if (this.virtualDom === null) {
 	      this.virtualDom = virtualDom;
@@ -401,8 +435,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      patch(this.refs, patches);
 	    }
 	    this._status = 2;
-	    this.emit('rendered');
-	    if (util.isFunction(done)) {
+	    this.emit('rendered', this.refs);
+	    if (isFunction(done)) {
 	      return done();
 	    }
 	  };
@@ -421,7 +455,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Template.prototype.regEvent = function(event, el, callback, id) {
+	  Template.prototype.addEvent = function(event, el, callback, id) {
 	    var base, isIn;
 	    event = event.toLowerCase();
 	    (base = this._events)[event] || (base[event] = []);
@@ -443,6 +477,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.addEventListener(event);
 	  };
 
+	  Template.prototype.removeEvent = function(event, el, id) {
+	    if (!this.refs) {
+	      return;
+	    }
+	    event = event.toLowerCase();
+	    if (false === this._events.hasOwnProperty(event)) {
+	      return;
+	    }
+	    each(this._events[event], (function(_this) {
+	      return function(e, i) {
+	        if (e.id === id) {
+	          _this._events[event].splice(i, 1);
+	          return false;
+	        }
+	      };
+	    })(this));
+	    if (this._events[event].length === 0) {
+	      return removeEvent(this.refs, event, this._eventListener[event]);
+	    }
+	  };
+
 	  Template.prototype.addEventListener = function(event) {
 	    if (!this.refs) {
 	      this._initTask.push((function(_this) {
@@ -454,7 +509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (indexOf.call(this._eventReged, event) < 0) {
 	      this._eventReged.push(event);
-	      return this.refs.addEventListener(event, (function(_this) {
+	      this._eventListener[event] = (function(_this) {
 	        return function(e) {
 	          var tasks;
 	          tasks = _this._events[event];
@@ -467,7 +522,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              } else if (isFunction(_this[task.callback])) {
 	                res = _this[task.callback](task.el, e);
 	              } else {
-	                throw new Error('not callback :' + task.callback);
+	                throw new Error('not callback : ' + task.callback);
 	              }
 	              if (false === res) {
 	                if (e.stopPropagation && e.preventDefault) {
@@ -482,7 +537,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	          });
 	        };
-	      })(this));
+	      })(this);
+	      return addEvent(this.refs, event, this._eventListener[event]);
 	    }
 	  };
 
@@ -497,7 +553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    this._status = 1;
 	    this.emit('beforeRender');
-	    scopeKeys = Object.keys(scope);
+	    scopeKeys = objectKeys(scope);
 	    scopeLen = scopeKeys.length;
 	    if (scopeLen === 0) {
 	      this.renderQueue(doneOrAsync);
@@ -509,7 +565,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	      })(this));
 	    }
-	    this.watchScope();
 	    return this;
 	  };
 
@@ -948,6 +1003,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	exports.objectKeys = function(obj) {
+	  var key, keys;
+	  if (obj == null) {
+	    obj = {};
+	  }
+	  if (Object.keys) {
+	    return Object.keys(obj);
+	  }
+	  keys = [];
+	  for (key in obj) {
+	    keys.push(key);
+	  }
+	  return keys;
+	};
+
+	exports.addEvent = function(node, type, callback) {
+	  if (node.addEventListener) {
+	    return node.addEventListener(type, callback);
+	  } else if (node.attachEvent) {
+	    node['e' + type + callback] = callback;
+	    node[type + callback] = function() {
+	      var event;
+	      event = window.event;
+	      event.target = event.srcElement;
+	      return node['e' + type + callback](event);
+	    };
+	    return node.attachEvent('on' + type, node[type + callback]);
+	  }
+	};
+
+	exports.removeEvent = function(node, type, callback) {
+	  if (node.removeEventListener) {
+	    return node.removeEventListener(type, callback);
+	  } else if (node.detachEvent) {
+	    node.detachEvent('on' + type, node[type + callback]);
+	    return node[type + callback] = null;
+	  }
+	};
+
 	(function() {
 	  if (window.requestAnimationFrame) {
 	    exports.nextTick = function(fun) {
@@ -1189,11 +1283,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  });
 	  each(moves, function(move) {
-	    var index, insertNode;
+	    var el, index, insertNode;
 	    index = move.index;
 	    if (move.type === 0) {
 	      if (staticNodeList[index] === node.childNodes[index]) {
-	        node.removeChild(node.childNodes[index]);
+	        el = node.childNodes[index];
+	        if (el._element && el._element.destroy) {
+	          el._element.destroy();
+	        }
+	        node.removeChild(el);
 	      }
 	      staticNodeList.splice(index, 1);
 	    } else if (move.type === 1) {
@@ -1434,11 +1532,187 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// Generated by CoffeeScript 1.10.0
+
+	/**
+	 * 组件
+	 * @date 2016-01-23 16:46:42
+	 * @author vfasky <vfasky@gmail.com>
+	 * @link http://vfasky.com
+	 */
+	'use strict';
+	var Component, EventEmitter, Template,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	EventEmitter = __webpack_require__(5);
+
+	Template = __webpack_require__(4);
+
+	Component = (function(superClass) {
+	  extend(Component, superClass);
+
+	  function Component(el, virtualEl) {
+	    this.el = el;
+	    this.virtualEl = virtualEl;
+	    this.init();
+	  }
+
+	  Component.prototype.init = function() {};
+
+	  Component.prototype.render = function(virtualDomDefine, scope) {
+	    this.virtualDomDefine = virtualDomDefine;
+	    if (scope == null) {
+	      scope = {};
+	    }
+	    if (!this.template) {
+	      this.template = new Template();
+	      this.template.once('rendered', (function(_this) {
+	        return function(refs1) {
+	          _this.refs = refs1;
+	          return _this.mount();
+	        };
+	      })(this));
+	      this.template.on('rendered', (function(_this) {
+	        return function(refs) {
+	          return _this.emit('rendered', refs);
+	        };
+	      })(this));
+	    }
+	    return this.template.render(this.virtualDomDefine, scope, true);
+	  };
+
+	  Component.prototype.mount = function() {
+	    return this.el.appendChild(this.refs);
+	  };
+
+	  Component.prototype.set = function() {
+	    if (this.template) {
+	      return this.template.set.apply(this.template, arguments);
+	    }
+	  };
+
+	  Component.prototype.get = function() {
+	    if (this.template) {
+	      return this.template.get.apply(this.template, arguments);
+	    }
+	  };
+
+	  Component.prototype.remove = function() {
+	    if (this.template) {
+	      return this.template.remove.apply(this.template, arguments);
+	    }
+	  };
+
+	  Component.prototype.update = function(attrName, value) {
+	    this.set(attrName, value);
+	    return this.emit('update', attrName, value);
+	  };
+
+	  Component.prototype.destroy = function() {
+	    if (this.template) {
+	      return this.template.destroy();
+	    }
+	  };
+
+	  return Component;
+
+	})(EventEmitter);
+
+	module.exports = Component;
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Generated by CoffeeScript 1.10.0
+
+	/**
+	 * 
+	 * @date 2016-01-26 09:41:52
+	 * @author vfasky <vfasky@gmail.com>
+	 * @link http://vfasky.com
+	 */
+	'use strict';
+	var Component, Template, Time, ref,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	ref = __webpack_require__(1), Template = ref.Template, Component = ref.Component;
+
+	Time = (function(superClass) {
+	  extend(Time, superClass);
+
+	  function Time() {
+	    return Time.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Time.prototype.init = function() {
+	    this.on('rendered', (function(_this) {
+	      return function() {
+	        return setTimeout(function() {
+	          return _this.set('time', new Date());
+	        }, 1000);
+	      };
+	    })(this));
+	    return this.render(__webpack_require__(16), {
+	      time: new Date()
+	    });
+	  };
+
+	  return Time;
+
+	})(Component);
+
+	Template.components.time = Time;
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict'
 	var mcore = __webpack_require__(1);
 	var __mc_T_El = mcore.virtualDom.Element;
 	var __mc_T_formatters = mcore.Template.formatters;
 	var __mc_T_binders = mcore.Template.binders;
+	var objectKeys = mcore.util.objectKeys;
+	var each = mcore.util.each;
+	 
+	module.exports = function(scope, __mc__observe){
+	    var __mc__children_0 = [];
+	    var __mc__binders = {};
+	    var __mc__dom_id = 0;
+	    
+	    (function(scope, tree){ // startTree 0
+
+	        var __mc__children_0 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+
+	        var __mc__rp__key_0;
+	        __mc__rp__key_0 = scope.time; 
+
+	        tree.push( "" + __mc__rp__key_0 + " " );
+	    })(scope, __mc__children_0); // endTree 0
+
+	    var templateDefined = {
+	        'virtualDom': new __mc_T_El( 'div', {'class': 'mc-vd'}, __mc__children_0 ),
+	        'binders': __mc__binders
+	    };
+	    return templateDefined;
+	};
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict'
+	var mcore = __webpack_require__(1);
+	var __mc_T_El = mcore.virtualDom.Element;
+	var __mc_T_formatters = mcore.Template.formatters;
+	var __mc_T_binders = mcore.Template.binders;
+	var objectKeys = mcore.util.objectKeys;
+	var each = mcore.util.each;
 	 
 	module.exports = function(scope, __mc__observe){
 	    var __mc__children_0 = [];
@@ -1460,8 +1734,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            tree.push( "" + __mc__rp__key_0 + "" );
 	        })(scope, __mc__children_0); // endTree 1
 
-	        var __mc__new_el = new __mc_T_El('h2', __mc__attr, __mc__children_0);        var __mc__attr__keys = Object.keys(__mc__attr);
-	        __mc__attr__keys.forEach(function(attr){
+	        var __mc__new_el = new __mc_T_El('h2', __mc__attr, __mc__children_0);        var __mc__attr__keys = objectKeys(__mc__attr);
+	        each(__mc__attr__keys, function(attr){
 	            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	        });
 	        if(__mc__isBindObserve){
@@ -1524,8 +1798,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                tree.push( "" + __mc__rp__key_0 + "  " + __mc__rp__key_1 + "" );
 	                            })(scope, __mc__children_8); // endTree 9
 
-	                            var __mc__new_el = new __mc_T_El('span', __mc__attr, __mc__children_8);                            var __mc__attr__keys = Object.keys(__mc__attr);
-	                            __mc__attr__keys.forEach(function(attr){
+	                            var __mc__new_el = new __mc_T_El('span', __mc__attr, __mc__children_8);                            var __mc__attr__keys = objectKeys(__mc__attr);
+	                            each(__mc__attr__keys, function(attr){
 	                                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                            });
 	                            if(__mc__isBindObserve){
@@ -1550,8 +1824,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                tree.push( "t1 " + __mc__rp__key_0 + "" );
 	                            })(scope, __mc__children_10); // endTree 11
 
-	                            var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_10);                            var __mc__attr__keys = Object.keys(__mc__attr);
-	                            __mc__attr__keys.forEach(function(attr){
+	                            var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_10);                            var __mc__attr__keys = objectKeys(__mc__attr);
+	                            each(__mc__attr__keys, function(attr){
 	                                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                            });
 	                            if(__mc__isBindObserve){
@@ -1565,8 +1839,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            tree.push( __mc__new_el );
 	                        })(scope, __mc__children_6); // endTree 7
 
-	                        var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_6);                        var __mc__attr__keys = Object.keys(__mc__attr);
-	                        __mc__attr__keys.forEach(function(attr){
+	                        var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_6);                        var __mc__attr__keys = objectKeys(__mc__attr);
+	                        each(__mc__attr__keys, function(attr){
 	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                        });
 	                        if(__mc__isBindObserve){
@@ -1584,8 +1858,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            })(scope, __mc__children_3); // endTree 4
 
-	            var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_3);            var __mc__attr__keys = Object.keys(__mc__attr);
-	            __mc__attr__keys.forEach(function(attr){
+	            var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_3);            var __mc__attr__keys = objectKeys(__mc__attr);
+	            each(__mc__attr__keys, function(attr){
 	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	            });
 	            if(__mc__isBindObserve){
@@ -1637,8 +1911,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            tree.push( "             " + __mc__rp__key_0 + " " + __mc__rp__key_1 + "         " );
 	                        })(scope, __mc__children_15); // endTree 16
 
-	                        var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_15);                        var __mc__attr__keys = Object.keys(__mc__attr);
-	                        __mc__attr__keys.forEach(function(attr){
+	                        var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_15);                        var __mc__attr__keys = objectKeys(__mc__attr);
+	                        each(__mc__attr__keys, function(attr){
 	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                        });
 	                        if(__mc__isBindObserve){
@@ -1656,8 +1930,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            })(scope, __mc__children_12); // endTree 13
 
-	            var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_12);            var __mc__attr__keys = Object.keys(__mc__attr);
-	            __mc__attr__keys.forEach(function(attr){
+	            var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_12);            var __mc__attr__keys = objectKeys(__mc__attr);
+	            each(__mc__attr__keys, function(attr){
+	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
+	            });
+	            if(__mc__isBindObserve){
+	                __mc__new_el.bindTemplate(__mc__observe); 
+	                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
+	                    var __mc_v = __mc__binderData[__mc_i];
+	                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
+	                }
+	            }
+
+	            tree.push( __mc__new_el );
+	            var __mc__children_17 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+
+
+	            var __mc__new_el = new __mc_T_El('time', __mc__attr, __mc__children_17);            var __mc__attr__keys = objectKeys(__mc__attr);
+	            each(__mc__attr__keys, function(attr){
 	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	            });
 	            if(__mc__isBindObserve){
@@ -1677,21 +1967,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for(var __mc__$ix_=0, len=__mc__arr.length; __mc__$ix_ < len; __mc__$ix_++){
 	                var v = __mc__arr[__mc__$ix_];
 	                
-	                var __mc__children_18 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_19 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                __mc__attr['on-click'] = 'scope.time';
 
-	                (function(scope, tree){ // startTree 19
+	                (function(scope, tree){ // startTree 20
 
-	                    var __mc__children_19 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_20 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                    var __mc__rp__key_0;
 	                    __mc__rp__key_0 = v.name; 
 
 	                    tree.push( " " + __mc__rp__key_0 + " " );
-	                })(scope, __mc__children_18); // endTree 19
+	                })(scope, __mc__children_19); // endTree 20
 
-	                var __mc__new_el = new __mc_T_El('h5', __mc__attr, __mc__children_18);                var __mc__attr__keys = Object.keys(__mc__attr);
-	                __mc__attr__keys.forEach(function(attr){
+	                var __mc__new_el = new __mc_T_El('h5', __mc__attr, __mc__children_19);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
 	                if(__mc__isBindObserve){
@@ -1705,11 +1995,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                tree.push( __mc__new_el );
 	            }// endEach
 
-	            var __mc__children_20 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	            var __mc__children_21 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	            var __mc__new_el = new __mc_T_El('br', __mc__attr, __mc__children_20);            var __mc__attr__keys = Object.keys(__mc__attr);
-	            __mc__attr__keys.forEach(function(attr){
+	            var __mc__new_el = new __mc_T_El('br', __mc__attr, __mc__children_21);            var __mc__attr__keys = objectKeys(__mc__attr);
+	            each(__mc__attr__keys, function(attr){
 	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	            });
 	            if(__mc__isBindObserve){
@@ -1724,7 +2014,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // if scope.time
 	            if( !(scope.time) ){
 	               
-	                var __mc__children_22 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_23 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                __mc__attr['type'] = 'button';                __mc__attr['value'] = '1';                __mc__attr['show'] = scope.isShow; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('show') ){
@@ -1733,8 +2023,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 }// end 
 
 
-	                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_22);                var __mc__attr__keys = Object.keys(__mc__attr);
-	                __mc__attr__keys.forEach(function(attr){
+	                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_23);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
 	                if(__mc__isBindObserve){
@@ -1751,12 +2041,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // if scope.time
 	            if( scope.time ){
 	               
-	                var __mc__children_24 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_25 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	                (function(scope, tree){ // startTree 25
+	                (function(scope, tree){ // startTree 26
 
-	                    var __mc__children_25 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_26 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                    __mc__attr['type'] = 'button';                    __mc__attr['value'] = '1';                    __mc__attr['show'] = scope.isShow; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('show') ){
@@ -1765,8 +2055,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 }// end 
 	                    __mc__attr['on-click'] = 'test';
 
-	                    var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_25);                    var __mc__attr__keys = Object.keys(__mc__attr);
-	                    __mc__attr__keys.forEach(function(attr){
+	                    var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_26);                    var __mc__attr__keys = objectKeys(__mc__attr);
+	                    each(__mc__attr__keys, function(attr){
 	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                    });
 	                    if(__mc__isBindObserve){
@@ -1778,32 +2068,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 
 	                    tree.push( __mc__new_el );
-	                    var __mc__children_26 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                    __mc__attr['type'] = 'button';                    __mc__attr['value'] = '2';                    __mc__attr['hide'] = scope.isShow; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('hide') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'hide', value: __mc__attr['hide']});
-	 }// end 
+	                    // if scope.isShow
+	                    if( !(scope.isShow) ){
+	                       
+	                        var __mc__children_28 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                        __mc__attr['type'] = 'button';                        __mc__attr['value'] = '2';                        __mc__attr['on-change'] = 'test';
 
-
-	                    var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_26);                    var __mc__attr__keys = Object.keys(__mc__attr);
-	                    __mc__attr__keys.forEach(function(attr){
-	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                    });
-	                    if(__mc__isBindObserve){
-	                        __mc__new_el.bindTemplate(__mc__observe); 
-	                        for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                            var __mc_v = __mc__binderData[__mc_i];
-	                            __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
+	                        var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_28);                        var __mc__attr__keys = objectKeys(__mc__attr);
+	                        each(__mc__attr__keys, function(attr){
+	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
+	                        });
+	                        if(__mc__isBindObserve){
+	                            __mc__new_el.bindTemplate(__mc__observe); 
+	                            for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
+	                                var __mc_v = __mc__binderData[__mc_i];
+	                                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
+	                            }
 	                        }
-	                    }
 
-	                    tree.push( __mc__new_el );
-	                })(scope, __mc__children_24); // endTree 25
+	                        tree.push( __mc__new_el );
+	                    }// endif 
 
-	                var __mc__new_el = new __mc_T_El('div', __mc__attr, __mc__children_24);                var __mc__attr__keys = Object.keys(__mc__attr);
-	                __mc__attr__keys.forEach(function(attr){
+	                })(scope, __mc__children_25); // endTree 26
+
+	                var __mc__new_el = new __mc_T_El('div', __mc__attr, __mc__children_25);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
 	                if(__mc__isBindObserve){
@@ -1822,7 +2111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for(var k in __mc__obj){
 	                var  v = __mc__obj[k] || {};
 	                
-	                var __mc__children_28 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_30 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                __mc__attr['href'] = v.id; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('href') ){
@@ -1831,9 +2120,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 }// end 
 
 
-	                (function(scope, tree){ // startTree 29
+	                (function(scope, tree){ // startTree 31
 
-	                    var __mc__children_29 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_31 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                    var __mc__rp__key_0;
 	                    var __mc__rp__key_1;
@@ -1842,11 +2131,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    __mc__rp__key_1 = k; 
 
 	                    tree.push( "" + __mc__rp__key_0 + " - " + __mc__rp__key_1 + " " );
-	                    var __mc__children_30 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_32 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	                    var __mc__new_el = new __mc_T_El('br', __mc__attr, __mc__children_30);                    var __mc__attr__keys = Object.keys(__mc__attr);
-	                    __mc__attr__keys.forEach(function(attr){
+	                    var __mc__new_el = new __mc_T_El('br', __mc__attr, __mc__children_32);                    var __mc__attr__keys = objectKeys(__mc__attr);
+	                    each(__mc__attr__keys, function(attr){
 	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                    });
 	                    if(__mc__isBindObserve){
@@ -1858,10 +2147,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 
 	                    tree.push( __mc__new_el );
-	                })(scope, __mc__children_28); // endTree 29
+	                })(scope, __mc__children_30); // endTree 31
 
-	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_28);                var __mc__attr__keys = Object.keys(__mc__attr);
-	                __mc__attr__keys.forEach(function(attr){
+	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_30);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
 	                if(__mc__isBindObserve){
@@ -1877,8 +2166,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        })(scope, __mc__children_2); // endTree 3
 
-	        var __mc__new_el = new __mc_T_El('div', __mc__attr, __mc__children_2);        var __mc__attr__keys = Object.keys(__mc__attr);
-	        __mc__attr__keys.forEach(function(attr){
+	        var __mc__new_el = new __mc_T_El('div', __mc__attr, __mc__children_2);        var __mc__attr__keys = objectKeys(__mc__attr);
+	        each(__mc__attr__keys, function(attr){
 	            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	        });
 	        if(__mc__isBindObserve){
@@ -1892,10 +2181,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        tree.push( __mc__new_el );
 	    })(scope, __mc__children_0); // endTree 0
 
-	    return {
-	        virtualDom: new __mc_T_El('div', {'class': 'mc-vd'}, __mc__children_0),
-	        binders: __mc__binders,
-	    }
+	    var templateDefined = {
+	        'virtualDom': new __mc_T_El( 'div', {'class': 'mc-vd'}, __mc__children_0 ),
+	        'binders': __mc__binders
+	    };
+	    return templateDefined;
 	};
 
 /***/ }

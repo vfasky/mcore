@@ -7,23 +7,21 @@
  * @link http://vfasky.com
  */
 'use strict';
-var EventEmitter, Template, clone, diff, each, isFunction, nextTick, patch, ref, util,
-  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, objectKeys, patch, ref, removeEvent,
+  extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 EventEmitter = require('./eventEmitter');
 
-util = require('./util');
-
-ref = require('./util'), clone = ref.clone, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction;
+ref = require('./util'), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent;
 
 diff = require('./diff');
 
 patch = require('./patch');
 
 Template = (function(superClass) {
-  extend(Template, superClass);
+  extend1(Template, superClass);
 
   function Template() {
     this._status = 0;
@@ -31,23 +29,13 @@ Template = (function(superClass) {
     this._initTask = [];
     this._events = {};
     this._eventReged = [];
+    this._eventListener = {};
     this.refs = null;
     this.virtualDomDefine = null;
     this.virtualDom = null;
     this.scope = {};
     this.init();
   }
-
-  Template.prototype.test = function() {
-    return alert('hello');
-  };
-
-  Template.prototype.watchScope = function() {
-    if (this.__initWatch) {
-      return;
-    }
-    return this.__initWatch = true;
-  };
 
   Template.prototype.set = function(key, value, doneOrAsync) {
     if (doneOrAsync == null) {
@@ -58,6 +46,21 @@ Template = (function(superClass) {
       return;
     }
     this.emit('changeScope', this.scope, key, value);
+    return this.renderQueue(doneOrAsync);
+  };
+
+  Template.prototype.remove = function(key, doneOrAsync) {
+    if (doneOrAsync == null) {
+      doneOrAsync = null;
+    }
+    if (false === this.scope.hasOwnProperty(key)) {
+      return;
+    }
+    delete this.scope[key];
+    if (this._status === 0) {
+      return;
+    }
+    this.emit('removeScope', this.scope, key);
     return this.renderQueue(doneOrAsync);
   };
 
@@ -72,19 +75,20 @@ Template = (function(superClass) {
   };
 
   Template.prototype.destroy = function() {
-    if (this.__initWatch) {
-      Object.unobserve(this.scope);
-    }
     if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
-      return this.refs.parentNode.removeChild(this.refs);
+      this.refs.parentNode.removeChild(this.refs);
     }
+    this.virtualDomDefine = null;
+    this.virtualDom = null;
+    this.scope = null;
+    return this.refs = null;
   };
 
   Template.prototype.init = function() {};
 
   Template.prototype._render = function(done) {
     var patches, scope, virtualDom;
-    scope = util.extend(true, this.scope);
+    scope = extend(true, this.scope);
     virtualDom = this.virtualDomDefine(scope, this).virtualDom;
     if (this.virtualDom === null) {
       this.virtualDom = virtualDom;
@@ -99,8 +103,8 @@ Template = (function(superClass) {
       patch(this.refs, patches);
     }
     this._status = 2;
-    this.emit('rendered');
-    if (util.isFunction(done)) {
+    this.emit('rendered', this.refs);
+    if (isFunction(done)) {
       return done();
     }
   };
@@ -119,7 +123,7 @@ Template = (function(superClass) {
     }
   };
 
-  Template.prototype.regEvent = function(event, el, callback, id) {
+  Template.prototype.addEvent = function(event, el, callback, id) {
     var base, isIn;
     event = event.toLowerCase();
     (base = this._events)[event] || (base[event] = []);
@@ -141,6 +145,27 @@ Template = (function(superClass) {
     return this.addEventListener(event);
   };
 
+  Template.prototype.removeEvent = function(event, el, id) {
+    if (!this.refs) {
+      return;
+    }
+    event = event.toLowerCase();
+    if (false === this._events.hasOwnProperty(event)) {
+      return;
+    }
+    each(this._events[event], (function(_this) {
+      return function(e, i) {
+        if (e.id === id) {
+          _this._events[event].splice(i, 1);
+          return false;
+        }
+      };
+    })(this));
+    if (this._events[event].length === 0) {
+      return removeEvent(this.refs, event, this._eventListener[event]);
+    }
+  };
+
   Template.prototype.addEventListener = function(event) {
     if (!this.refs) {
       this._initTask.push((function(_this) {
@@ -152,7 +177,7 @@ Template = (function(superClass) {
     }
     if (indexOf.call(this._eventReged, event) < 0) {
       this._eventReged.push(event);
-      return this.refs.addEventListener(event, (function(_this) {
+      this._eventListener[event] = (function(_this) {
         return function(e) {
           var tasks;
           tasks = _this._events[event];
@@ -165,7 +190,7 @@ Template = (function(superClass) {
               } else if (isFunction(_this[task.callback])) {
                 res = _this[task.callback](task.el, e);
               } else {
-                throw new Error('not callback :' + task.callback);
+                throw new Error('not callback : ' + task.callback);
               }
               if (false === res) {
                 if (e.stopPropagation && e.preventDefault) {
@@ -180,7 +205,8 @@ Template = (function(superClass) {
             }
           });
         };
-      })(this));
+      })(this);
+      return addEvent(this.refs, event, this._eventListener[event]);
     }
   };
 
@@ -195,7 +221,7 @@ Template = (function(superClass) {
     }
     this._status = 1;
     this.emit('beforeRender');
-    scopeKeys = Object.keys(scope);
+    scopeKeys = objectKeys(scope);
     scopeLen = scopeKeys.length;
     if (scopeLen === 0) {
       this.renderQueue(doneOrAsync);
@@ -207,7 +233,6 @@ Template = (function(superClass) {
         };
       })(this));
     }
-    this.watchScope();
     return this;
   };
 

@@ -7,14 +7,14 @@
  * @link http://vfasky.com
  */
 'use strict';
-var Element, Template, _id, setElementAttr,
+var Element, Template, _id, each, ref, setElementAttr,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 _id = 0;
 
 Template = require('./template');
 
-setElementAttr = require('./util').setElementAttr;
+ref = require('./util'), setElementAttr = ref.setElementAttr, each = ref.each;
 
 Element = (function() {
   function Element(tagName, props, children) {
@@ -25,9 +25,10 @@ Element = (function() {
     this._id = _id++;
     this._binders = [];
     this._bindersReg = [];
+    this._component = null;
     this.key = this.props.key || void 0;
     count = 0;
-    this.children.forEach((function(_this) {
+    each(this.children, (function(_this) {
       return function(child, i) {
         if (child instanceof Element) {
           count += child.count;
@@ -41,20 +42,20 @@ Element = (function() {
   }
 
   Element.prototype.render = function() {
-    var attr, el, ref, value;
-    el = this.bindComponents();
+    var attr, el, ref1, value;
+    el = this.bindComponent();
     if (false === el) {
       el = document.createElement(this.tagName);
       if (this.template) {
         el._element = this;
         this.el = el;
       }
-      ref = this.props;
-      for (attr in ref) {
-        value = ref[attr];
+      ref1 = this.props;
+      for (attr in ref1) {
+        value = ref1[attr];
         this.setAttribute(el, attr, value);
       }
-      this.children.forEach(function(child) {
+      each(this.children, function(child) {
         var childEl;
         if (child instanceof Element) {
           childEl = child.render();
@@ -68,11 +69,15 @@ Element = (function() {
   };
 
   Element.prototype.removeAttribute = function(attrName) {
-    var binder, j, len, ref;
+    var binder, j, len, ref1;
     attrName = attrName.toLowerCase();
-    ref = this._binders;
-    for (j = 0, len = ref.length; j < len; j++) {
-      binder = ref[j];
+    if (this._component) {
+      this._component.update(attrName, null);
+      return;
+    }
+    ref1 = this._binders;
+    for (j = 0, len = ref1.length; j < len; j++) {
+      binder = ref1[j];
       if (binder.attrName === attrName) {
         if (binder.binder.remove) {
           binder.binder.remove.call(this, this.el);
@@ -83,18 +88,42 @@ Element = (function() {
     return this.el.removeAttribute(attrName);
   };
 
+  Element.prototype.destroy = function() {
+    var attrName, event, results;
+    if (!this.template) {
+      return;
+    }
+    if (this._component) {
+      this._component.destroy();
+    }
+    results = [];
+    for (attrName in this.props) {
+      if (attrName.indexOf('on-') === 0) {
+        event = attrName.replace('on-', '');
+        results.push(this.template.removeEvent(event, this.el, this._id));
+      } else {
+        results.push(void 0);
+      }
+    }
+    return results;
+  };
+
   Element.prototype.setAttribute = function(el, attrName, value) {
-    var binder, j, len, ref;
+    var binder, j, len, ref1;
     attrName = String(attrName).toLowerCase();
     if (this.template) {
       if (attrName.indexOf('on-') === 0) {
-        this.template.regEvent(attrName.replace('on-', ''), el, value, this._id);
+        this.template.addEvent(attrName.replace('on-', ''), el, value, this._id);
         setElementAttr(el, '_mc', this._id, true);
         return;
       }
-      ref = this._binders;
-      for (j = 0, len = ref.length; j < len; j++) {
-        binder = ref[j];
+      if (this._component) {
+        this._component.update(attrName, value);
+        return;
+      }
+      ref1 = this._binders;
+      for (j = 0, len = ref1.length; j < len; j++) {
+        binder = ref1[j];
         if (binder.attrName === attrName) {
           if (indexOf.call(this._bindersReg, attrName) < 0) {
             this._bindersReg.push(attrName);
@@ -115,16 +144,13 @@ Element = (function() {
     return setElementAttr(el, attrName, value, true);
   };
 
-  Element.prototype.bindComponents = function() {
+  Element.prototype.bindComponent = function() {
     var el;
-    if (!this.template) {
-      return false;
-    }
     if (false === Template.components.hasOwnProperty(this.tagName)) {
       return false;
     }
     el = document.createElement(this.tagName);
-    new Template.components[this.tagName](el, this);
+    this._component = new Template.components[this.tagName](el, this);
     return el;
   };
 

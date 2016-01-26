@@ -12,18 +12,23 @@ _isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/
 exports.isNumber = (x)->
     _isNumberReg.test x
 
+
 exports.isArray = (x)->
     return Array.isArray(x) if Array.isArray
     Object::toString.call(x) == '[object Array]'
-    
+ 
+
 exports.isObject = (x)->
     Object::toString.call(x) == '[object Object]'
+
 
 exports.isString = (x)->
     Object::toString.call(x) == '[object String]'
 
+
 exports.isFunction = (x)->
     Object::toString.call(x) == '[object Function]'
+
 
 exports.isPlainObject = (x)->
     if !x or Object::toString.call(x) != '[object Object]' or
@@ -40,6 +45,7 @@ exports.isPlainObject = (x)->
         lastKey = key
 
     typeof lastKey == 'undefined' or Object.hasOwnProperty.call x, lastKey
+
 
 exports.extend = ->
     target = arguments[0] or {}
@@ -75,6 +81,7 @@ exports.extend = ->
 
     target
 
+
 exports.setElementAttr = (el, attrName, value, noHash)->
     if attrName == 'style'
         return el.style.cssText = value
@@ -89,11 +96,13 @@ exports.setElementAttr = (el, attrName, value, noHash)->
     else
         el.setAttribute attrName, value
 
+
 exports.removeElementAttr = (el, attrName)->
     if el._element and el._element.removeAttribute
         el._element.removeAttribute attrName
     else
         el.removeAttribute attrName
+
 
 exports.toArray = (listLike)->
     return [] if !listLike
@@ -102,11 +111,41 @@ exports.toArray = (listLike)->
         list.push listLike[i]
     list
 
+
 exports.each = (arr, done)->
     for v, k in arr
         res = done v, k
         return if false == res
 
+
+exports.objectKeys = (obj = {})->
+    return Object.keys(obj) if Object.keys
+    keys = []
+    for key of obj
+        keys.push key
+
+    keys
+
+
+exports.addEvent = (node, type, callback)->
+    if node.addEventListener
+        node.addEventListener type, callback
+    else if node.attachEvent
+        node['e' + type + callback] = callback
+        node[type + callback] = ->
+            event = window.event
+            event.target = event.srcElement
+            node['e' + type + callback] event
+        node.attachEvent 'on' + type, node[type + callback]
+
+        
+exports.removeEvent = (node, type, callback)->
+    if node.removeEventListener
+        node.removeEventListener type, callback
+    else if node.detachEvent
+        node.detachEvent 'on' + type, node[type + callback]
+        node[type + callback] = null
+        
 
 # 放到下一帧执行
 do ->

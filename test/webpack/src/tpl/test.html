@@ -19,6 +19,7 @@
             }
         </li>
     </ul>
+    <time></time>
 
     <h5 mc-each-v="scope.list" mc-on-click="scope.time"> {v.name} </h5>
 
@@ -27,7 +28,7 @@
     
     <div mc-if="scope.time">
         <input type="button" value="1" mc-show="scope.isShow" mc-on-click="test">
-        <input type="button" value="2" mc-hide="scope.isShow">
+        <input type="button" value="2" mc-unless="scope.isShow" mc-on-change="test">
     </div>
 
     <a mc-for="k, v of scope.books" mc-href="v.id">{v.name} - {k} <br></a>

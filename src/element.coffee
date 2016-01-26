@@ -9,7 +9,7 @@
 _id = 0
 
 Template = require './template'
-{setElementAttr} = require './util'
+{setElementAttr, each} = require './util'
 
 class Element
     constructor: (tagName, @props = {}, @children = [])->
@@ -21,12 +21,14 @@ class Element
         # 已经初始化的属性
         @_bindersReg = []
 
-        @key = @props.key or undefined
+        # 自定义组件
+        @_component = null
 
+        @key = @props.key or undefined
 
         count = 0
 
-        @children.forEach (child, i)=>
+        each @children, (child, i)=>
             if child instanceof Element
                 count += child.count
             else
@@ -37,7 +39,7 @@ class Element
         @count = count
 
     render: ->
-        el = @bindComponents()
+        el = @bindComponent()
 
         if false == el
             el = document.createElement @tagName
@@ -52,7 +54,7 @@ class Element
 
 
             # 渲染子元素
-            @children.forEach (child)->
+            each @children, (child)->
                 if child instanceof Element
                     childEl = child.render()
                 else
@@ -64,12 +66,32 @@ class Element
     # 移除属性
     removeAttribute: (attrName)->
         attrName = attrName.toLowerCase()
+
+        # 通知组件更新
+        if @_component
+            @_component.update attrName, null
+            return
+
         for binder in @_binders
             if binder.attrName == attrName
                 binder.binder.remove.call @, @el if binder.binder.remove
                 return
 
         @el.removeAttribute attrName
+
+    
+    destroy: ->
+        return if !@template
+
+        if @_component
+            @_component.destroy()
+
+        # 移除事件
+        for attrName of @props
+            if attrName.indexOf('on-') == 0
+                event = attrName.replace('on-', '')
+                @template.removeEvent event, @el, @_id
+
 
 
     # 设置属性值
@@ -80,9 +102,15 @@ class Element
             
             # 事件注册
             if attrName.indexOf('on-') == 0
-                @template.regEvent attrName.replace('on-', ''), el, value, @_id
+                @template.addEvent attrName.replace('on-', ''), el, value, @_id
                 setElementAttr el, '_mc', @_id, true
                 return
+
+            # 通知组件更新
+            if @_component
+                @_component.update attrName, value
+                return
+
             for binder in @_binders
                 if binder.attrName == attrName
                     # init
@@ -103,13 +131,12 @@ class Element
         setElementAttr el, attrName, value, true
         
     # 绑定自定义组件
-    bindComponents: ->
-        return false if !@template
+    bindComponent: ->
 
         return false if false == Template.components.hasOwnProperty @tagName
 
         el = document.createElement @tagName
-        new Template.components[@tagName] el, @
+        @_component = new Template.components[@tagName] el, @
         el
 
     # 绑定自定义属性

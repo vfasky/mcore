@@ -9,5 +9,7 @@
 module.exports =
     version: '2.0.0'
     virtualDom: require './virtualDom'
+    util: require './util'
     EventEmitter: require './eventEmitter'
     Template: require './template'
+    Component: require './component'

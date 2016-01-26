@@ -11,6 +11,8 @@ var Template;
 
 Template = require('mcore').Template;
 
+require('./tagTime');
+
 exports.test = function() {
   var tpl;
   tpl = new Template;
