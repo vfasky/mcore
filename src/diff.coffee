@@ -13,10 +13,13 @@ listDiff = require 'list-diff2'
 diff = (oldTree, newTree) ->
     index = 0
     patches = {}
+    #console.log oldTree, newTree
     dfsWalk oldTree, newTree, index, patches
     patches
 
 dfsWalk = (oldNode, newNode, index, patches) ->
+    #if oldNode._component
+    #console.log oldNode, newNode
     currentPatch = []
     # node is removed
     if newNode == null
@@ -29,15 +32,25 @@ dfsWalk = (oldNode, newNode, index, patches) ->
                 content: newNode
     # nodes are the same, diff its props and children
     else if oldNode.tagName == newNode.tagName and oldNode.key == newNode.key
+       # if oldNode._component
+            #console.log oldNode.props
+        if oldNode._element
+            newNode._element = oldNode._element
+        if oldNode._component
+            newNode._component = oldNode._component
+
         # diff props
         propsPatches = diffProps(oldNode, newNode)
+        
         if propsPatches
             currentPatch.push
                 type: patch.PROPS
                 props: propsPatches
+            
+        if !oldNode._component
             # diff children
-        diffChildren oldNode.children, newNode.children, index, patches, currentPatch
-        # nodes are not the same, replace the old node with new node
+            diffChildren oldNode.children, newNode.children, index, patches, currentPatch
+    # nodes are not the same, replace the old node with new node
     else
         currentPatch.push
             type: patch.REPLACE
@@ -74,6 +87,9 @@ diffProps = (oldNode, newNode) ->
     newProps = newNode.props
     propsPatches = {}
 
+    #if oldNode._component
+        #console.log oldNode.props
+
     for key, value of oldProps
         if newProps[key] != value
             count++
@@ -87,6 +103,7 @@ diffProps = (oldNode, newNode) ->
 
     return null if count == 0
 
+    
     propsPatches
 
 

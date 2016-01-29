@@ -18,7 +18,9 @@ patch = (node, patches) ->
 
 dfsWalk = (node, walker, patches) ->
     currentPatches = patches[walker.index]
+    #console.log node
     len = if node.childNodes then node.childNodes.length else 0
+    len = 0 if node._component
     i = 0
     while i < len
         child = node.childNodes[i]

@@ -46,6 +46,7 @@ Template = (function(superClass) {
       return;
     }
     this.emit('changeScope', this.scope, key, value);
+    this.emit('change:' + key, value);
     return this.renderQueue(doneOrAsync);
   };
 
@@ -61,6 +62,7 @@ Template = (function(superClass) {
       return;
     }
     this.emit('removeScope', this.scope, key);
+    this.emit('change:' + key, null);
     return this.renderQueue(doneOrAsync);
   };
 
@@ -185,7 +187,9 @@ Template = (function(superClass) {
             var res;
             if (task.el === e.target) {
               res = null;
-              if (isFunction(task.callback)) {
+              if (_this._proxy && isFunction(_this._proxy[task.callback])) {
+                res = _this._proxy[task.callback](task.el, e);
+              } else if (isFunction(task.callback)) {
                 res = task.callback(task.el, e);
               } else if (isFunction(_this[task.callback])) {
                 res = _this[task.callback](task.el, e);

@@ -67,6 +67,7 @@ class Template extends EventEmitter
         return if @_status == 0
 
         @emit 'changeScope', @scope, key, value
+        @emit 'change:' + key, value
         @renderQueue doneOrAsync
 
 
@@ -79,6 +80,7 @@ class Template extends EventEmitter
         return if @_status == 0
 
         @emit 'removeScope', @scope, key
+        @emit 'change:' + key, null
         @renderQueue doneOrAsync
 
 
@@ -121,6 +123,7 @@ class Template extends EventEmitter
             # 对比
             patches = diff @virtualDom, virtualDom
             @virtualDom = virtualDom
+            #console.log patches, @refs
 
             # 更新dom
             patch @refs, patches
@@ -146,6 +149,7 @@ class Template extends EventEmitter
     # 注册事件
     addEvent: (event, el, callback, id)->
         event = event.toLowerCase()
+        
         @_events[event] or= []
         isIn = false
         each @_events[event], (e)->
@@ -189,7 +193,10 @@ class Template extends EventEmitter
                 each tasks, (task)=>
                     if task.el == e.target
                         res = null
-                        if isFunction task.callback
+                        if @_proxy and isFunction @_proxy[task.callback]
+                            res = @_proxy[task.callback] task.el, e
+
+                        else if isFunction task.callback
                             res = task.callback task.el, e
 
                         else if isFunction @[task.callback]

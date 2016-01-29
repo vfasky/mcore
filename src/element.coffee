@@ -94,7 +94,13 @@ class Element
 
     # 设置属性值
     setAttribute: (el, attrName, value)->
+        
         attrName = String(attrName).toLowerCase()
+
+        # 通知组件更新
+        if @_component
+            @_component.update attrName, value
+
         # 已经绑定模板引擎
         if @template
             
@@ -104,10 +110,7 @@ class Element
                 setElementAttr el, '_mc', @_id, true
                 return
 
-            # 通知组件更新
-            if @_component
-                @_component.update attrName, value
-                return
+            return if @_component
 
             for binder in @_binders
                 if binder.attrName == attrName
@@ -135,6 +138,12 @@ class Element
 
         el = document.createElement @tagName
         @_component = new Template.components[@tagName] el, @
+
+        for attr, value of @props
+            @setAttribute el, attr, value
+
+        el._element = @
+        el._component = @_component
         el
 
     # 绑定自定义属性

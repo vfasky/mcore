@@ -22,9 +22,12 @@ Component = (function(superClass) {
     this.el = el;
     this.virtualEl = virtualEl;
     this.init();
+    this.watch();
   }
 
   Component.prototype.init = function() {};
+
+  Component.prototype.watch = function() {};
 
   Component.prototype.render = function(virtualDomDefine, scope) {
     this.virtualDomDefine = virtualDomDefine;
@@ -33,6 +36,7 @@ Component = (function(superClass) {
     }
     if (!this.template) {
       this.template = new Template();
+      this.template._proxy = this;
       this.template.once('rendered', (function(_this) {
         return function(refs1) {
           _this.refs = refs1;
@@ -71,8 +75,11 @@ Component = (function(superClass) {
   };
 
   Component.prototype.update = function(attrName, value) {
-    this.set(attrName, value);
-    return this.emit('update', attrName, value);
+    if (this.get(attrName) !== value) {
+      this.set(attrName, value);
+      this.emit('update', attrName, value);
+      return this.emit('change:' + attrName, value);
+    }
   };
 
   Component.prototype.destroy = function() {

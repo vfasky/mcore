@@ -7,7 +7,8 @@
  * @link http://vfasky.com
  */
 'use strict';
-var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, loadPromise, ref, util,
+var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, each, loadPromise, ref, util,
+  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   slice = [].slice,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
@@ -15,6 +16,8 @@ var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBro
 ref = require('mcore'), EventEmitter = ref.EventEmitter, Template = ref.Template, util = ref.util;
 
 $ = require('jquery');
+
+each = util.each;
 
 $win = $(window);
 
@@ -25,6 +28,72 @@ _isWeixinBrowser = /MicroMessenger/i.test(window.navigator.userAgent);
 _isIOS = /iphone|ipad/gi.test(window.navigator.appVersion);
 
 _id = 0;
+
+Template.prototype.addEventListener = function(event) {
+  if (!this.refs) {
+    this._initTask.push((function(_this) {
+      return function() {
+        return _this.addEventListener(event);
+      };
+    })(this));
+    return;
+  }
+  if (indexOf.call(this._eventReged, event) < 0) {
+    this._eventReged.push(event);
+    this._eventListener[event] = (function(_this) {
+      return function() {
+        var args, e, res, tasks;
+        e = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+        tasks = _this._events[event];
+        res = null;
+        util.each(tasks, function(task) {
+          if (task.el === e.target) {
+            args || (args = []);
+            args.splice(0, 0, e);
+            args.splice(0, 0, task.el);
+            if (_this._proxy && util.isFunction(_this._proxy[task.callback])) {
+              res = _this._proxy[task.callback].apply(_this._proxy, args);
+            } else if (util.isFunction(task.callback)) {
+              res = task.callback.apply(_this, args);
+            } else if (util.isFunction(_this[task.callback])) {
+              res = _this[task.callback].apply(_this, args);
+            } else {
+              throw new Error('not callback : ' + task.callback);
+            }
+            return false;
+          }
+        });
+        return res;
+      };
+    })(this);
+    return $(this.refs).on(event, (function(_this) {
+      return function() {
+        return _this._eventListener[event].apply(_this, arguments);
+      };
+    })(this));
+  }
+};
+
+Template.prototype.removeEvent = function(event, el, id) {
+  if (!this.refs) {
+    return;
+  }
+  event = event.toLowerCase();
+  if (false === this._events.hasOwnProperty(event)) {
+    return;
+  }
+  util.each(this._events[event], (function(_this) {
+    return function(e, i) {
+      if (e.id === id) {
+        _this._events[event].splice(i, 1);
+        return false;
+      }
+    };
+  })(this));
+  if (this._events[event].length === 0) {
+    return $(this.refs).off(event);
+  }
+};
 
 loadPromise = function(data) {
   var dtd, keys, promises;
@@ -92,11 +161,13 @@ BaseClass = (function(superClass) {
     }
     if (!this.template) {
       this.template = new Template();
+      this.template._proxy = this;
     }
     dtd = $.Deferred();
     loadPromise(scope).then((function(_this) {
       return function(scope) {
         return _this.template.render(_this.virtualDomDefine, scope, function(refs) {
+          _this.emit('rendered', refs);
           return dtd.resolve(refs);
         });
       };

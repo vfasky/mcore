@@ -29,6 +29,9 @@ dfsWalk = function(node, walker, patches) {
   var child, currentPatches, i, len;
   currentPatches = patches[walker.index];
   len = node.childNodes ? node.childNodes.length : 0;
+  if (node._component) {
+    len = 0;
+  }
   i = 0;
   while (i < len) {
     child = node.childNodes[i];

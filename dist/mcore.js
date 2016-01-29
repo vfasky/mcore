@@ -206,6 +206,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Element.prototype.setAttribute = function(el, attrName, value) {
 	    var binder, j, len, ref1;
 	    attrName = String(attrName).toLowerCase();
+	    if (this._component) {
+	      this._component.update(attrName, value);
+	    }
 	    if (this.template) {
 	      if (attrName.indexOf('on-') === 0) {
 	        this.template.addEvent(attrName.replace('on-', ''), el, value, this._id);
@@ -213,7 +216,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 	      if (this._component) {
-	        this._component.update(attrName, value);
 	        return;
 	      }
 	      ref1 = this._binders;
@@ -240,12 +242,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Element.prototype.bindComponent = function() {
-	    var el;
+	    var attr, el, ref1, value;
 	    if (false === Template.components.hasOwnProperty(this.tagName)) {
 	      return false;
 	    }
 	    el = document.createElement(this.tagName);
 	    this._component = new Template.components[this.tagName](el, this);
+	    ref1 = this.props;
+	    for (attr in ref1) {
+	      value = ref1[attr];
+	      this.setAttribute(el, attr, value);
+	    }
+	    el._element = this;
+	    el._component = this._component;
 	    return el;
 	  };
 
@@ -322,6 +331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    this.emit('changeScope', this.scope, key, value);
+	    this.emit('change:' + key, value);
 	    return this.renderQueue(doneOrAsync);
 	  };
 
@@ -337,6 +347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    this.emit('removeScope', this.scope, key);
+	    this.emit('change:' + key, null);
 	    return this.renderQueue(doneOrAsync);
 	  };
 
@@ -461,7 +472,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var res;
 	            if (task.el === e.target) {
 	              res = null;
-	              if (isFunction(task.callback)) {
+	              if (_this._proxy && isFunction(_this._proxy[task.callback])) {
+	                res = _this._proxy[task.callback](task.el, e);
+	              } else if (isFunction(task.callback)) {
 	                res = task.callback(task.el, e);
 	              } else if (isFunction(_this[task.callback])) {
 	                res = _this[task.callback](task.el, e);
@@ -1051,6 +1064,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    }
 	  } else if (oldNode.tagName === newNode.tagName && oldNode.key === newNode.key) {
+	    if (oldNode._element) {
+	      newNode._element = oldNode._element;
+	    }
+	    if (oldNode._component) {
+	      newNode._component = oldNode._component;
+	    }
 	    propsPatches = diffProps(oldNode, newNode);
 	    if (propsPatches) {
 	      currentPatch.push({
@@ -1058,7 +1077,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        props: propsPatches
 	      });
 	    }
-	    diffChildren(oldNode.children, newNode.children, index, patches, currentPatch);
+	    if (!oldNode._component) {
+	      diffChildren(oldNode.children, newNode.children, index, patches, currentPatch);
+	    }
 	  } else {
 	    currentPatch.push({
 	      type: patch.REPLACE,
@@ -1156,6 +1177,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var child, currentPatches, i, len;
 	  currentPatches = patches[walker.index];
 	  len = node.childNodes ? node.childNodes.length : 0;
+	  if (node._component) {
+	    len = 0;
+	  }
 	  i = 0;
 	  while (i < len) {
 	    child = node.childNodes[i];
@@ -1498,9 +1522,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.el = el;
 	    this.virtualEl = virtualEl;
 	    this.init();
+	    this.watch();
 	  }
 
 	  Component.prototype.init = function() {};
+
+	  Component.prototype.watch = function() {};
 
 	  Component.prototype.render = function(virtualDomDefine, scope) {
 	    this.virtualDomDefine = virtualDomDefine;
@@ -1509,6 +1536,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (!this.template) {
 	      this.template = new Template();
+	      this.template._proxy = this;
 	      this.template.once('rendered', (function(_this) {
 	        return function(refs1) {
 	          _this.refs = refs1;
@@ -1547,8 +1575,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Component.prototype.update = function(attrName, value) {
-	    this.set(attrName, value);
-	    return this.emit('update', attrName, value);
+	    if (this.get(attrName) !== value) {
+	      this.set(attrName, value);
+	      this.emit('update', attrName, value);
+	      return this.emit('change:' + attrName, value);
+	    }
 	  };
 
 	  Component.prototype.destroy = function() {

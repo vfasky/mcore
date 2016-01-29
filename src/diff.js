@@ -34,6 +34,12 @@ dfsWalk = function(oldNode, newNode, index, patches) {
       });
     }
   } else if (oldNode.tagName === newNode.tagName && oldNode.key === newNode.key) {
+    if (oldNode._element) {
+      newNode._element = oldNode._element;
+    }
+    if (oldNode._component) {
+      newNode._component = oldNode._component;
+    }
     propsPatches = diffProps(oldNode, newNode);
     if (propsPatches) {
       currentPatch.push({
@@ -41,7 +47,9 @@ dfsWalk = function(oldNode, newNode, index, patches) {
         props: propsPatches
       });
     }
-    diffChildren(oldNode.children, newNode.children, index, patches, currentPatch);
+    if (!oldNode._component) {
+      diffChildren(oldNode.children, newNode.children, index, patches, currentPatch);
+    }
   } else {
     currentPatch.push({
       type: patch.REPLACE,

@@ -14,15 +14,19 @@ class Component extends EventEmitter
     # @virtualEl 虚拟 el
     constructor: (@el, @virtualEl)->
         @init()
+        @watch()
 
     # 初始化
     init: ->
+
+    watch: ->
 
 
     # 渲染
     render: (@virtualDomDefine, scope = {})->
         if !@template
             @template = new Template()
+            @template._proxy = @
             @template.once 'rendered', (@refs)=> @mount()
             @template.on 'rendered', (refs)=> @emit 'rendered', refs
 
@@ -47,8 +51,10 @@ class Component extends EventEmitter
 
     # 属性有更新
     update: (attrName, value)->
-        @set attrName, value
-        @emit 'update', attrName, value
+        if @get(attrName) != value
+            @set attrName, value
+            @emit 'update', attrName, value
+            @emit 'change:' + attrName, value
 
 
     destroy: ->

@@ -145,6 +145,7 @@ exports.removeEvent = (node, type, callback)->
     else if node.detachEvent
         node.detachEvent 'on' + type, node[type + callback]
         node[type + callback] = null
+
         
 
 # 放到下一帧执行
