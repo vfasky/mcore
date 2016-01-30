@@ -9,6 +9,12 @@
 'use strict';
 var _isNumberReg;
 
+if (window.Node && Node.prototype && !Node.prototype.contains) {
+  Node.prototype.contains = function(arg) {
+    return !!(this.compareDocumentPosition(arg) & 16);
+  };
+}
+
 _isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/;
 
 exports.isNumber = function(x) {
@@ -147,6 +153,10 @@ exports.objectKeys = function(obj) {
     keys.push(key);
   }
   return keys;
+};
+
+exports.nodeContains = function(parentNode, node) {
+  return parentNode.contains(node);
 };
 
 exports.addEvent = function(node, type, callback) {

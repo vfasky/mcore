@@ -6,6 +6,9 @@
 ###
 'use strict'
 
+if window.Node && Node.prototype && !Node.prototype.contains
+    Node.prototype.contains = (arg)-> !!(this.compareDocumentPosition(arg) & 16)
+
 
 _isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/
 
@@ -126,6 +129,8 @@ exports.objectKeys = (obj = {})->
 
     keys
 
+exports.nodeContains = (parentNode, node)->
+    parentNode.contains node
 
 exports.addEvent = (node, type, callback)->
     if node.addEventListener

@@ -28,6 +28,10 @@ _isIOS = (/iphone|ipad/gi).test(
 
 _id = 0
 
+_keyCode =
+    keyenter: 13
+    keyesc: 27
+
 # 使用 jQuery 的事件，处理 Template 的事件绑定
 Template::addEventListener = (event)->
     if !@refs
@@ -39,12 +43,11 @@ Template::addEventListener = (event)->
             tasks = @_events[event]
             res = null
             util.each tasks, (task)=>
-                if task.el == e.target
+                if task.el == e.target or util.nodeContains task.el, e.target
                     args or= []
                     args.splice 0, 0, e
                     args.splice 0, 0, task.el
-                    #console.log arguments
-                    #console.log @ if !@_proxy
+                    
                     if @_proxy and util.isFunction @_proxy[task.callback]
                         res = @_proxy[task.callback].apply @_proxy, args
 
@@ -61,8 +64,22 @@ Template::addEventListener = (event)->
                     
             res
 
-        $(@refs).on event, =>
-            return @_eventListener[event].apply @, arguments
+        $refa = $(@refs)
+
+        if event not in ['blur', 'focus']
+            if _keyCode.hasOwnProperty(event)
+                $refa.on 'keyup', (e)=>
+                    if e.keyCode == _keyCode[event]
+                        return @_eventListener[event].apply @, arguments
+
+            else
+                $refa.on event, =>
+                    return @_eventListener[event].apply @, arguments
+
+        else
+            $refa.on event, 'input, textarea', =>
+                return @_eventListener[event].apply @, arguments
+
 
 
 Template::removeEvent = (event, el, id)->

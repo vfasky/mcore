@@ -14,3 +14,7 @@ exports['show'] = function(el, value) {
 exports['hide'] = function(el, value) {
   return el.style.display = value ? 'none' : '';
 };
+
+exports['checked'] = function(el, value) {
+  return el.checked = value && true || false;
+};

@@ -543,7 +543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, each, loadPromise, ref, util,
+	var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, _keyCode, each, loadPromise, ref, util,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
 	  slice = [].slice,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -565,7 +565,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	_id = 0;
 
+	_keyCode = {
+	  keyenter: 13,
+	  keyesc: 27
+	};
+
 	Template.prototype.addEventListener = function(event) {
+	  var $refa;
 	  if (!this.refs) {
 	    this._initTask.push((function(_this) {
 	      return function() {
@@ -583,7 +589,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        tasks = _this._events[event];
 	        res = null;
 	        util.each(tasks, function(task) {
-	          if (task.el === e.target) {
+	          if (task.el === e.target || util.nodeContains(task.el, e.target)) {
 	            args || (args = []);
 	            args.splice(0, 0, e);
 	            args.splice(0, 0, task.el);
@@ -602,11 +608,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return res;
 	      };
 	    })(this);
-	    return $(this.refs).on(event, (function(_this) {
-	      return function() {
-	        return _this._eventListener[event].apply(_this, arguments);
-	      };
-	    })(this));
+	    $refa = $(this.refs);
+	    if (event !== 'blur' && event !== 'focus') {
+	      if (_keyCode.hasOwnProperty(event)) {
+	        return $refa.on('keyup', (function(_this) {
+	          return function(e) {
+	            if (e.keyCode === _keyCode[event]) {
+	              return _this._eventListener[event].apply(_this, arguments);
+	            }
+	          };
+	        })(this));
+	      } else {
+	        return $refa.on(event, (function(_this) {
+	          return function() {
+	            return _this._eventListener[event].apply(_this, arguments);
+	          };
+	        })(this));
+	      }
+	    } else {
+	      return $refa.on(event, 'input, textarea', (function(_this) {
+	        return function() {
+	          return _this._eventListener[event].apply(_this, arguments);
+	        };
+	      })(this));
+	    }
 	  }
 	};
 

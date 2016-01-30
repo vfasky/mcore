@@ -7,14 +7,14 @@
  * @link http://vfasky.com
  */
 'use strict';
-var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, objectKeys, patch, ref, removeEvent,
+var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
   extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 EventEmitter = require('./eventEmitter');
 
-ref = require('./util'), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent;
+ref = require('./util'), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
 
 diff = require('./diff');
 
@@ -185,7 +185,7 @@ Template = (function(superClass) {
           tasks = _this._events[event];
           return each(tasks, function(task) {
             var res;
-            if (task.el === e.target) {
+            if (task.el === e.target || nodeContains(task.el, e.target)) {
               res = null;
               if (_this._proxy && isFunction(_this._proxy[task.callback])) {
                 res = _this._proxy[task.callback](task.el, e);

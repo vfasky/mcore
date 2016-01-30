@@ -11,3 +11,6 @@ exports['show'] = (el, value)->
 
 exports['hide'] = (el, value)->
     el.style.display = if value then 'none' else ''
+
+exports['checked'] = (el, value)->
+    el.checked = value and true or false

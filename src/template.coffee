@@ -9,7 +9,7 @@
 EventEmitter = require './eventEmitter'
 #observe = require './observe'
 
-{extend, nextTick, each, isFunction, objectKeys, addEvent, removeEvent} = require './util'
+{extend, nextTick, each, isFunction, objectKeys, addEvent, removeEvent, nodeContains} = require './util'
 diff = require './diff'
 patch = require './patch'
 
@@ -191,7 +191,7 @@ class Template extends EventEmitter
             @_eventListener[event] = (e)=>
                 tasks = @_events[event]
                 each tasks, (task)=>
-                    if task.el == e.target
+                    if task.el == e.target or nodeContains task.el, e.target
                         res = null
                         if @_proxy and isFunction @_proxy[task.callback]
                             res = @_proxy[task.callback] task.el, e

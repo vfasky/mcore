@@ -292,14 +292,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, objectKeys, patch, ref, removeEvent,
+	var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
 	  extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	EventEmitter = __webpack_require__(4);
 
-	ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent;
+	ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
 
 	diff = __webpack_require__(7);
 
@@ -470,7 +470,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          tasks = _this._events[event];
 	          return each(tasks, function(task) {
 	            var res;
-	            if (task.el === e.target) {
+	            if (task.el === e.target || nodeContains(task.el, e.target)) {
 	              res = null;
 	              if (_this._proxy && isFunction(_this._proxy[task.callback])) {
 	                res = _this._proxy[task.callback](task.el, e);
@@ -835,6 +835,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	var _isNumberReg;
 
+	if (window.Node && Node.prototype && !Node.prototype.contains) {
+	  Node.prototype.contains = function(arg) {
+	    return !!(this.compareDocumentPosition(arg) & 16);
+	  };
+	}
+
 	_isNumberReg = /^-{0,1}\d*\.{0,1}\d+$/;
 
 	exports.isNumber = function(x) {
@@ -973,6 +979,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    keys.push(key);
 	  }
 	  return keys;
+	};
+
+	exports.nodeContains = function(parentNode, node) {
+	  return parentNode.contains(node);
 	};
 
 	exports.addEvent = function(node, type, callback) {
@@ -1491,6 +1501,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['hide'] = function(el, value) {
 	  return el.style.display = value ? 'none' : '';
+	};
+
+	exports['checked'] = function(el, value) {
+	  return el.checked = value && true || false;
 	};
 
 
