@@ -23,53 +23,47 @@ class Index extends View
         @set 'allTodos', model.list()
 
     # 编辑 
-    editTodo: (el)->
-        $el = $(el)
-        id = $el.attr 'data-id'
-        
-        todo = model.get id
-        return if !todo
-        
+    editTodo: (todo, el)->
         todo.isEdit = true
         model.update todo
         
         @updateTodos()
 
-        util.nextTick -> $el.next().focus()
+        util.nextTick -> $(el).next().focus()
 
     # 保存
-    saveTodo: (el)->
-        id = $(el).attr 'data-id'
+    saveTodo: (todo, el)->
+        return false if false == todo.isEdit
         
-        todo = model.get id
-        return if !todo
         todo.title = el.value if el.value
         todo.isEdit = false
         model.update todo
         @updateTodos()
 
     # 不保存
-    unsaveTodo: (el)->
-        id = $(el).attr 'data-id'
-        
-        todo = model.get id
-        return if !todo
+    unsaveTodo: (todo, el)->
         todo.isEdit = false
+        oldTodo = model.get todo.id
+        el.value = oldTodo.title
         model.update todo
         @updateTodos()
+        return false
 
 
 
     # 删除
-    removeTodo: (el)->
-        id = $(el).attr 'data-id'
+    removeTodo: (id)->
         model.remove id
         @updateTodos()
         false
 
     # 删除所有todo
-    removeAllTodos: ->
-        model.write []
+    removeCompleted: ->
+        data = []
+        todos = model.list()
+        $.each todos, (k, v)->
+            data.push v if v.visibility == 'active'
+        model.write data
         @updateTodos()
         false
 
@@ -100,13 +94,11 @@ class Index extends View
 
 
     # 更改单个todo的状态
-    changeTodoVisibility: (el)->
-        id = el.value
-        todo = model.get id
-        return if !todo
+    changeTodoVisibility: (todo, el)->
         
         todo.visibility = el.checked and 'completed' or 'active'
         model.update todo
+        #console.log todo
         
         @updateTodos()
 

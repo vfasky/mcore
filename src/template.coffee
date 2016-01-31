@@ -9,7 +9,11 @@
 EventEmitter = require './eventEmitter'
 #observe = require './observe'
 
-{extend, nextTick, each, isFunction, objectKeys, addEvent, removeEvent, nodeContains} = require './util'
+{
+    extend, nextTick, each, isFunction, isArray,
+    objectKeys, addEvent, removeEvent, nodeContains
+} = require './util'
+
 diff = require './diff'
 patch = require './patch'
 
@@ -149,6 +153,7 @@ class Template extends EventEmitter
     # 注册事件
     addEvent: (event, el, callback, id)->
         event = event.toLowerCase()
+        #console.log callback if event == 'change'
         
         @_events[event] or= []
         isIn = false
@@ -181,39 +186,51 @@ class Template extends EventEmitter
         if @_events[event].length == 0
             removeEvent @refs, event, @_eventListener[event]
         
+    regEventCallback: (event)->
+        @_eventReged.push event
+        @_eventListener[event] = (e)=>
+            tasks = @_events[event]
+            each tasks, (task)=>
+                if task.el == e.target or nodeContains task.el, e.target
+                    res = null
+                    args = [task.el, e]
+
+                    if isArray task.callback
+                        args = task.callback
+                        task.callback = args.shift()
+                        args.push task.el
+                        args.push e
+
+                    if @_proxy and isFunction @_proxy[task.callback]
+                        res = @_proxy[task.callback].apply @_proxy, args
+
+                    else if isFunction task.callback
+                        res = task.callback.apply @, args
+
+                    else if isFunction @[task.callback]
+                        res = @[task.callback].apply @, args
+
+                    else
+                        console.log task.callback
+                        throw new Error 'not callback : ' + task.callback
+                    
+                    if false == res
+                        if e.stopPropagation and e.preventDefault
+                            e.stopPropagation()
+                            e.preventDefault()
+                        else
+                            window.event.cancelBubble = true
+                            window.event.returnValue = false
+                    return false
+
+
     # 注册事件
     addEventListener: (event)->
         if !@refs
             @_initTask.push => @addEventListener event
             return
         if event not in @_eventReged
-            @_eventReged.push event
-            @_eventListener[event] = (e)=>
-                tasks = @_events[event]
-                each tasks, (task)=>
-                    if task.el == e.target or nodeContains task.el, e.target
-                        res = null
-                        if @_proxy and isFunction @_proxy[task.callback]
-                            res = @_proxy[task.callback] task.el, e
-
-                        else if isFunction task.callback
-                            res = task.callback task.el, e
-
-                        else if isFunction @[task.callback]
-                            res = @[task.callback] task.el, e
-
-                        else
-                            throw new Error 'not callback : ' + task.callback
-                        
-                        if false == res
-                            if e.stopPropagation and e.preventDefault
-                                e.stopPropagation()
-                                e.preventDefault()
-                            else
-                                window.event.cancelBubble = true
-                                window.event.returnValue = false
-                        return false
-
+            @regEventCallback event
             addEvent @refs, event, @_eventListener[event]
 
         

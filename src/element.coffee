@@ -61,6 +61,7 @@ class Element
                 el.appendChild childEl
         el
 
+
     # 移除属性
     removeAttribute: (attrName)->
         attrName = attrName.toLowerCase()
@@ -68,11 +69,11 @@ class Element
         # 通知组件更新
         if @_component
             @_component.update attrName, null
-            return
 
         for binder in @_binders
             if binder.attrName == attrName
                 binder.binder.remove.call @, @el if binder.binder.remove
+                binder.value = null
                 return
 
         @el.removeAttribute attrName
@@ -107,10 +108,9 @@ class Element
             # 事件注册
             if attrName.indexOf('on-') == 0
                 @template.addEvent attrName.replace('on-', ''), el, value, @_id
-                setElementAttr el, '_mc', @_id, true
+                #setElementAttr el, '_mc', @_id, true
                 return
 
-            return if @_component
 
             for binder in @_binders
                 if binder.attrName == attrName
@@ -118,6 +118,8 @@ class Element
                     if attrName not in @_bindersReg
                         @_bindersReg.push attrName
                         binder.binder.init.call @, el if binder.binder.init
+
+                    #return if binder.value == value
 
                     # update
                     if binder.binder.update
@@ -130,6 +132,7 @@ class Element
                     return
 
         setElementAttr el, attrName, value, true
+
         
     # 绑定自定义组件
     bindComponent: ->
@@ -145,6 +148,7 @@ class Element
         el._element = @
         el._component = @_component
         el
+
 
     # 绑定自定义属性
     bindBinder: (attrName, value)->

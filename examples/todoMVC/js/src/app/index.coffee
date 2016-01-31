@@ -15,10 +15,17 @@ Template.formatters.itemLen = (todos)->
     $.each todos, (k, v)->
         len++ if v.visibility != 'completed'
 
-    if len <= 1
-        return "#{len} item left"
+    if len < 2
+        return "#{len} item"
 
-    return "#{len} items left"
+    return "#{len} items"
+
+Template.formatters.completedLen = (todos)->
+    len = 0
+    $.each todos, (k, v)->
+        len++ if v.visibility == 'completed'
+
+    len
 
 
 app = new App $('body')

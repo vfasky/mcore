@@ -168,7 +168,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    attrName = attrName.toLowerCase();
 	    if (this._component) {
 	      this._component.update(attrName, null);
-	      return;
 	    }
 	    ref1 = this._binders;
 	    for (j = 0, len = ref1.length; j < len; j++) {
@@ -177,6 +176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (binder.binder.remove) {
 	          binder.binder.remove.call(this, this.el);
 	        }
+	        binder.value = null;
 	        return;
 	      }
 	    }
@@ -212,10 +212,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (this.template) {
 	      if (attrName.indexOf('on-') === 0) {
 	        this.template.addEvent(attrName.replace('on-', ''), el, value, this._id);
-	        setElementAttr(el, '_mc', this._id, true);
-	        return;
-	      }
-	      if (this._component) {
 	        return;
 	      }
 	      ref1 = this._binders;
@@ -292,14 +288,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
+	var EventEmitter, Template, addEvent, diff, each, extend, isArray, isFunction, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
 	  extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	EventEmitter = __webpack_require__(4);
 
-	ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
+	ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, isArray = ref.isArray, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
 
 	diff = __webpack_require__(7);
 
@@ -453,6 +449,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
+	  Template.prototype.regEventCallback = function(event) {
+	    this._eventReged.push(event);
+	    return this._eventListener[event] = (function(_this) {
+	      return function(e) {
+	        var tasks;
+	        tasks = _this._events[event];
+	        return each(tasks, function(task) {
+	          var args, res;
+	          if (task.el === e.target || nodeContains(task.el, e.target)) {
+	            res = null;
+	            args = [task.el, e];
+	            if (isArray(task.callback)) {
+	              args = task.callback;
+	              task.callback = args.shift();
+	              args.push(task.el);
+	              args.push(e);
+	            }
+	            if (_this._proxy && isFunction(_this._proxy[task.callback])) {
+	              res = _this._proxy[task.callback].apply(_this._proxy, args);
+	            } else if (isFunction(task.callback)) {
+	              res = task.callback.apply(_this, args);
+	            } else if (isFunction(_this[task.callback])) {
+	              res = _this[task.callback].apply(_this, args);
+	            } else {
+	              console.log(task.callback);
+	              throw new Error('not callback : ' + task.callback);
+	            }
+	            if (false === res) {
+	              if (e.stopPropagation && e.preventDefault) {
+	                e.stopPropagation();
+	                e.preventDefault();
+	              } else {
+	                window.event.cancelBubble = true;
+	                window.event.returnValue = false;
+	              }
+	            }
+	            return false;
+	          }
+	        });
+	      };
+	    })(this);
+	  };
+
 	  Template.prototype.addEventListener = function(event) {
 	    if (!this.refs) {
 	      this._initTask.push((function(_this) {
@@ -463,38 +502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    if (indexOf.call(this._eventReged, event) < 0) {
-	      this._eventReged.push(event);
-	      this._eventListener[event] = (function(_this) {
-	        return function(e) {
-	          var tasks;
-	          tasks = _this._events[event];
-	          return each(tasks, function(task) {
-	            var res;
-	            if (task.el === e.target || nodeContains(task.el, e.target)) {
-	              res = null;
-	              if (_this._proxy && isFunction(_this._proxy[task.callback])) {
-	                res = _this._proxy[task.callback](task.el, e);
-	              } else if (isFunction(task.callback)) {
-	                res = task.callback(task.el, e);
-	              } else if (isFunction(_this[task.callback])) {
-	                res = _this[task.callback](task.el, e);
-	              } else {
-	                throw new Error('not callback : ' + task.callback);
-	              }
-	              if (false === res) {
-	                if (e.stopPropagation && e.preventDefault) {
-	                  e.stopPropagation();
-	                  e.preventDefault();
-	                } else {
-	                  window.event.cancelBubble = true;
-	                  window.event.returnValue = false;
-	                }
-	              }
-	              return false;
-	            }
-	          });
-	        };
-	      })(this);
+	      this.regEventCallback(event);
 	      return addEvent(this.refs, event, this._eventListener[event]);
 	    }
 	  };

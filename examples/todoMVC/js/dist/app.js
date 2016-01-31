@@ -77,10 +77,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return len++;
 	    }
 	  });
-	  if (len <= 1) {
-	    return len + " item left";
+	  if (len < 2) {
+	    return len + " item";
 	  }
-	  return len + " items left";
+	  return len + " items";
+	};
+
+	Template.formatters.completedLen = function(todos) {
+	  var len;
+	  len = 0;
+	  $.each(todos, function(k, v) {
+	    if (v.visibility === 'completed') {
+	      return len++;
+	    }
+	  });
+	  return len;
 	};
 
 	app = new App($('body'));
@@ -677,33 +688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    return;
 		  }
 		  if (indexOf.call(this._eventReged, event) < 0) {
-		    this._eventReged.push(event);
-		    this._eventListener[event] = (function(_this) {
-		      return function() {
-		        var args, e, res, tasks;
-		        e = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
-		        tasks = _this._events[event];
-		        res = null;
-		        util.each(tasks, function(task) {
-		          if (task.el === e.target || util.nodeContains(task.el, e.target)) {
-		            args || (args = []);
-		            args.splice(0, 0, e);
-		            args.splice(0, 0, task.el);
-		            if (_this._proxy && util.isFunction(_this._proxy[task.callback])) {
-		              res = _this._proxy[task.callback].apply(_this._proxy, args);
-		            } else if (util.isFunction(task.callback)) {
-		              res = task.callback.apply(_this, args);
-		            } else if (util.isFunction(_this[task.callback])) {
-		              res = _this[task.callback].apply(_this, args);
-		            } else {
-		              throw new Error('not callback : ' + task.callback);
-		            }
-		            return false;
-		          }
-		        });
-		        return res;
-		      };
-		    })(this);
+		    this.regEventCallback(event);
 		    $refa = $(this.refs);
 		    if (event !== 'blur' && event !== 'focus') {
 		      if (_keyCode.hasOwnProperty(event)) {
@@ -1281,7 +1266,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		    attrName = attrName.toLowerCase();
 		    if (this._component) {
 		      this._component.update(attrName, null);
-		      return;
 		    }
 		    ref1 = this._binders;
 		    for (j = 0, len = ref1.length; j < len; j++) {
@@ -1290,6 +1274,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		        if (binder.binder.remove) {
 		          binder.binder.remove.call(this, this.el);
 		        }
+		        binder.value = null;
 		        return;
 		      }
 		    }
@@ -1325,10 +1310,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		    if (this.template) {
 		      if (attrName.indexOf('on-') === 0) {
 		        this.template.addEvent(attrName.replace('on-', ''), el, value, this._id);
-		        setElementAttr(el, '_mc', this._id, true);
-		        return;
-		      }
-		      if (this._component) {
 		        return;
 		      }
 		      ref1 = this._binders;
@@ -1405,14 +1386,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		 * @link http://vfasky.com
 		 */
 		'use strict';
-		var EventEmitter, Template, addEvent, diff, each, extend, isFunction, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
+		var EventEmitter, Template, addEvent, diff, each, extend, isArray, isFunction, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
 		  extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 		  hasProp = {}.hasOwnProperty,
 		  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 		EventEmitter = __webpack_require__(4);
 
-		ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
+		ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, isArray = ref.isArray, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
 
 		diff = __webpack_require__(7);
 
@@ -1566,6 +1547,49 @@ return /******/ (function(modules) { // webpackBootstrap
 		    }
 		  };
 
+		  Template.prototype.regEventCallback = function(event) {
+		    this._eventReged.push(event);
+		    return this._eventListener[event] = (function(_this) {
+		      return function(e) {
+		        var tasks;
+		        tasks = _this._events[event];
+		        return each(tasks, function(task) {
+		          var args, res;
+		          if (task.el === e.target || nodeContains(task.el, e.target)) {
+		            res = null;
+		            args = [task.el, e];
+		            if (isArray(task.callback)) {
+		              args = task.callback;
+		              task.callback = args.shift();
+		              args.push(task.el);
+		              args.push(e);
+		            }
+		            if (_this._proxy && isFunction(_this._proxy[task.callback])) {
+		              res = _this._proxy[task.callback].apply(_this._proxy, args);
+		            } else if (isFunction(task.callback)) {
+		              res = task.callback.apply(_this, args);
+		            } else if (isFunction(_this[task.callback])) {
+		              res = _this[task.callback].apply(_this, args);
+		            } else {
+		              console.log(task.callback);
+		              throw new Error('not callback : ' + task.callback);
+		            }
+		            if (false === res) {
+		              if (e.stopPropagation && e.preventDefault) {
+		                e.stopPropagation();
+		                e.preventDefault();
+		              } else {
+		                window.event.cancelBubble = true;
+		                window.event.returnValue = false;
+		              }
+		            }
+		            return false;
+		          }
+		        });
+		      };
+		    })(this);
+		  };
+
 		  Template.prototype.addEventListener = function(event) {
 		    if (!this.refs) {
 		      this._initTask.push((function(_this) {
@@ -1576,38 +1600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		      return;
 		    }
 		    if (indexOf.call(this._eventReged, event) < 0) {
-		      this._eventReged.push(event);
-		      this._eventListener[event] = (function(_this) {
-		        return function(e) {
-		          var tasks;
-		          tasks = _this._events[event];
-		          return each(tasks, function(task) {
-		            var res;
-		            if (task.el === e.target || nodeContains(task.el, e.target)) {
-		              res = null;
-		              if (_this._proxy && isFunction(_this._proxy[task.callback])) {
-		                res = _this._proxy[task.callback](task.el, e);
-		              } else if (isFunction(task.callback)) {
-		                res = task.callback(task.el, e);
-		              } else if (isFunction(_this[task.callback])) {
-		                res = _this[task.callback](task.el, e);
-		              } else {
-		                throw new Error('not callback : ' + task.callback);
-		              }
-		              if (false === res) {
-		                if (e.stopPropagation && e.preventDefault) {
-		                  e.stopPropagation();
-		                  e.preventDefault();
-		                } else {
-		                  window.event.cancelBubble = true;
-		                  window.event.returnValue = false;
-		                }
-		              }
-		              return false;
-		            }
-		          });
-		        };
-		      })(this);
+		      this.regEventCallback(event);
 		      return addEvent(this.refs, event, this._eventListener[event]);
 		    }
 		  };
@@ -2777,28 +2770,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.set('allTodos', model.list());
 	  };
 
-	  Index.prototype.editTodo = function(el) {
-	    var $el, id, todo;
-	    $el = $(el);
-	    id = $el.attr('data-id');
-	    todo = model.get(id);
-	    if (!todo) {
-	      return;
-	    }
+	  Index.prototype.editTodo = function(todo, el) {
 	    todo.isEdit = true;
 	    model.update(todo);
 	    this.updateTodos();
 	    return util.nextTick(function() {
-	      return $el.next().focus();
+	      return $(el).next().focus();
 	    });
 	  };
 
-	  Index.prototype.saveTodo = function(el) {
-	    var id, todo;
-	    id = $(el).attr('data-id');
-	    todo = model.get(id);
-	    if (!todo) {
-	      return;
+	  Index.prototype.saveTodo = function(todo, el) {
+	    if (false === todo.isEdit) {
+	      return false;
 	    }
 	    if (el.value) {
 	      todo.title = el.value;
@@ -2808,28 +2791,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.updateTodos();
 	  };
 
-	  Index.prototype.unsaveTodo = function(el) {
-	    var id, todo;
-	    id = $(el).attr('data-id');
-	    todo = model.get(id);
-	    if (!todo) {
-	      return;
-	    }
+	  Index.prototype.unsaveTodo = function(todo, el) {
+	    var oldTodo;
 	    todo.isEdit = false;
+	    oldTodo = model.get(todo.id);
+	    el.value = oldTodo.title;
 	    model.update(todo);
-	    return this.updateTodos();
+	    this.updateTodos();
+	    return false;
 	  };
 
-	  Index.prototype.removeTodo = function(el) {
-	    var id;
-	    id = $(el).attr('data-id');
+	  Index.prototype.removeTodo = function(id) {
 	    model.remove(id);
 	    this.updateTodos();
 	    return false;
 	  };
 
-	  Index.prototype.removeAllTodos = function() {
-	    model.write([]);
+	  Index.prototype.removeCompleted = function() {
+	    var data, todos;
+	    data = [];
+	    todos = model.list();
+	    $.each(todos, function(k, v) {
+	      if (v.visibility === 'active') {
+	        return data.push(v);
+	      }
+	    });
+	    model.write(data);
 	    this.updateTodos();
 	    return false;
 	  };
@@ -2860,13 +2847,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.updateTodos();
 	  };
 
-	  Index.prototype.changeTodoVisibility = function(el) {
-	    var id, todo;
-	    id = el.value;
-	    todo = model.get(id);
-	    if (!todo) {
-	      return;
-	    }
+	  Index.prototype.changeTodoVisibility = function(todo, el) {
 	    todo.visibility = el.checked && 'completed' || 'active';
 	    model.update(todo);
 	    return this.updateTodos();
@@ -3110,24 +3091,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        (function(scope, tree){ // startTree 10
 
 	                            var __mc__children_10 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                            __mc__attr['class'] = 'view';                            __mc__attr['on-dblclick'] = 'editTodo';                            __mc__attr['data-id'] = todo.id; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('data-id') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'data-id', value: __mc__attr['data-id']});
-	 }// end 
-
+	                            __mc__attr['class'] = 'view';                            __mc__attr['on-dblclick'] = ['editTodo',todo];
 
 	                            (function(scope, tree){ // startTree 11
 
 	                                var __mc__children_11 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                                __mc__attr['class'] = 'toggle';                                __mc__attr['value'] = todo.id; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('value') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'value', value: __mc__attr['value']});
-	 }// end 
-	                                __mc__attr['on-change'] = 'changeTodoVisibility';                                __mc__attr['type'] = 'checkbox';                                __mc__attr['checked'] = todo.visibility == 'completed'; 
+	                                __mc__attr['class'] = 'toggle';                                __mc__attr['on-change'] = ['changeTodoVisibility',todo];                                __mc__attr['type'] = 'checkbox';                                __mc__attr['checked'] = todo.visibility == 'completed'; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('checked') ){
 	    __mc__isBindObserve = true;
@@ -3175,13 +3144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                                tree.push( __mc__new_el );
 	                                var __mc__children_14 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                                __mc__attr['class'] = 'destroy';                                __mc__attr['data-id'] = todo.id; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('data-id') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'data-id', value: __mc__attr['data-id']});
-	 }// end 
-	                                __mc__attr['on-click'] = 'removeTodo';
+	                                __mc__attr['class'] = 'destroy';                                __mc__attr['on-click'] = ['removeTodo',todo.id];
 
 	                                var __mc__new_el = new __mc_T_El('button', __mc__attr, __mc__children_14);                                var __mc__attr__keys = objectKeys(__mc__attr);
 	                                each(__mc__attr__keys, function(attr){
@@ -3212,13 +3175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	                            tree.push( __mc__new_el );
 	                            var __mc__children_15 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                            __mc__attr['class'] = 'edit';                            __mc__attr['type'] = 'text';                            __mc__attr['data-id'] = todo.id; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('data-id') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'data-id', value: __mc__attr['data-id']});
-	 }// end 
-	                            __mc__attr['on-blur'] = 'saveTodo';                            __mc__attr['on-keyenter'] = 'saveTodo';                            __mc__attr['on-keyesc'] = 'unsaveTodo';                            __mc__attr['value'] = todo.title; 
+	                            __mc__attr['class'] = 'edit';                            __mc__attr['type'] = 'text';                            __mc__attr['on-blur'] = ['saveTodo',todo];                            __mc__attr['on-keyenter'] = ['saveTodo',todo];                            __mc__attr['on-keyesc'] = ['unsaveTodo',todo];                            __mc__attr['value'] = todo.title; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('value') ){
 	    __mc__isBindObserve = true;
@@ -3303,7 +3260,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (function(scope, tree){ // startTree 18
 
 	                    var __mc__children_18 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                    __mc__attr['v-text'] = 'remaining';
+
+
+	                    (function(scope, tree){ // startTree 19
+
+	                        var __mc__children_19 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+
+	                        var __mc__rp__key_0;
+	    
+	                        __mc__rp__key_0 = (function(x){
+	                                // itemLen
+	                            if( __mc_T_formatters.hasOwnProperty('itemLen') ) {
+	                                x = __mc_T_formatters['itemLen'](x);
+	                            } // end itemLen 
+	                            return x;
+	                        })(scope.allTodos);
+
+	                        tree.push( "" + __mc__rp__key_0 + "" );
+	                    })(scope, __mc__children_18); // endTree 19
 
 	                    var __mc__new_el = new __mc_T_El('strong', __mc__attr, __mc__children_18);                    var __mc__attr__keys = objectKeys(__mc__attr);
 	                    each(__mc__attr__keys, function(attr){
@@ -3318,19 +3292,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 
 	                    tree.push( __mc__new_el );
-	                    var __mc__children_19 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_20 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
-	                    var __mc__rp__key_0;
-	    
-	                    __mc__rp__key_0 = (function(x){
-	                            // itemLen
-	                        if( __mc_T_formatters.hasOwnProperty('itemLen') ) {
-	                            x = __mc_T_formatters['itemLen'](x);
-	                        } // end itemLen 
-	                        return x;
-	                    })(scope.allTodos);
-
-	                    tree.push( " " + __mc__rp__key_0 + " 		" );
+	                    tree.push( ' left  		' );
 	                })(scope, __mc__children_17); // endTree 18
 
 	                var __mc__new_el = new __mc_T_El('span', __mc__attr, __mc__children_17);                var __mc__attr__keys = objectKeys(__mc__attr);
@@ -3346,17 +3310,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                tree.push( __mc__new_el );
-	                var __mc__children_20 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_21 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                __mc__attr['class'] = 'filters';
 
-	                (function(scope, tree){ // startTree 21
+	                (function(scope, tree){ // startTree 22
 
-	                    var __mc__children_21 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_22 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	                    (function(scope, tree){ // startTree 22
+	                    (function(scope, tree){ // startTree 23
 
-	                        var __mc__children_22 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                        var __mc__children_23 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                        __mc__attr['href'] = '#/all';                        __mc__attr['class'] = scope.selected == 'all' ? 'selected' : ''; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('class') ){
@@ -3365,14 +3329,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 }// end 
 
 
-	                        (function(scope, tree){ // startTree 23
+	                        (function(scope, tree){ // startTree 24
 
-	                            var __mc__children_23 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                            var __mc__children_24 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                            tree.push( 'All' );
-	                        })(scope, __mc__children_22); // endTree 23
+	                        })(scope, __mc__children_23); // endTree 24
 
-	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_22);                        var __mc__attr__keys = objectKeys(__mc__attr);
+	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_23);                        var __mc__attr__keys = objectKeys(__mc__attr);
 	                        each(__mc__attr__keys, function(attr){
 	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                        });
@@ -3385,9 +3349,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 
 	                        tree.push( __mc__new_el );
-	                    })(scope, __mc__children_21); // endTree 22
+	                    })(scope, __mc__children_22); // endTree 23
 
-	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_21);                    var __mc__attr__keys = objectKeys(__mc__attr);
+	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_22);                    var __mc__attr__keys = objectKeys(__mc__attr);
 	                    each(__mc__attr__keys, function(attr){
 	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                    });
@@ -3400,12 +3364,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 
 	                    tree.push( __mc__new_el );
-	                    var __mc__children_24 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_25 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	                    (function(scope, tree){ // startTree 25
+	                    (function(scope, tree){ // startTree 26
 
-	                        var __mc__children_25 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                        var __mc__children_26 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                        __mc__attr['href'] = '#/active';                        __mc__attr['class'] = scope.selected == 'active' ? 'selected' : ''; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('class') ){
@@ -3414,14 +3378,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 }// end 
 
 
-	                        (function(scope, tree){ // startTree 26
+	                        (function(scope, tree){ // startTree 27
 
-	                            var __mc__children_26 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                            var __mc__children_27 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                            tree.push( 'Active' );
-	                        })(scope, __mc__children_25); // endTree 26
+	                        })(scope, __mc__children_26); // endTree 27
 
-	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_25);                        var __mc__attr__keys = objectKeys(__mc__attr);
+	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_26);                        var __mc__attr__keys = objectKeys(__mc__attr);
 	                        each(__mc__attr__keys, function(attr){
 	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                        });
@@ -3434,9 +3398,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 
 	                        tree.push( __mc__new_el );
-	                    })(scope, __mc__children_24); // endTree 25
+	                    })(scope, __mc__children_25); // endTree 26
 
-	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_24);                    var __mc__attr__keys = objectKeys(__mc__attr);
+	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_25);                    var __mc__attr__keys = objectKeys(__mc__attr);
 	                    each(__mc__attr__keys, function(attr){
 	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                    });
@@ -3449,12 +3413,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 
 	                    tree.push( __mc__new_el );
-	                    var __mc__children_27 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_28 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	                    (function(scope, tree){ // startTree 28
+	                    (function(scope, tree){ // startTree 29
 
-	                        var __mc__children_28 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                        var __mc__children_29 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                        __mc__attr['href'] = '#/completed';                        __mc__attr['class'] = scope.selected == 'completed' ? 'selected' : ''; 
 	 // binders check
 	 if( __mc_T_binders.hasOwnProperty('class') ){
@@ -3463,14 +3427,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 }// end 
 
 
-	                        (function(scope, tree){ // startTree 29
+	                        (function(scope, tree){ // startTree 30
 
-	                            var __mc__children_29 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                            var __mc__children_30 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                            tree.push( 'Completed' );
-	                        })(scope, __mc__children_28); // endTree 29
+	                        })(scope, __mc__children_29); // endTree 30
 
-	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_28);                        var __mc__attr__keys = objectKeys(__mc__attr);
+	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_29);                        var __mc__attr__keys = objectKeys(__mc__attr);
 	                        each(__mc__attr__keys, function(attr){
 	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                        });
@@ -3483,9 +3447,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 
 	                        tree.push( __mc__new_el );
-	                    })(scope, __mc__children_27); // endTree 28
+	                    })(scope, __mc__children_28); // endTree 29
 
-	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_27);                    var __mc__attr__keys = objectKeys(__mc__attr);
+	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_28);                    var __mc__attr__keys = objectKeys(__mc__attr);
 	                    each(__mc__attr__keys, function(attr){
 	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                    });
@@ -3498,9 +3462,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 
 	                    tree.push( __mc__new_el );
-	                })(scope, __mc__children_20); // endTree 21
+	                })(scope, __mc__children_21); // endTree 22
 
-	                var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_20);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_21);                var __mc__attr__keys = objectKeys(__mc__attr);
 	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
@@ -3513,17 +3477,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                tree.push( __mc__new_el );
-	                var __mc__children_30 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                __mc__attr['class'] = 'clear-completed';                __mc__attr['on-click'] = 'removeAllTodos';
+	                var __mc__children_31 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                __mc__attr['class'] = 'clear-completed';                __mc__attr['on-click'] = 'removeCompleted';    
+	                __mc__attr['show'] = (function(x){
+	                        // completedLen
+	                    if( __mc_T_formatters.hasOwnProperty('completedLen') ) {
+	                        x = __mc_T_formatters['completedLen'](x);
+	                    } // end completedLen 
+	                    return x;
+	                })(scope.allTodos);
+	 // binders check
+	 if( __mc_T_binders.hasOwnProperty('show') ){
+	    __mc__isBindObserve = true;
+	    __mc__binderData.push({attrName: 'show', value: __mc__attr['show']});
+	 }// end 
 
-	                (function(scope, tree){ // startTree 31
 
-	                    var __mc__children_31 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                (function(scope, tree){ // startTree 32
+
+	                    var __mc__children_32 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                    tree.push( '             Clear completed         ' );
-	                })(scope, __mc__children_30); // endTree 31
+	                })(scope, __mc__children_31); // endTree 32
 
-	                var __mc__new_el = new __mc_T_El('button', __mc__attr, __mc__children_30);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                var __mc__new_el = new __mc_T_El('button', __mc__attr, __mc__children_31);                var __mc__attr__keys = objectKeys(__mc__attr);
 	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
@@ -3566,22 +3543,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        tree.push( __mc__new_el );
-	        var __mc__children_32 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	        var __mc__children_33 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	        __mc__attr['class'] = 'info';
 
-	        (function(scope, tree){ // startTree 33
+	        (function(scope, tree){ // startTree 34
 
-	            var __mc__children_33 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	            var __mc__children_34 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	            (function(scope, tree){ // startTree 34
+	            (function(scope, tree){ // startTree 35
 
-	                var __mc__children_34 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_35 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                tree.push( 'Double-click to edit a todo' );
-	            })(scope, __mc__children_33); // endTree 34
+	            })(scope, __mc__children_34); // endTree 35
 
-	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_33);            var __mc__attr__keys = objectKeys(__mc__attr);
+	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_34);            var __mc__attr__keys = objectKeys(__mc__attr);
 	            each(__mc__attr__keys, function(attr){
 	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	            });
@@ -3594,25 +3571,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            tree.push( __mc__new_el );
-	            var __mc__children_35 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	            var __mc__children_36 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	            (function(scope, tree){ // startTree 36
+	            (function(scope, tree){ // startTree 37
 
-	                var __mc__children_36 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_37 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                tree.push( 'Written by ' );
-	                var __mc__children_37 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                __mc__attr['href'] = 'http://evanyou.me';
+	                var __mc__children_38 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                __mc__attr['href'] = 'http://vfasky.com';
 
-	                (function(scope, tree){ // startTree 38
+	                (function(scope, tree){ // startTree 39
 
-	                    var __mc__children_38 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_39 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
-	                    tree.push( 'Evan You' );
-	                })(scope, __mc__children_37); // endTree 38
+	                    tree.push( 'vfasky' );
+	                })(scope, __mc__children_38); // endTree 39
 
-	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_37);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_38);                var __mc__attr__keys = objectKeys(__mc__attr);
 	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
@@ -3625,9 +3602,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                tree.push( __mc__new_el );
-	            })(scope, __mc__children_35); // endTree 36
+	            })(scope, __mc__children_36); // endTree 37
 
-	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_35);            var __mc__attr__keys = objectKeys(__mc__attr);
+	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_36);            var __mc__attr__keys = objectKeys(__mc__attr);
 	            each(__mc__attr__keys, function(attr){
 	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	            });
@@ -3640,25 +3617,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            tree.push( __mc__new_el );
-	            var __mc__children_39 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	            var __mc__children_40 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 
-	            (function(scope, tree){ // startTree 40
+	            (function(scope, tree){ // startTree 41
 
-	                var __mc__children_40 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_41 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                tree.push( 'Part of ' );
-	                var __mc__children_41 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_42 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 	                __mc__attr['href'] = 'http://todomvc.com';
 
-	                (function(scope, tree){ // startTree 42
+	                (function(scope, tree){ // startTree 43
 
-	                    var __mc__children_42 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_43 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
 
 	                    tree.push( 'TodoMVC' );
-	                })(scope, __mc__children_41); // endTree 42
+	                })(scope, __mc__children_42); // endTree 43
 
-	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_41);                var __mc__attr__keys = objectKeys(__mc__attr);
+	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_42);                var __mc__attr__keys = objectKeys(__mc__attr);
 	                each(__mc__attr__keys, function(attr){
 	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	                });
@@ -3671,9 +3648,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 
 	                tree.push( __mc__new_el );
-	            })(scope, __mc__children_39); // endTree 40
+	            })(scope, __mc__children_40); // endTree 41
 
-	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_39);            var __mc__attr__keys = objectKeys(__mc__attr);
+	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_40);            var __mc__attr__keys = objectKeys(__mc__attr);
 	            each(__mc__attr__keys, function(attr){
 	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	            });
@@ -3686,9 +3663,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            tree.push( __mc__new_el );
-	        })(scope, __mc__children_32); // endTree 33
+	        })(scope, __mc__children_33); // endTree 34
 
-	        var __mc__new_el = new __mc_T_El('footer', __mc__attr, __mc__children_32);        var __mc__attr__keys = objectKeys(__mc__attr);
+	        var __mc__new_el = new __mc_T_El('footer', __mc__attr, __mc__children_33);        var __mc__attr__keys = objectKeys(__mc__attr);
 	        each(__mc__attr__keys, function(attr){
 	            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	        });

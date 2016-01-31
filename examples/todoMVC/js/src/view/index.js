@@ -38,28 +38,18 @@ Index = (function(superClass) {
     return this.set('allTodos', model.list());
   };
 
-  Index.prototype.editTodo = function(el) {
-    var $el, id, todo;
-    $el = $(el);
-    id = $el.attr('data-id');
-    todo = model.get(id);
-    if (!todo) {
-      return;
-    }
+  Index.prototype.editTodo = function(todo, el) {
     todo.isEdit = true;
     model.update(todo);
     this.updateTodos();
     return util.nextTick(function() {
-      return $el.next().focus();
+      return $(el).next().focus();
     });
   };
 
-  Index.prototype.saveTodo = function(el) {
-    var id, todo;
-    id = $(el).attr('data-id');
-    todo = model.get(id);
-    if (!todo) {
-      return;
+  Index.prototype.saveTodo = function(todo, el) {
+    if (false === todo.isEdit) {
+      return false;
     }
     if (el.value) {
       todo.title = el.value;
@@ -69,28 +59,32 @@ Index = (function(superClass) {
     return this.updateTodos();
   };
 
-  Index.prototype.unsaveTodo = function(el) {
-    var id, todo;
-    id = $(el).attr('data-id');
-    todo = model.get(id);
-    if (!todo) {
-      return;
-    }
+  Index.prototype.unsaveTodo = function(todo, el) {
+    var oldTodo;
     todo.isEdit = false;
+    oldTodo = model.get(todo.id);
+    el.value = oldTodo.title;
     model.update(todo);
-    return this.updateTodos();
+    this.updateTodos();
+    return false;
   };
 
-  Index.prototype.removeTodo = function(el) {
-    var id;
-    id = $(el).attr('data-id');
+  Index.prototype.removeTodo = function(id) {
     model.remove(id);
     this.updateTodos();
     return false;
   };
 
-  Index.prototype.removeAllTodos = function() {
-    model.write([]);
+  Index.prototype.removeCompleted = function() {
+    var data, todos;
+    data = [];
+    todos = model.list();
+    $.each(todos, function(k, v) {
+      if (v.visibility === 'active') {
+        return data.push(v);
+      }
+    });
+    model.write(data);
     this.updateTodos();
     return false;
   };
@@ -121,13 +115,7 @@ Index = (function(superClass) {
     return this.updateTodos();
   };
 
-  Index.prototype.changeTodoVisibility = function(el) {
-    var id, todo;
-    id = el.value;
-    todo = model.get(id);
-    if (!todo) {
-      return;
-    }
+  Index.prototype.changeTodoVisibility = function(todo, el) {
     todo.visibility = el.checked && 'completed' || 'active';
     model.update(todo);
     return this.updateTodos();

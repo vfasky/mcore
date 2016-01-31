@@ -17,30 +17,30 @@
              mc-for="todo in scope.todos"
              mc-class="'todo'  + (todo.visibility == 'completed' ? ' completed' : '') + (todo.isEdit ? ' editing' : '')" >
                 <div class="view" 
-                 mc-on-dblclick="editTodo"
-                 mc-data-id="todo.id">
+                 mc-on-dblclick="editTodo(todo)">
+
                     <input class="toggle" 
-                     mc-value="todo.id"
-                     mc-on-change="changeTodoVisibility"
+                     mc-on-change="changeTodoVisibility(todo)"
                      type="checkbox" 
                      mc-checked="todo.visibility == 'completed'">
+
                     <label>{todo.title}</label>
+
                     <button class="destroy" 
-                     mc-data-id="todo.id"
-                     mc-on-click="removeTodo"></button>
+                     mc-on-click="removeTodo(todo.id)"></button>
+                    
                 </div>
                 <input class="edit" type="text" 
-                 mc-data-id="todo.id"
-                 mc-on-blur="saveTodo"
-                 mc-on-keyenter="saveTodo"
-                 mc-on-keyesc="unsaveTodo"
+                 mc-on-blur="saveTodo(todo)"
+                 mc-on-keyenter="saveTodo(todo)"
+                 mc-on-keyesc="unsaveTodo(todo)"
                  mc-value="todo.title" >
             </li>
         </ul>
     </section>
     <footer class="footer" mc-show="scope.allTodos.length > 0">
         <span class="todo-count">
-            <strong v-text="remaining"></strong> {scope.allTodos | itemLen}
+            <strong>{scope.allTodos | itemLen}</strong> left 
 		</span>
         <ul class="filters">
             <li><a href="#/all" mc-class=" scope.selected == 'all' ? 'selected' : '' ">All</a>
@@ -50,14 +50,14 @@
             <li><a href="#/completed" mc-class=" scope.selected == 'completed' ? 'selected' : '' ">Completed</a>
             </li>
         </ul>
-        <button class="clear-completed" mc-on-click="removeAllTodos">
+        <button class="clear-completed" mc-on-click="removeCompleted" mc-show="scope.allTodos | completedLen">
             Clear completed
         </button>
     </footer>
 </section>
 <footer class="info">
     <p>Double-click to edit a todo</p>
-    <p>Written by <a href="http://evanyou.me">Evan You</a>
+    <p>Written by <a href="http://vfasky.com">vfasky</a>
     </p>
     <p>Part of <a href="http://todomvc.com">TodoMVC</a>
     </p>

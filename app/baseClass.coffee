@@ -38,31 +38,7 @@ Template::addEventListener = (event)->
         @_initTask.push => @addEventListener event
         return
     if event not in @_eventReged
-        @_eventReged.push event
-        @_eventListener[event] = (e, args...)=>
-            tasks = @_events[event]
-            res = null
-            util.each tasks, (task)=>
-                if task.el == e.target or util.nodeContains task.el, e.target
-                    args or= []
-                    args.splice 0, 0, e
-                    args.splice 0, 0, task.el
-                    
-                    if @_proxy and util.isFunction @_proxy[task.callback]
-                        res = @_proxy[task.callback].apply @_proxy, args
-
-                    else if util.isFunction task.callback
-                        res = task.callback.apply @, args
-
-                    else if util.isFunction @[task.callback]
-                        res = @[task.callback].apply @, args
-
-                    else
-                        throw new Error 'not callback : ' + task.callback
-
-                    return false
-                    
-            res
+        @regEventCallback event
 
         $refa = $(@refs)
 

@@ -21,10 +21,21 @@ Template.formatters.itemLen = function(todos) {
       return len++;
     }
   });
-  if (len <= 1) {
-    return len + " item left";
+  if (len < 2) {
+    return len + " item";
   }
-  return len + " items left";
+  return len + " items";
+};
+
+Template.formatters.completedLen = function(todos) {
+  var len;
+  len = 0;
+  $.each(todos, function(k, v) {
+    if (v.visibility === 'completed') {
+      return len++;
+    }
+  });
+  return len;
 };
 
 app = new App($('body'));

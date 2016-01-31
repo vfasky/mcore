@@ -71,7 +71,6 @@ Element = (function() {
     attrName = attrName.toLowerCase();
     if (this._component) {
       this._component.update(attrName, null);
-      return;
     }
     ref1 = this._binders;
     for (j = 0, len = ref1.length; j < len; j++) {
@@ -80,6 +79,7 @@ Element = (function() {
         if (binder.binder.remove) {
           binder.binder.remove.call(this, this.el);
         }
+        binder.value = null;
         return;
       }
     }
@@ -115,10 +115,6 @@ Element = (function() {
     if (this.template) {
       if (attrName.indexOf('on-') === 0) {
         this.template.addEvent(attrName.replace('on-', ''), el, value, this._id);
-        setElementAttr(el, '_mc', this._id, true);
-        return;
-      }
-      if (this._component) {
         return;
       }
       ref1 = this._binders;

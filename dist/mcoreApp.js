@@ -581,33 +581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return;
 	  }
 	  if (indexOf.call(this._eventReged, event) < 0) {
-	    this._eventReged.push(event);
-	    this._eventListener[event] = (function(_this) {
-	      return function() {
-	        var args, e, res, tasks;
-	        e = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
-	        tasks = _this._events[event];
-	        res = null;
-	        util.each(tasks, function(task) {
-	          if (task.el === e.target || util.nodeContains(task.el, e.target)) {
-	            args || (args = []);
-	            args.splice(0, 0, e);
-	            args.splice(0, 0, task.el);
-	            if (_this._proxy && util.isFunction(_this._proxy[task.callback])) {
-	              res = _this._proxy[task.callback].apply(_this._proxy, args);
-	            } else if (util.isFunction(task.callback)) {
-	              res = task.callback.apply(_this, args);
-	            } else if (util.isFunction(_this[task.callback])) {
-	              res = _this[task.callback].apply(_this, args);
-	            } else {
-	              throw new Error('not callback : ' + task.callback);
-	            }
-	            return false;
-	          }
-	        });
-	        return res;
-	      };
-	    })(this);
+	    this.regEventCallback(event);
 	    $refa = $(this.refs);
 	    if (event !== 'blur' && event !== 'focus') {
 	      if (_keyCode.hasOwnProperty(event)) {
