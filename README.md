@@ -37,6 +37,51 @@ module.exports = {
 
 ### mcore 模板引擎
 
+#### 原理
+
+##### 渲染流程
+
+```flow
+template=>start: Template: 模板引擎
+
+render=>operation: @render Html, scope
+
+virtualDomDefine=>operation: Html -> Virtual Dom define 依赖：h2svd-loader(开发时，通过 webpack 实现)
+
+newVirtualDomDefine=>operation: new virtual dom = (Virtual Dom define)(scope)
+
+checkOldVirtualDom=>condition: 是否存在 old virtual dom
+
+diffVirtualDom=>operation: diff VirtualDom
+
+changeNode=>end: 应用变更到 dom
+
+buildNode=>end: 生成 dom
+
+template->render->virtualDomDefine->newVirtualDomDefine->checkOldVirtualDom
+checkOldVirtualDom(no)->buildNode
+checkOldVirtualDom(yes)->diffVirtualDom->changeNode
+```
+
+##### component 实现流程
+
+```flow
+virtualDomDefine=>start: Virtual Dom define
+build=>operation: build Virtual Dom
+findNodeTagName=>condition: find Template.components[Node.tagName]
+buildNode=>end: 生成 dom
+buildComponent=>end: new Template.components[Node.tagName]
+
+virtualDomDefine->build->findNodeTagName
+findNodeTagName(yes)->buildComponent
+findNodeTagName(no)->buildNode
+```
+
+> diff VirtualDom 时，component 当成没有子树的 Node (只 diff 属性),
+> component 的 dom 变更，由 component 自身维护
+
+
+
 #### DEMO
 
 > 模板中，变量都在 `scope` 名字空间下 （事件除外）
@@ -44,7 +89,7 @@ module.exports = {
 ``` html
 <!-- ./tpl/test.html -->
 <ul>
-  <li mc-for="v , k in scope.list" mc-on-click="showIx">
+  <li mc-for="v , k in scope.list" mc-on-click="showIx(v)">
     <span mc-data-ix="k + 1">{v.name}</span>
   </li>
 </ul>
@@ -58,8 +103,8 @@ module.exports = {
 tpl = new Template()
 
 # bind click event
-tpl.showIx = (el)->
-	console.log el
+tpl.showIx = (v, el, event)->
+	console.log v, el, event
     
  # render
 tpl.render require('./tpl/test.html'),
