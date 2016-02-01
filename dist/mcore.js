@@ -456,15 +456,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var tasks;
 	        tasks = _this._events[event];
 	        return each(tasks, function(task) {
-	          var args, res;
+	          var _args, args, res;
 	          if (task.el === e.target || nodeContains(task.el, e.target)) {
 	            res = null;
 	            args = [task.el, e];
 	            if (isArray(task.callback)) {
-	              args = task.callback;
-	              task.callback = args.shift();
-	              args.push(task.el);
-	              args.push(e);
+	              _args = task.callback;
+	              task.callback = _args.shift();
+	              each(_args, function(arg) {
+	                return args.push(arg);
+	              });
 	            }
 	            if (_this._proxy && isFunction(_this._proxy[task.callback])) {
 	              res = _this._proxy[task.callback].apply(_this._proxy, args);

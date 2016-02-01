@@ -23,7 +23,7 @@ class Index extends View
         @set 'allTodos', model.list()
 
     # 编辑 
-    editTodo: (todo, el)->
+    editTodo: (el, event, todo)->
         todo.isEdit = true
         model.update todo
         
@@ -32,7 +32,7 @@ class Index extends View
         util.nextTick -> $(el).next().focus()
 
     # 保存
-    saveTodo: (todo, el)->
+    saveTodo: (el, event, todo)->
         return false if false == todo.isEdit
         
         todo.title = el.value if el.value
@@ -41,7 +41,7 @@ class Index extends View
         @updateTodos()
 
     # 不保存
-    unsaveTodo: (todo, el)->
+    unsaveTodo: (el, event, todo)->
         todo.isEdit = false
         oldTodo = model.get todo.id
         el.value = oldTodo.title
@@ -52,7 +52,7 @@ class Index extends View
 
 
     # 删除
-    removeTodo: (id)->
+    removeTodo: (el, event, id)->
         model.remove id
         @updateTodos()
         false
@@ -68,7 +68,7 @@ class Index extends View
         false
 
     # 添加todo
-    addTodo: (el, event)->
+    addTodo: (el)->
         todo =
             title: $.trim el.value
             visibility: 'active'
@@ -94,7 +94,7 @@ class Index extends View
 
 
     # 更改单个todo的状态
-    changeTodoVisibility: (todo, el)->
+    changeTodoVisibility: (el, event, todo)->
         
         todo.visibility = el.checked and 'completed' or 'active'
         model.update todo

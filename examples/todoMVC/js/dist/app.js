@@ -1554,15 +1554,16 @@ return /******/ (function(modules) { // webpackBootstrap
 		        var tasks;
 		        tasks = _this._events[event];
 		        return each(tasks, function(task) {
-		          var args, res;
+		          var _args, args, res;
 		          if (task.el === e.target || nodeContains(task.el, e.target)) {
 		            res = null;
 		            args = [task.el, e];
 		            if (isArray(task.callback)) {
-		              args = task.callback;
-		              task.callback = args.shift();
-		              args.push(task.el);
-		              args.push(e);
+		              _args = task.callback;
+		              task.callback = _args.shift();
+		              each(_args, function(arg) {
+		                return args.push(arg);
+		              });
 		            }
 		            if (_this._proxy && isFunction(_this._proxy[task.callback])) {
 		              res = _this._proxy[task.callback].apply(_this._proxy, args);
@@ -2770,7 +2771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.set('allTodos', model.list());
 	  };
 
-	  Index.prototype.editTodo = function(todo, el) {
+	  Index.prototype.editTodo = function(el, event, todo) {
 	    todo.isEdit = true;
 	    model.update(todo);
 	    this.updateTodos();
@@ -2779,7 +2780,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  };
 
-	  Index.prototype.saveTodo = function(todo, el) {
+	  Index.prototype.saveTodo = function(el, event, todo) {
 	    if (false === todo.isEdit) {
 	      return false;
 	    }
@@ -2791,7 +2792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.updateTodos();
 	  };
 
-	  Index.prototype.unsaveTodo = function(todo, el) {
+	  Index.prototype.unsaveTodo = function(el, event, todo) {
 	    var oldTodo;
 	    todo.isEdit = false;
 	    oldTodo = model.get(todo.id);
@@ -2801,7 +2802,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return false;
 	  };
 
-	  Index.prototype.removeTodo = function(id) {
+	  Index.prototype.removeTodo = function(el, event, id) {
 	    model.remove(id);
 	    this.updateTodos();
 	    return false;
@@ -2821,7 +2822,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return false;
 	  };
 
-	  Index.prototype.addTodo = function(el, event) {
+	  Index.prototype.addTodo = function(el) {
 	    var todo;
 	    todo = {
 	      title: $.trim(el.value),
@@ -2847,7 +2848,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.updateTodos();
 	  };
 
-	  Index.prototype.changeTodoVisibility = function(todo, el) {
+	  Index.prototype.changeTodoVisibility = function(el, event, todo) {
 	    todo.visibility = el.checked && 'completed' || 'active';
 	    model.update(todo);
 	    return this.updateTodos();

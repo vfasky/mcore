@@ -196,10 +196,11 @@ class Template extends EventEmitter
                     args = [task.el, e]
 
                     if isArray task.callback
-                        args = task.callback
-                        task.callback = args.shift()
-                        args.push task.el
-                        args.push e
+                        _args = task.callback
+                        task.callback = _args.shift()
+
+                        each _args, (arg)->
+                            args.push arg
 
                     if @_proxy and isFunction @_proxy[task.callback]
                         res = @_proxy[task.callback].apply @_proxy, args
