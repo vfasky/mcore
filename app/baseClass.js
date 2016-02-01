@@ -7,13 +7,13 @@
  * @link http://vfasky.com
  */
 'use strict';
-var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, _keyCode, each, loadPromise, ref, util,
+var $, $body, $win, BaseClass, Component, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, _keyCode, each, loadPromise, ref, util,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   slice = [].slice,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
-ref = require('mcore'), EventEmitter = ref.EventEmitter, Template = ref.Template, util = ref.util;
+ref = require('mcore'), EventEmitter = ref.EventEmitter, Template = ref.Template, Component = ref.Component, util = ref.util;
 
 $ = require('jquery');
 
@@ -92,6 +92,23 @@ Template.prototype.removeEvent = function(event, el, id) {
   if (this._events[event].length === 0) {
     return $(this.refs).off(event);
   }
+};
+
+Component.prototype.emitEvent = function() {
+  var args, eventName, pEventName;
+  eventName = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+  pEventName = this.getProxyEventName(eventName);
+  args.splice(0, 0, this.el);
+  if (pEventName) {
+    return this.$el.trigger(pEventName, args);
+  }
+};
+
+Component.prototype.getProxyEventName = function(eventName) {
+  if (!this.virtualEl || !this.virtualEl.props) {
+    return null;
+  }
+  return this.virtualEl.props['on-' + eventName];
 };
 
 loadPromise = function(data) {

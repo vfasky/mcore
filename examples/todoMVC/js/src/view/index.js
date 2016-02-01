@@ -38,7 +38,7 @@ Index = (function(superClass) {
     return this.set('allTodos', model.list());
   };
 
-  Index.prototype.editTodo = function(el, event, todo) {
+  Index.prototype.editTodo = function(event, el, todo) {
     todo.isEdit = true;
     model.update(todo);
     this.updateTodos();
@@ -47,7 +47,7 @@ Index = (function(superClass) {
     });
   };
 
-  Index.prototype.saveTodo = function(el, event, todo) {
+  Index.prototype.saveTodo = function(event, el, todo) {
     if (false === todo.isEdit) {
       return false;
     }
@@ -59,7 +59,7 @@ Index = (function(superClass) {
     return this.updateTodos();
   };
 
-  Index.prototype.unsaveTodo = function(el, event, todo) {
+  Index.prototype.unsaveTodo = function(event, el, todo) {
     var oldTodo;
     todo.isEdit = false;
     oldTodo = model.get(todo.id);
@@ -69,7 +69,7 @@ Index = (function(superClass) {
     return false;
   };
 
-  Index.prototype.removeTodo = function(el, event, id) {
+  Index.prototype.removeTodo = function(event, el, id) {
     model.remove(id);
     this.updateTodos();
     return false;
@@ -89,7 +89,7 @@ Index = (function(superClass) {
     return false;
   };
 
-  Index.prototype.addTodo = function(el) {
+  Index.prototype.addTodo = function(event, el) {
     var todo;
     todo = {
       title: $.trim(el.value),
@@ -104,7 +104,7 @@ Index = (function(superClass) {
     return false;
   };
 
-  Index.prototype.changeAllVisibility = function(el) {
+  Index.prototype.changeAllVisibility = function(event, el) {
     var isCompleted, todos;
     isCompleted = el.checked;
     todos = model.list(this.selected);
@@ -115,7 +115,7 @@ Index = (function(superClass) {
     return this.updateTodos();
   };
 
-  Index.prototype.changeTodoVisibility = function(el, event, todo) {
+  Index.prototype.changeTodoVisibility = function(event, el, todo) {
     todo.visibility = el.checked && 'completed' || 'active';
     model.update(todo);
     return this.updateTodos();

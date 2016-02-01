@@ -6,7 +6,7 @@
 ###
 'use strict'
 
-{EventEmitter, Template, util} = require 'mcore'
+{EventEmitter, Template, Component, util} = require 'mcore'
 $ = require 'jquery'
 
 each = util.each
@@ -74,7 +74,16 @@ Template::removeEvent = (event, el, id)->
         $(@refs).off event
         
 
+# 自定义组件，向 parent dom 发送自定义事件
+Component::emitEvent = (eventName, args...)->
+    pEventName = @getProxyEventName eventName
+    args.splice 0, 0, @el
+    @.$el.trigger pEventName, args if pEventName
 
+# 取 parent dom 定义的事件名
+Component::getProxyEventName = (eventName)->
+    return null if !@virtualEl or !@virtualEl.props
+    @virtualEl.props['on-' + eventName]
 
 loadPromise = (data)->
     dtd = $.Deferred()
