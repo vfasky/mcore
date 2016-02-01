@@ -12,6 +12,16 @@ _storage_key = '__todo_mvc_data_'
 
 storage = window.localStorage
 
+# 支持ie
+if !storage or !storage.setItem
+    _data = {}
+    storage =
+        setItem: (key, val)->
+            _data[key] = val
+
+        getItem: (key)->
+            _data[key]
+
 # 取数据列表
 exports.list = (selected = 'all')->
     data = []

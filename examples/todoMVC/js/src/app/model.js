@@ -7,13 +7,25 @@
  * @link http://vfasky.com
  */
 'use strict';
-var $, _storage_key, storage;
+var $, _data, _storage_key, storage;
 
 $ = require('jquery');
 
 _storage_key = '__todo_mvc_data_';
 
 storage = window.localStorage;
+
+if (!storage || !storage.setItem) {
+  _data = {};
+  storage = {
+    setItem: function(key, val) {
+      return _data[key] = val;
+    },
+    getItem: function(key) {
+      return _data[key];
+    }
+  };
+}
 
 exports.list = function(selected) {
   var data, error, error1;
