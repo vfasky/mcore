@@ -94,23 +94,6 @@ Template.prototype.removeEvent = function(event, el, id) {
   }
 };
 
-Component.prototype.emitEvent = function() {
-  var args, eventName, pEventName;
-  eventName = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
-  pEventName = this.getProxyEventName(eventName);
-  args.splice(0, 0, this.el);
-  if (pEventName) {
-    return this.$el.trigger(pEventName, args);
-  }
-};
-
-Component.prototype.getProxyEventName = function(eventName) {
-  if (!this.virtualEl || !this.virtualEl.props) {
-    return null;
-  }
-  return this.virtualEl.props['on-' + eventName];
-};
-
 loadPromise = function(data) {
   var dtd, keys, promises;
   dtd = $.Deferred();
@@ -193,18 +176,18 @@ BaseClass = (function(superClass) {
     return dtd.promise();
   };
 
-  BaseClass.prototype.set = function(key, value) {
+  BaseClass.prototype.set = function(key, value, doneOrAsync) {
     if (!this.template) {
       return;
     }
     if (util.isFunction(value.then)) {
       return value.then((function(_this) {
         return function(val) {
-          return _this.template.set(key, val);
+          return _this.template.set(key, val, doneOrAsync);
         };
       })(this));
     } else {
-      return this.template.set(key, value);
+      return this.template.set(key, value, doneOrAsync);
     }
   };
 

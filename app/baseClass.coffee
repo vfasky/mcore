@@ -74,17 +74,6 @@ Template::removeEvent = (event, el, id)->
         $(@refs).off event
         
 
-# 自定义组件，向 parent dom 发送自定义事件
-Component::emitEvent = (eventName, args...)->
-    pEventName = @getProxyEventName eventName
-    args.splice 0, 0, @el
-    @.$el.trigger pEventName, args if pEventName
-
-# 取 parent dom 定义的事件名
-Component::getProxyEventName = (eventName)->
-    return null if !@virtualEl or !@virtualEl.props
-    @virtualEl.props['on-' + eventName]
-
 loadPromise = (data)->
     dtd = $.Deferred()
     keys = util.objectKeys data
@@ -162,13 +151,13 @@ class BaseClass extends EventEmitter
         dtd.promise()
         
 
-    set: (key, value)->
+    set: (key, value, doneOrAsync)->
         return if !@template
         if util.isFunction value.then
             return value.then (val)=>
-                @template.set key, val
+                @template.set key, val, doneOrAsync
         else
-            @template.set key, value
+            @template.set key, value, doneOrAsync
 
     get: ->
         @template.get.apply @template, arguments if @template

@@ -630,13 +630,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	Component.prototype.emitEvent = function() {
-	  var args, eventName, pEventName;
-	  eventName = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+	Component.prototype.emitEvent = function(eventName, args) {
+	  var pEventName, parentView, ref1, ref2;
 	  pEventName = this.getProxyEventName(eventName);
-	  args.splice(0, 0, this.el);
-	  if (pEventName) {
-	    return this.$el.trigger(pEventName, args);
+	  parentView = (ref1 = this.el._element) != null ? (ref2 = ref1.template) != null ? ref2._proxy : void 0 : void 0;
+	  if (!parentView) {
+	    return;
+	  }
+	  if (util.isFunction(parentView[pEventName])) {
+	    return parentView[pEventName].apply(parentView, args);
 	  }
 	};
 
