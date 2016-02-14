@@ -6,8 +6,8 @@
 ###
 'use strict'
 EventEmitter = require './eventEmitter'
-
 Template = require './template'
+util = require './util'
 
 class Component extends EventEmitter
     # @el 真实的 DOM
@@ -57,7 +57,26 @@ class Component extends EventEmitter
             @emit 'change:' + attrName, value
 
 
+    # 向 parent dom 发送自定义事件
+    emitEvent: (eventName, args)->
+        proxyEventName = @getProxyEventName eventName
+        parentView = @el._element.template._proxy
+        return if !parentView
+
+        if util.isFunction parentView[proxyEventName]
+            parentView[proxyEventName].apply parentView, args
+
+            
+    # 取代理事件名
+    getProxyEventName: (eventName)->
+        return null if !@virtualEl or !@virtualEl.props
+        @virtualEl.props['on-' + eventName]
+
+
+
     destroy: ->
-        @template.destroy() if @template
+        if @template
+            @template.destroy()
+            @template = null
 
 module.exports = Component

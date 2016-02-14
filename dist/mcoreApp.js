@@ -543,13 +543,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, _keyCode, each, loadPromise, ref, util,
+	var $, $body, $win, BaseClass, Component, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, _keyCode, each, loadPromise, ref, util,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
 	  slice = [].slice,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	ref = __webpack_require__(14), EventEmitter = ref.EventEmitter, Template = ref.Template, util = ref.util;
+	ref = __webpack_require__(14), EventEmitter = ref.EventEmitter, Template = ref.Template, Component = ref.Component, util = ref.util;
 
 	$ = __webpack_require__(16);
 
@@ -628,6 +628,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (this._events[event].length === 0) {
 	    return $(this.refs).off(event);
 	  }
+	};
+
+	Component.prototype.emitEvent = function(eventName, args) {
+	  var pEventName, parentView, ref1, ref2;
+	  pEventName = this.getProxyEventName(eventName);
+	  parentView = (ref1 = this.el._element) != null ? (ref2 = ref1.template) != null ? ref2._proxy : void 0 : void 0;
+	  if (!parentView) {
+	    return;
+	  }
+	  if (util.isFunction(parentView[pEventName])) {
+	    return parentView[pEventName].apply(parentView, args);
+	  }
+	};
+
+	Component.prototype.getProxyEventName = function(eventName) {
+	  if (!this.virtualEl || !this.virtualEl.props) {
+	    return null;
+	  }
+	  return this.virtualEl.props['on-' + eventName];
 	};
 
 	loadPromise = function(data) {

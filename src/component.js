@@ -7,13 +7,15 @@
  * @link http://vfasky.com
  */
 'use strict';
-var Component, EventEmitter, Template,
+var Component, EventEmitter, Template, util,
   extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   hasProp = {}.hasOwnProperty;
 
 EventEmitter = require('./eventEmitter');
 
 Template = require('./template');
+
+util = require('./util');
 
 Component = (function(superClass) {
   extend(Component, superClass);
@@ -82,9 +84,29 @@ Component = (function(superClass) {
     }
   };
 
+  Component.prototype.emitEvent = function(eventName, args) {
+    var parentView, proxyEventName;
+    proxyEventName = this.getProxyEventName(eventName);
+    parentView = this.el._element.template._proxy;
+    if (!parentView) {
+      return;
+    }
+    if (util.isFunction(parentView[proxyEventName])) {
+      return parentView[proxyEventName].apply(parentView, args);
+    }
+  };
+
+  Component.prototype.getProxyEventName = function(eventName) {
+    if (!this.virtualEl || !this.virtualEl.props) {
+      return null;
+    }
+    return this.virtualEl.props['on-' + eventName];
+  };
+
   Component.prototype.destroy = function() {
     if (this.template) {
-      return this.template.destroy();
+      this.template.destroy();
+      return this.template = null;
     }
   };
 

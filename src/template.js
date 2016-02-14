@@ -175,22 +175,26 @@ Template = (function(superClass) {
         var tasks;
         tasks = _this._events[event];
         return each(tasks, function(task) {
-          var args, res;
+          var _args, args, callbackName, res;
           if (task.el === e.target || nodeContains(task.el, e.target)) {
             res = null;
-            args = [task.el, e];
+            args = [e, task.el];
+            callbackName = task.callback;
             if (isArray(task.callback)) {
-              args = task.callback;
-              task.callback = args.shift();
-              args.push(task.el);
-              args.push(e);
+              _args = task.callback;
+              callbackName = _args[0];
+              each(_args, function(arg, k) {
+                if (k > 0) {
+                  return args.push(arg);
+                }
+              });
             }
-            if (_this._proxy && isFunction(_this._proxy[task.callback])) {
-              res = _this._proxy[task.callback].apply(_this._proxy, args);
-            } else if (isFunction(task.callback)) {
-              res = task.callback.apply(_this, args);
-            } else if (isFunction(_this[task.callback])) {
-              res = _this[task.callback].apply(_this, args);
+            if (_this._proxy && isFunction(_this._proxy[callbackName])) {
+              res = _this._proxy[callbackName].apply(_this._proxy, args);
+            } else if (isFunction(callbackName)) {
+              res = callbackName.apply(_this, args);
+            } else if (isFunction(_this[callbackName])) {
+              res = _this[callbackName].apply(_this, args);
             } else {
               console.log(task.callback);
               throw new Error('not callback : ' + task.callback);

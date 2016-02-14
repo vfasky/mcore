@@ -193,22 +193,24 @@ class Template extends EventEmitter
             each tasks, (task)=>
                 if task.el == e.target or nodeContains task.el, e.target
                     res = null
-                    args = [task.el, e]
+                    args = [e, task.el]
+                    callbackName = task.callback
 
                     if isArray task.callback
-                        args = task.callback
-                        task.callback = args.shift()
-                        args.push task.el
-                        args.push e
+                        _args = task.callback
+                        callbackName = _args[0]
 
-                    if @_proxy and isFunction @_proxy[task.callback]
-                        res = @_proxy[task.callback].apply @_proxy, args
+                        each _args, (arg, k)->
+                            args.push arg if k > 0
 
-                    else if isFunction task.callback
-                        res = task.callback.apply @, args
+                    if @_proxy and isFunction @_proxy[callbackName]
+                        res = @_proxy[callbackName].apply @_proxy, args
 
-                    else if isFunction @[task.callback]
-                        res = @[task.callback].apply @, args
+                    else if isFunction callbackName
+                        res = callbackName.apply @, args
+
+                    else if isFunction @[callbackName]
+                        res = @[callbackName].apply @, args
 
                     else
                         console.log task.callback

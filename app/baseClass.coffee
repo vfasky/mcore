@@ -6,7 +6,7 @@
 ###
 'use strict'
 
-{EventEmitter, Template, util} = require 'mcore'
+{EventEmitter, Template, Component, util} = require 'mcore'
 $ = require 'jquery'
 
 each = util.each
@@ -73,8 +73,6 @@ Template::removeEvent = (event, el, id)->
     if @_events[event].length == 0
         $(@refs).off event
         
-
-
 
 loadPromise = (data)->
     dtd = $.Deferred()
@@ -153,13 +151,13 @@ class BaseClass extends EventEmitter
         dtd.promise()
         
 
-    set: (key, value)->
+    set: (key, value, doneOrAsync)->
         return if !@template
         if util.isFunction value.then
             return value.then (val)=>
-                @template.set key, val
+                @template.set key, val, doneOrAsync
         else
-            @template.set key, value
+            @template.set key, value, doneOrAsync
 
     get: ->
         @template.get.apply @template, arguments if @template
