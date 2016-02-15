@@ -2976,732 +2976,437 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict'
+	'use strict';
+
 	var mcore = __webpack_require__(2);
 	var __mc_T_El = mcore.virtualDom.Element;
 	var __mc_T_formatters = mcore.Template.formatters;
 	var __mc_T_binders = mcore.Template.binders;
-	var objectKeys = mcore.util.objectKeys;
-	var each = mcore.util.each;
-	 
-	module.exports = function(scope, __mc__observe){
+	var __objectKeys = mcore.util.objectKeys;
+	var __each = mcore.util.each;
+	var __isArray = mcore.util.isArray;
+
+	var __parserBinders = function(__mc__binderData, __mc__isBindObserve, key, val) {
+	    if (__mc_T_binders.hasOwnProperty(key)) {
+	        __mc__isBindObserve = true;
+	        __mc__binderData.push({
+	            attrName: key,
+	            value: val
+	        });
+	    }
+	};
+
+
+
+	module.exports = function(scope, __mc__observe) {
 	    var __mc__children_0 = [];
 	    var __mc__binders = {};
 	    var __mc__dom_id = 0;
-	    
-	    (function(scope, tree){ // startTree 0
 
-	        var __mc__children_0 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	        __mc__attr['class'] = 'todoapp';
-
-	        (function(scope, tree){ // startTree 1
-
-	            var __mc__children_1 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	            __mc__attr['class'] = 'header';
-
-	            (function(scope, tree){ // startTree 2
-
-	                var __mc__children_2 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	                (function(scope, tree){ // startTree 3
-
-	                    var __mc__children_3 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                    tree.push( 'todos' );
-	                })(scope, __mc__children_2); // endTree 3
-
-	                var __mc__new_el = new __mc_T_El('h1', __mc__attr, __mc__children_2);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
+	    var __bindBinder = function(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData) {
+	        if (!__mc__isBindObserve) {
+	            var __mc__attr__keys = __objectKeys(__mc__attr);
+	            __each(__mc__attr__keys, function(attr) {
+	                if (attr.indexOf('on-') === 0) {
+	                    __mc__isBindObserve = true;
 	                }
-
-	                tree.push( __mc__new_el );
-	                var __mc__children_4 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                __mc__attr['class'] = 'new-todo';                __mc__attr['on-keyenter'] = 'addTodo';                __mc__attr['autofocus'] = '';                __mc__attr['autocomplete'] = 'off';                __mc__attr['placeholder'] = 'What needs to be done?';
-
-	                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_4);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
-	            })(scope, __mc__children_1); // endTree 2
-
-	            var __mc__new_el = new __mc_T_El('header', __mc__attr, __mc__children_1);            var __mc__attr__keys = objectKeys(__mc__attr);
-	            each(__mc__attr__keys, function(attr){
-	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
 	            });
-	            if(__mc__isBindObserve){
-	                __mc__new_el.bindTemplate(__mc__observe); 
-	                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                    var __mc_v = __mc__binderData[__mc_i];
-	                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                }
+	        }
+	        if (__mc__isBindObserve) {
+	            __mc__new_el.bindTemplate(__mc__observe);
+	            for (var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++) {
+	                var __mc_v = __mc__binderData[__mc_i];
+	                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
 	            }
+	        }
+	    };
 
-	            tree.push( __mc__new_el );
-	            var __mc__children_5 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	    (function(scope, tree) { // startTree 0
+
+	        var __mc__children_0 = [],
+	            __mc__attr = {},
+	            __mc__isBindObserve = false,
+	            __mc__binderData = [];
+	        __mc__attr['class'] = 'todoapp';
+	        (function(scope, tree) { // startTree 1
+
+	            var __mc__children_1 = [],
+	                __mc__attr = {},
+	                __mc__isBindObserve = false,
+	                __mc__binderData = [];
+	            __mc__attr['class'] = 'header';
+	            (function(scope, tree) { // startTree 2
+
+	                var __mc__children_2 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
+	                (function(scope, tree) { // startTree 3
+
+	                    tree.push('todos');
+	                })(scope, __mc__children_2); // endTree 3
+	                var __mc__new_el = new __mc_T_El('h1', __mc__attr, __mc__children_2);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
+	                var __mc__children_4 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
+	                __mc__attr['class'] = 'new-todo';
+	                __mc__attr['on-keyenter'] = 'addTodo';
+	                __mc__attr['autofocus'] = '';
+	                __mc__attr['autocomplete'] = 'off';
+	                __mc__attr['placeholder'] = 'What needs to be done?';
+	                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_4);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
+	            })(scope, __mc__children_1); // endTree 2
+	            var __mc__new_el = new __mc_T_El('header', __mc__attr, __mc__children_1);
+	            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	            tree.push(__mc__new_el);
+	            var __mc__children_5 = [],
+	                __mc__attr = {},
+	                __mc__isBindObserve = false,
+	                __mc__binderData = [];
 	            __mc__attr['class'] = 'main';
+	            (function(scope, tree) { // startTree 6
 
-	            (function(scope, tree){ // startTree 6
-
-	                var __mc__children_6 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                __mc__attr['class'] = 'toggle-all';                __mc__attr['on-change'] = 'changeAllVisibility';                __mc__attr['type'] = 'checkbox';                __mc__attr['show'] = scope.todos.length > 0; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('show') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'show', value: __mc__attr['show']});
-	 }// end 
-
-
-	                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_6);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
-	                var __mc__children_7 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_6 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
+	                __mc__attr['class'] = 'toggle-all';
+	                __mc__attr['on-change'] = 'changeAllVisibility';
+	                __mc__attr['type'] = 'checkbox';
+	                __mc__attr['show'] = scope.todos.length > 0;
+	                __parserBinders(__mc__binderData, __mc__isBindObserve, 'show', __mc__attr['show']);
+	                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_6);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
+	                var __mc__children_7 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
 	                __mc__attr['class'] = 'todo-list';
+	                (function(scope, tree) { // startTree 8
 
-	                (function(scope, tree){ // startTree 8
 
 	                    // for todo in scope.todos
-	                    var __mc__arr = scope.todos.length ? scope.todos : [];
-	                    for(var __mc__$ix_=0, len=__mc__arr.length; __mc__$ix_ < len; __mc__$ix_++){
+	                    var __mc__arr = __isArray(scope.todos) ? scope.todos : [];
+	                    for (var __mc__$ix_ = 0, len = __mc__arr.length; __mc__$ix_ < len; __mc__$ix_++) {
 	                        var todo = __mc__arr[__mc__$ix_];
-	                        
-	                        var __mc__children_9 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                        __mc__attr['class'] = 'todo'  + (todo.visibility == 'completed' ? ' completed' : '') + (todo.isEdit ? ' editing' : ''); 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('class') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'class', value: __mc__attr['class']});
-	 }// end 
+	                        var __mc__children_9 = [],
+	                            __mc__attr = {},
+	                            __mc__isBindObserve = false,
+	                            __mc__binderData = [];
+	                        __mc__attr['class'] = 'todo' + (todo.visibility == 'completed' ? ' completed' : '') + (todo.isEdit ? ' editing' : '');
+	                        __parserBinders(__mc__binderData, __mc__isBindObserve, 'class', __mc__attr['class']);
+	                        (function(scope, tree) { // startTree 10
 
+	                            var __mc__children_10 = [],
+	                                __mc__attr = {},
+	                                __mc__isBindObserve = false,
+	                                __mc__binderData = [];
+	                            __mc__attr['class'] = 'view';
+	                            __mc__attr['on-dblclick'] = ['editTodo', todo];
+	                            (function(scope, tree) { // startTree 11
 
-	                        (function(scope, tree){ // startTree 10
-
-	                            var __mc__children_10 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                            __mc__attr['class'] = 'view';                            __mc__attr['on-dblclick'] = ['editTodo',todo];
-
-	                            (function(scope, tree){ // startTree 11
-
-	                                var __mc__children_11 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                                __mc__attr['class'] = 'toggle';                                __mc__attr['on-change'] = ['changeTodoVisibility',todo];                                __mc__attr['type'] = 'checkbox';                                __mc__attr['checked'] = todo.visibility == 'completed'; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('checked') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'checked', value: __mc__attr['checked']});
-	 }// end 
-
-
-	                                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_11);                                var __mc__attr__keys = objectKeys(__mc__attr);
-	                                each(__mc__attr__keys, function(attr){
-	                                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                                });
-	                                if(__mc__isBindObserve){
-	                                    __mc__new_el.bindTemplate(__mc__observe); 
-	                                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                        var __mc_v = __mc__binderData[__mc_i];
-	                                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                                    }
-	                                }
-
-	                                tree.push( __mc__new_el );
-	                                var __mc__children_12 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	                                (function(scope, tree){ // startTree 13
-
-	                                    var __mc__children_13 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                                var __mc__children_11 = [],
+	                                    __mc__attr = {},
+	                                    __mc__isBindObserve = false,
+	                                    __mc__binderData = [];
+	                                __mc__attr['class'] = 'toggle';
+	                                __mc__attr['on-change'] = ['changeTodoVisibility', todo];
+	                                __mc__attr['type'] = 'checkbox';
+	                                __mc__attr['checked'] = todo.visibility == 'completed';
+	                                __parserBinders(__mc__binderData, __mc__isBindObserve, 'checked', __mc__attr['checked']);
+	                                var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_11);
+	                                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                                tree.push(__mc__new_el);
+	                                var __mc__children_12 = [],
+	                                    __mc__attr = {},
+	                                    __mc__isBindObserve = false,
+	                                    __mc__binderData = [];
+	                                (function(scope, tree) { // startTree 13
 
 	                                    var __mc__rp__key_0;
-	                                    __mc__rp__key_0 = todo.title; 
-
-	                                    tree.push( "" + __mc__rp__key_0 + "" );
+	                                    __mc__rp__key_0 = todo.title;
+	                                    tree.push("" + __mc__rp__key_0 + "");
 	                                })(scope, __mc__children_12); // endTree 13
-
-	                                var __mc__new_el = new __mc_T_El('label', __mc__attr, __mc__children_12);                                var __mc__attr__keys = objectKeys(__mc__attr);
-	                                each(__mc__attr__keys, function(attr){
-	                                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                                });
-	                                if(__mc__isBindObserve){
-	                                    __mc__new_el.bindTemplate(__mc__observe); 
-	                                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                        var __mc_v = __mc__binderData[__mc_i];
-	                                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                                    }
-	                                }
-
-	                                tree.push( __mc__new_el );
-	                                var __mc__children_14 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                                __mc__attr['class'] = 'destroy';                                __mc__attr['on-click'] = ['removeTodo',todo.id];
-
-	                                var __mc__new_el = new __mc_T_El('button', __mc__attr, __mc__children_14);                                var __mc__attr__keys = objectKeys(__mc__attr);
-	                                each(__mc__attr__keys, function(attr){
-	                                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                                });
-	                                if(__mc__isBindObserve){
-	                                    __mc__new_el.bindTemplate(__mc__observe); 
-	                                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                        var __mc_v = __mc__binderData[__mc_i];
-	                                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                                    }
-	                                }
-
-	                                tree.push( __mc__new_el );
+	                                var __mc__new_el = new __mc_T_El('label', __mc__attr, __mc__children_12);
+	                                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                                tree.push(__mc__new_el);
+	                                var __mc__children_14 = [],
+	                                    __mc__attr = {},
+	                                    __mc__isBindObserve = false,
+	                                    __mc__binderData = [];
+	                                __mc__attr['class'] = 'destroy';
+	                                __mc__attr['on-click'] = ['removeTodo', todo.id];
+	                                var __mc__new_el = new __mc_T_El('button', __mc__attr, __mc__children_14);
+	                                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                                tree.push(__mc__new_el);
 	                            })(scope, __mc__children_10); // endTree 11
-
-	                            var __mc__new_el = new __mc_T_El('div', __mc__attr, __mc__children_10);                            var __mc__attr__keys = objectKeys(__mc__attr);
-	                            each(__mc__attr__keys, function(attr){
-	                                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                            });
-	                            if(__mc__isBindObserve){
-	                                __mc__new_el.bindTemplate(__mc__observe); 
-	                                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                    var __mc_v = __mc__binderData[__mc_i];
-	                                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                                }
-	                            }
-
-	                            tree.push( __mc__new_el );
-	                            var __mc__children_15 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                            __mc__attr['class'] = 'edit';                            __mc__attr['type'] = 'text';                            __mc__attr['on-blur'] = ['saveTodo',todo];                            __mc__attr['on-keyenter'] = ['saveTodo',todo];                            __mc__attr['on-keyesc'] = ['unsaveTodo',todo];                            __mc__attr['value'] = todo.title; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('value') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'value', value: __mc__attr['value']});
-	 }// end 
-
-
-	                            var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_15);                            var __mc__attr__keys = objectKeys(__mc__attr);
-	                            each(__mc__attr__keys, function(attr){
-	                                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                            });
-	                            if(__mc__isBindObserve){
-	                                __mc__new_el.bindTemplate(__mc__observe); 
-	                                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                    var __mc_v = __mc__binderData[__mc_i];
-	                                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                                }
-	                            }
-
-	                            tree.push( __mc__new_el );
+	                            var __mc__new_el = new __mc_T_El('div', __mc__attr, __mc__children_10);
+	                            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                            tree.push(__mc__new_el);
+	                            var __mc__children_15 = [],
+	                                __mc__attr = {},
+	                                __mc__isBindObserve = false,
+	                                __mc__binderData = [];
+	                            __mc__attr['class'] = 'edit';
+	                            __mc__attr['type'] = 'text';
+	                            __mc__attr['on-blur'] = ['saveTodo', todo];
+	                            __mc__attr['on-keyenter'] = ['saveTodo', todo];
+	                            __mc__attr['on-keyesc'] = ['unsaveTodo', todo];
+	                            __mc__attr['value'] = todo.title;
+	                            __parserBinders(__mc__binderData, __mc__isBindObserve, 'value', __mc__attr['value']);
+	                            var __mc__new_el = new __mc_T_El('input', __mc__attr, __mc__children_15);
+	                            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                            tree.push(__mc__new_el);
 	                        })(scope, __mc__children_9); // endTree 10
-
-	                        var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_9);                        var __mc__attr__keys = objectKeys(__mc__attr);
-	                        each(__mc__attr__keys, function(attr){
-	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                        });
-	                        if(__mc__isBindObserve){
-	                            __mc__new_el.bindTemplate(__mc__observe); 
-	                            for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                var __mc_v = __mc__binderData[__mc_i];
-	                                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                            }
-	                        }
-
-	                        tree.push( __mc__new_el );
+	                        var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_9);
+	                        __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                        tree.push(__mc__new_el);
 	                    } // endFor 
-
 	                })(scope, __mc__children_7); // endTree 8
-
-	                var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_7);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
+	                var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_7);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
 	            })(scope, __mc__children_5); // endTree 6
+	            var __mc__new_el = new __mc_T_El('section', __mc__attr, __mc__children_5);
+	            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	            tree.push(__mc__new_el);
+	            var __mc__children_16 = [],
+	                __mc__attr = {},
+	                __mc__isBindObserve = false,
+	                __mc__binderData = [];
+	            __mc__attr['class'] = 'footer';
+	            __mc__attr['show'] = scope.allTodos.length > 0;
+	            __parserBinders(__mc__binderData, __mc__isBindObserve, 'show', __mc__attr['show']);
+	            (function(scope, tree) { // startTree 17
 
-	            var __mc__new_el = new __mc_T_El('section', __mc__attr, __mc__children_5);            var __mc__attr__keys = objectKeys(__mc__attr);
-	            each(__mc__attr__keys, function(attr){
-	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	            });
-	            if(__mc__isBindObserve){
-	                __mc__new_el.bindTemplate(__mc__observe); 
-	                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                    var __mc_v = __mc__binderData[__mc_i];
-	                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                }
-	            }
-
-	            tree.push( __mc__new_el );
-	            var __mc__children_16 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	            __mc__attr['class'] = 'footer';            __mc__attr['show'] = scope.allTodos.length > 0; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('show') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'show', value: __mc__attr['show']});
-	 }// end 
-
-
-	            (function(scope, tree){ // startTree 17
-
-	                var __mc__children_17 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__children_17 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
 	                __mc__attr['class'] = 'todo-count';
+	                (function(scope, tree) { // startTree 18
 
-	                (function(scope, tree){ // startTree 18
-
-	                    var __mc__children_18 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	                    (function(scope, tree){ // startTree 19
-
-	                        var __mc__children_19 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                    var __mc__children_18 = [],
+	                        __mc__attr = {},
+	                        __mc__isBindObserve = false,
+	                        __mc__binderData = [];
+	                    (function(scope, tree) { // startTree 19
 
 	                        var __mc__rp__key_0;
-	    
-	                        __mc__rp__key_0 = (function(x){
-	                                // itemLen
-	                            if( __mc_T_formatters.hasOwnProperty('itemLen') ) {
+	                        __mc__rp__key_0 = (function(x) {
+	                            // itemLen
+	                            if (__mc_T_formatters.hasOwnProperty('itemLen')) {
 	                                x = __mc_T_formatters['itemLen'](x);
 	                            } // end itemLen 
 	                            return x;
 	                        })(scope.allTodos);
-
-	                        tree.push( "" + __mc__rp__key_0 + "" );
+	                        tree.push("" + __mc__rp__key_0 + "");
 	                    })(scope, __mc__children_18); // endTree 19
-
-	                    var __mc__new_el = new __mc_T_El('strong', __mc__attr, __mc__children_18);                    var __mc__attr__keys = objectKeys(__mc__attr);
-	                    each(__mc__attr__keys, function(attr){
-	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                    });
-	                    if(__mc__isBindObserve){
-	                        __mc__new_el.bindTemplate(__mc__observe); 
-	                        for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                            var __mc_v = __mc__binderData[__mc_i];
-	                            __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                        }
-	                    }
-
-	                    tree.push( __mc__new_el );
-	                    var __mc__children_20 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                    tree.push( ' left  		' );
+	                    var __mc__new_el = new __mc_T_El('strong', __mc__attr, __mc__children_18);
+	                    __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                    tree.push(__mc__new_el);
+	                    tree.push(' left  		');
 	                })(scope, __mc__children_17); // endTree 18
-
-	                var __mc__new_el = new __mc_T_El('span', __mc__attr, __mc__children_17);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
-	                var __mc__children_21 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                var __mc__new_el = new __mc_T_El('span', __mc__attr, __mc__children_17);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
+	                var __mc__children_21 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
 	                __mc__attr['class'] = 'filters';
+	                (function(scope, tree) { // startTree 22
 
-	                (function(scope, tree){ // startTree 22
+	                    var __mc__children_22 = [],
+	                        __mc__attr = {},
+	                        __mc__isBindObserve = false,
+	                        __mc__binderData = [];
+	                    (function(scope, tree) { // startTree 23
 
-	                    var __mc__children_22 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                        var __mc__children_23 = [],
+	                            __mc__attr = {},
+	                            __mc__isBindObserve = false,
+	                            __mc__binderData = [];
+	                        __mc__attr['href'] = '#/all';
+	                        __mc__attr['class'] = scope.selected == 'all' ? 'selected' : '';
+	                        __parserBinders(__mc__binderData, __mc__isBindObserve, 'class', __mc__attr['class']);
+	                        (function(scope, tree) { // startTree 24
 
-
-	                    (function(scope, tree){ // startTree 23
-
-	                        var __mc__children_23 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                        __mc__attr['href'] = '#/all';                        __mc__attr['class'] = scope.selected == 'all' ? 'selected' : ''; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('class') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'class', value: __mc__attr['class']});
-	 }// end 
-
-
-	                        (function(scope, tree){ // startTree 24
-
-	                            var __mc__children_24 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                            tree.push( 'All' );
+	                            tree.push('All');
 	                        })(scope, __mc__children_23); // endTree 24
-
-	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_23);                        var __mc__attr__keys = objectKeys(__mc__attr);
-	                        each(__mc__attr__keys, function(attr){
-	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                        });
-	                        if(__mc__isBindObserve){
-	                            __mc__new_el.bindTemplate(__mc__observe); 
-	                            for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                var __mc_v = __mc__binderData[__mc_i];
-	                                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                            }
-	                        }
-
-	                        tree.push( __mc__new_el );
+	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_23);
+	                        __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                        tree.push(__mc__new_el);
 	                    })(scope, __mc__children_22); // endTree 23
+	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_22);
+	                    __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                    tree.push(__mc__new_el);
+	                    var __mc__children_25 = [],
+	                        __mc__attr = {},
+	                        __mc__isBindObserve = false,
+	                        __mc__binderData = [];
+	                    (function(scope, tree) { // startTree 26
 
-	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_22);                    var __mc__attr__keys = objectKeys(__mc__attr);
-	                    each(__mc__attr__keys, function(attr){
-	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                    });
-	                    if(__mc__isBindObserve){
-	                        __mc__new_el.bindTemplate(__mc__observe); 
-	                        for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                            var __mc_v = __mc__binderData[__mc_i];
-	                            __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                        }
-	                    }
+	                        var __mc__children_26 = [],
+	                            __mc__attr = {},
+	                            __mc__isBindObserve = false,
+	                            __mc__binderData = [];
+	                        __mc__attr['href'] = '#/active';
+	                        __mc__attr['class'] = scope.selected == 'active' ? 'selected' : '';
+	                        __parserBinders(__mc__binderData, __mc__isBindObserve, 'class', __mc__attr['class']);
+	                        (function(scope, tree) { // startTree 27
 
-	                    tree.push( __mc__new_el );
-	                    var __mc__children_25 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	                    (function(scope, tree){ // startTree 26
-
-	                        var __mc__children_26 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                        __mc__attr['href'] = '#/active';                        __mc__attr['class'] = scope.selected == 'active' ? 'selected' : ''; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('class') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'class', value: __mc__attr['class']});
-	 }// end 
-
-
-	                        (function(scope, tree){ // startTree 27
-
-	                            var __mc__children_27 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                            tree.push( 'Active' );
+	                            tree.push('Active');
 	                        })(scope, __mc__children_26); // endTree 27
-
-	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_26);                        var __mc__attr__keys = objectKeys(__mc__attr);
-	                        each(__mc__attr__keys, function(attr){
-	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                        });
-	                        if(__mc__isBindObserve){
-	                            __mc__new_el.bindTemplate(__mc__observe); 
-	                            for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                var __mc_v = __mc__binderData[__mc_i];
-	                                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                            }
-	                        }
-
-	                        tree.push( __mc__new_el );
+	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_26);
+	                        __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                        tree.push(__mc__new_el);
 	                    })(scope, __mc__children_25); // endTree 26
+	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_25);
+	                    __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                    tree.push(__mc__new_el);
+	                    var __mc__children_28 = [],
+	                        __mc__attr = {},
+	                        __mc__isBindObserve = false,
+	                        __mc__binderData = [];
+	                    (function(scope, tree) { // startTree 29
 
-	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_25);                    var __mc__attr__keys = objectKeys(__mc__attr);
-	                    each(__mc__attr__keys, function(attr){
-	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                    });
-	                    if(__mc__isBindObserve){
-	                        __mc__new_el.bindTemplate(__mc__observe); 
-	                        for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                            var __mc_v = __mc__binderData[__mc_i];
-	                            __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                        }
-	                    }
+	                        var __mc__children_29 = [],
+	                            __mc__attr = {},
+	                            __mc__isBindObserve = false,
+	                            __mc__binderData = [];
+	                        __mc__attr['href'] = '#/completed';
+	                        __mc__attr['class'] = scope.selected == 'completed' ? 'selected' : '';
+	                        __parserBinders(__mc__binderData, __mc__isBindObserve, 'class', __mc__attr['class']);
+	                        (function(scope, tree) { // startTree 30
 
-	                    tree.push( __mc__new_el );
-	                    var __mc__children_28 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	                    (function(scope, tree){ // startTree 29
-
-	                        var __mc__children_29 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                        __mc__attr['href'] = '#/completed';                        __mc__attr['class'] = scope.selected == 'completed' ? 'selected' : ''; 
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('class') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'class', value: __mc__attr['class']});
-	 }// end 
-
-
-	                        (function(scope, tree){ // startTree 30
-
-	                            var __mc__children_30 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                            tree.push( 'Completed' );
+	                            tree.push('Completed');
 	                        })(scope, __mc__children_29); // endTree 30
-
-	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_29);                        var __mc__attr__keys = objectKeys(__mc__attr);
-	                        each(__mc__attr__keys, function(attr){
-	                            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                        });
-	                        if(__mc__isBindObserve){
-	                            __mc__new_el.bindTemplate(__mc__observe); 
-	                            for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                                var __mc_v = __mc__binderData[__mc_i];
-	                                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                            }
-	                        }
-
-	                        tree.push( __mc__new_el );
+	                        var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_29);
+	                        __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                        tree.push(__mc__new_el);
 	                    })(scope, __mc__children_28); // endTree 29
-
-	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_28);                    var __mc__attr__keys = objectKeys(__mc__attr);
-	                    each(__mc__attr__keys, function(attr){
-	                        if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                    });
-	                    if(__mc__isBindObserve){
-	                        __mc__new_el.bindTemplate(__mc__observe); 
-	                        for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                            var __mc_v = __mc__binderData[__mc_i];
-	                            __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                        }
-	                    }
-
-	                    tree.push( __mc__new_el );
+	                    var __mc__new_el = new __mc_T_El('li', __mc__attr, __mc__children_28);
+	                    __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                    tree.push(__mc__new_el);
 	                })(scope, __mc__children_21); // endTree 22
-
-	                var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_21);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
-	                var __mc__children_31 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-	                __mc__attr['class'] = 'clear-completed';                __mc__attr['on-click'] = 'removeCompleted';    
-	                __mc__attr['show'] = (function(x){
-	                        // completedLen
-	                    if( __mc_T_formatters.hasOwnProperty('completedLen') ) {
+	                var __mc__new_el = new __mc_T_El('ul', __mc__attr, __mc__children_21);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
+	                var __mc__children_31 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
+	                __mc__attr['class'] = 'clear-completed';
+	                __mc__attr['on-click'] = 'removeCompleted';
+	                __mc__attr['show'] = (function(x) {
+	                    // completedLen
+	                    if (__mc_T_formatters.hasOwnProperty('completedLen')) {
 	                        x = __mc_T_formatters['completedLen'](x);
 	                    } // end completedLen 
 	                    return x;
 	                })(scope.allTodos);
-	 // binders check
-	 if( __mc_T_binders.hasOwnProperty('show') ){
-	    __mc__isBindObserve = true;
-	    __mc__binderData.push({attrName: 'show', value: __mc__attr['show']});
-	 }// end 
+	                __parserBinders(__mc__binderData, __mc__isBindObserve, 'show', __mc__attr['show']);
+	                (function(scope, tree) { // startTree 32
 
-
-	                (function(scope, tree){ // startTree 32
-
-	                    var __mc__children_32 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                    tree.push( '             Clear completed         ' );
+	                    tree.push('             Clear completed         ');
 	                })(scope, __mc__children_31); // endTree 32
-
-	                var __mc__new_el = new __mc_T_El('button', __mc__attr, __mc__children_31);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
+	                var __mc__new_el = new __mc_T_El('button', __mc__attr, __mc__children_31);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
 	            })(scope, __mc__children_16); // endTree 17
-
-	            var __mc__new_el = new __mc_T_El('footer', __mc__attr, __mc__children_16);            var __mc__attr__keys = objectKeys(__mc__attr);
-	            each(__mc__attr__keys, function(attr){
-	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	            });
-	            if(__mc__isBindObserve){
-	                __mc__new_el.bindTemplate(__mc__observe); 
-	                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                    var __mc_v = __mc__binderData[__mc_i];
-	                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                }
-	            }
-
-	            tree.push( __mc__new_el );
+	            var __mc__new_el = new __mc_T_El('footer', __mc__attr, __mc__children_16);
+	            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	            tree.push(__mc__new_el);
 	        })(scope, __mc__children_0); // endTree 1
-
-	        var __mc__new_el = new __mc_T_El('section', __mc__attr, __mc__children_0);        var __mc__attr__keys = objectKeys(__mc__attr);
-	        each(__mc__attr__keys, function(attr){
-	            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	        });
-	        if(__mc__isBindObserve){
-	            __mc__new_el.bindTemplate(__mc__observe); 
-	            for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                var __mc_v = __mc__binderData[__mc_i];
-	                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	            }
-	        }
-
-	        tree.push( __mc__new_el );
-	        var __mc__children_33 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	        var __mc__new_el = new __mc_T_El('section', __mc__attr, __mc__children_0);
+	        __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	        tree.push(__mc__new_el);
+	        var __mc__children_33 = [],
+	            __mc__attr = {},
+	            __mc__isBindObserve = false,
+	            __mc__binderData = [];
 	        __mc__attr['class'] = 'info';
+	        (function(scope, tree) { // startTree 34
 
-	        (function(scope, tree){ // startTree 34
+	            var __mc__children_34 = [],
+	                __mc__attr = {},
+	                __mc__isBindObserve = false,
+	                __mc__binderData = [];
+	            (function(scope, tree) { // startTree 35
 
-	            var __mc__children_34 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	            (function(scope, tree){ // startTree 35
-
-	                var __mc__children_35 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                tree.push( 'Double-click to edit a todo' );
+	                tree.push('Double-click to edit a todo');
 	            })(scope, __mc__children_34); // endTree 35
+	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_34);
+	            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	            tree.push(__mc__new_el);
+	            var __mc__children_36 = [],
+	                __mc__attr = {},
+	                __mc__isBindObserve = false,
+	                __mc__binderData = [];
+	            (function(scope, tree) { // startTree 37
 
-	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_34);            var __mc__attr__keys = objectKeys(__mc__attr);
-	            each(__mc__attr__keys, function(attr){
-	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	            });
-	            if(__mc__isBindObserve){
-	                __mc__new_el.bindTemplate(__mc__observe); 
-	                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                    var __mc_v = __mc__binderData[__mc_i];
-	                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                }
-	            }
-
-	            tree.push( __mc__new_el );
-	            var __mc__children_36 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	            (function(scope, tree){ // startTree 37
-
-	                var __mc__children_37 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                tree.push( 'Written by ' );
-	                var __mc__children_38 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                tree.push('Written by ');
+	                var __mc__children_38 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
 	                __mc__attr['href'] = 'http://vfasky.com';
+	                (function(scope, tree) { // startTree 39
 
-	                (function(scope, tree){ // startTree 39
-
-	                    var __mc__children_39 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                    tree.push( 'vfasky' );
+	                    tree.push('vfasky');
 	                })(scope, __mc__children_38); // endTree 39
-
-	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_38);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
+	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_38);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
 	            })(scope, __mc__children_36); // endTree 37
+	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_36);
+	            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	            tree.push(__mc__new_el);
+	            var __mc__children_40 = [],
+	                __mc__attr = {},
+	                __mc__isBindObserve = false,
+	                __mc__binderData = [];
+	            (function(scope, tree) { // startTree 41
 
-	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_36);            var __mc__attr__keys = objectKeys(__mc__attr);
-	            each(__mc__attr__keys, function(attr){
-	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	            });
-	            if(__mc__isBindObserve){
-	                __mc__new_el.bindTemplate(__mc__observe); 
-	                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                    var __mc_v = __mc__binderData[__mc_i];
-	                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                }
-	            }
-
-	            tree.push( __mc__new_el );
-	            var __mc__children_40 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-
-	            (function(scope, tree){ // startTree 41
-
-	                var __mc__children_41 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                tree.push( 'Part of ' );
-	                var __mc__children_42 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
+	                tree.push('Part of ');
+	                var __mc__children_42 = [],
+	                    __mc__attr = {},
+	                    __mc__isBindObserve = false,
+	                    __mc__binderData = [];
 	                __mc__attr['href'] = 'http://todomvc.com';
+	                (function(scope, tree) { // startTree 43
 
-	                (function(scope, tree){ // startTree 43
-
-	                    var __mc__children_43 = [], __mc__attr = {}, __mc__isBindObserve = false, __mc__binderData = [];
-
-	                    tree.push( 'TodoMVC' );
+	                    tree.push('TodoMVC');
 	                })(scope, __mc__children_42); // endTree 43
-
-	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_42);                var __mc__attr__keys = objectKeys(__mc__attr);
-	                each(__mc__attr__keys, function(attr){
-	                    if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	                });
-	                if(__mc__isBindObserve){
-	                    __mc__new_el.bindTemplate(__mc__observe); 
-	                    for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                        var __mc_v = __mc__binderData[__mc_i];
-	                        __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                    }
-	                }
-
-	                tree.push( __mc__new_el );
+	                var __mc__new_el = new __mc_T_El('a', __mc__attr, __mc__children_42);
+	                __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	                tree.push(__mc__new_el);
 	            })(scope, __mc__children_40); // endTree 41
-
-	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_40);            var __mc__attr__keys = objectKeys(__mc__attr);
-	            each(__mc__attr__keys, function(attr){
-	                if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	            });
-	            if(__mc__isBindObserve){
-	                __mc__new_el.bindTemplate(__mc__observe); 
-	                for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                    var __mc_v = __mc__binderData[__mc_i];
-	                    __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	                }
-	            }
-
-	            tree.push( __mc__new_el );
+	            var __mc__new_el = new __mc_T_El('p', __mc__attr, __mc__children_40);
+	            __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	            tree.push(__mc__new_el);
 	        })(scope, __mc__children_33); // endTree 34
-
-	        var __mc__new_el = new __mc_T_El('footer', __mc__attr, __mc__children_33);        var __mc__attr__keys = objectKeys(__mc__attr);
-	        each(__mc__attr__keys, function(attr){
-	            if(attr.indexOf('on-') === 0){ __mc__isBindObserve = true; }
-	        });
-	        if(__mc__isBindObserve){
-	            __mc__new_el.bindTemplate(__mc__observe); 
-	            for(var __mc_i = 0, __mc_len = __mc__binderData.length; __mc_i < __mc_len; __mc_i++){ 
-	                var __mc_v = __mc__binderData[__mc_i];
-	                __mc__new_el.bindBinder(__mc_v.attrName, __mc_v.value);
-	            }
-	        }
-
-	        tree.push( __mc__new_el );
+	        var __mc__new_el = new __mc_T_El('footer', __mc__attr, __mc__children_33);
+	        __bindBinder(__mc__new_el, __mc__attr, __mc__isBindObserve, __mc__binderData);
+	        tree.push(__mc__new_el);
 	    })(scope, __mc__children_0); // endTree 0
-	    if(__mc__children_0.length === 1 && __mc__children_0[0].render){
+
+
+	    if (__mc__children_0.length === 1 && __mc__children_0[0].render) {
 	        var virtualDom = __mc__children_0[0];
-	    }
-	    else{
-	        var virtualDom = new __mc_T_El( 'mc-vd', {}, __mc__children_0 );
+	    } else {
+	        var virtualDom = new __mc_T_El('mc-vd', {}, __mc__children_0);
 	    }
 
 	    var templateDefined = {
-	        'virtualDom': virtualDom,
-	        'binders': __mc__binders
+	        'virtualDom': virtualDom
 	    };
 	    return templateDefined;
 	};
