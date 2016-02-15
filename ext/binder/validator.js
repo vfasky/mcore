@@ -227,12 +227,7 @@ Template.binders['validator'] = {
     if (el.tagName.toLowerCase() !== 'form' || !el._element) {
       return el.setAttribute('validator', value);
     }
-    callback = function() {};
-    if (el._element.template.hasOwnProperty('_proxy') && el._element.template._proxy[value]) {
-      callback = el._element.template._proxy[value];
-    } else if (el._element.template[value]) {
-      callback = el._element.template[value];
-    }
+    callback = Template.strToFun(el, value) || function() {};
     $form = $(el);
     return $form.off('submit.validator').on('submit.validator', function() {
       var data, err, rules;

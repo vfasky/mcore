@@ -190,11 +190,7 @@ Template.binders['validator'] =
         if el.tagName.toLowerCase() != 'form' or !el._element
             return el.setAttribute 'validator', value
 
-        callback = ->
-        if el._element.template.hasOwnProperty('_proxy') and el._element.template._proxy[value]
-            callback = el._element.template._proxy[value]
-        else if el._element.template[value]
-            callback = el._element.template[value]
+        callback = Template.strToFun(el, value) or ->
 
         $form = $ el
 

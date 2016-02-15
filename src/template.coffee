@@ -99,7 +99,7 @@ class Template extends EventEmitter
     destroy: ->
         if @refs and @refs.parentNode and @refs.parentNode.removeChild
             @refs.parentNode.removeChild @refs
-            
+
         @virtualDomDefine = null
         @virtualDom = null
         @scope = null
@@ -114,7 +114,7 @@ class Template extends EventEmitter
     _render: (done)->
         scope = extend true, @scope
         #scope = data.scope
-        
+
         {virtualDom} = @virtualDomDefine scope, @
         # 未渲染，不用对比
         if @virtualDom == null
@@ -136,7 +136,7 @@ class Template extends EventEmitter
         @emit 'rendered', @refs
         done @refs if isFunction done
 
-    
+
     # 渲染队列
     renderQueue: (doneOrAsync)->
         nextTick.clear @_queueId
@@ -154,7 +154,7 @@ class Template extends EventEmitter
     addEvent: (event, el, callback, id)->
         event = event.toLowerCase()
         #console.log callback if event == 'change'
-        
+
         @_events[event] or= []
         isIn = false
         each @_events[event], (e)->
@@ -185,7 +185,7 @@ class Template extends EventEmitter
         # 移除事件
         if @_events[event].length == 0
             removeEvent @refs, event, @_eventListener[event]
-        
+
     regEventCallback: (event)->
         @_eventReged.push event
         @_eventListener[event] = (e)=>
@@ -215,7 +215,7 @@ class Template extends EventEmitter
                     else
                         console.log task.callback
                         throw new Error 'not callback : ' + task.callback
-                    
+
                     if false == res
                         if e.stopPropagation and e.preventDefault
                             e.stopPropagation()
@@ -235,7 +235,7 @@ class Template extends EventEmitter
             @regEventCallback event
             addEvent @refs, event, @_eventListener[event]
 
-        
+
     # 渲染
     render: (@virtualDomDefine, scope = {}, doneOrAsync = ->)->
         @_status = 1
@@ -262,6 +262,26 @@ Template.components = {}
 
 # 属性
 Template.binders = require './binders'
+
+Template.strToFun = (el, funName)->
+    return false if !el._element
+    
+    proxyFun = null
+    proxyEnv = null
+
+    if el._element.template.hasOwnProperty('_proxy') and el._element.template._proxy[funName]
+        proxyEnv = el._element.template._proxy
+    else if el._element.template[funName]
+        proxyEnv = el._element.template
+
+    if proxyEnv
+        proxyFun = proxyEnv[funName]
+        callback = ->
+            proxyFun.apply proxyEnv, arguments
+
+        return callback
+
+    return false
 
 
 module.exports = Template

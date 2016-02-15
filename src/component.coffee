@@ -23,14 +23,14 @@ class Component extends EventEmitter
 
 
     # 渲染
-    render: (@virtualDomDefine, scope = {})->
+    render: (@virtualDomDefine, scope = {}, doneOrAsync = true)->
         if !@template
             @template = new Template()
             @template._proxy = @
             @template.once 'rendered', (@refs)=> @mount()
             @template.on 'rendered', (refs)=> @emit 'rendered', refs
 
-        @template.render @virtualDomDefine, scope, true
+        @template.render @virtualDomDefine, scope, doneOrAsync
 
 
     mount: ->

@@ -1,0 +1,79 @@
+
+$color-red: #FF3666 !default;
+
+/* 提示框 */
+.popover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin:0;
+    background: $color-red;
+    color: #fff;
+    display: none;
+    font-size: 14px;
+    z-index: 900;
+    opacity: 0;
+    cursor: pointer;
+
+    &.active {
+        display: block!important;
+        opacity: 1;
+    }
+
+    &:hover {
+        background-color: lighten($color-red, 8%);
+
+        .popover-inner {
+            background-color: lighten($color-red, 8%);
+        }
+
+        .popover-caret {
+            border-bottom: 8px solid lighten($color-red, 8%);
+        }
+
+    }
+
+
+}
+
+.popover-inner {
+    position: relative;
+    background: $color-red;
+    padding: 8px 16px;
+    z-index: 110;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.7em;
+
+}
+
+.popover-caret {
+    position: absolute;
+    left: 5px;
+    top: 0;
+    z-index: 100;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    border-bottom: 8px solid $color-red;
+    border-right: 8px solid transparent;
+    border-left: 8px solid transparent;
+    border-top: 0 dotted;
+    -webkit-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+    overflow: hidden;
+}
+
+.popover-bottom .popover-caret {
+    top: -8px;
+}
+
+.popover-top .popover-caret {
+    top: auto;
+    bottom: -8px;
+    -webkit-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}

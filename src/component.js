@@ -30,10 +30,13 @@ Component = (function(superClass) {
 
   Component.prototype.watch = function() {};
 
-  Component.prototype.render = function(virtualDomDefine, scope) {
+  Component.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
     this.virtualDomDefine = virtualDomDefine;
     if (scope == null) {
       scope = {};
+    }
+    if (doneOrAsync == null) {
+      doneOrAsync = true;
     }
     if (!this.template) {
       this.template = new Template();
@@ -50,7 +53,7 @@ Component = (function(superClass) {
         };
       })(this));
     }
-    return this.template.render(this.virtualDomDefine, scope, true);
+    return this.template.render(this.virtualDomDefine, scope, doneOrAsync);
   };
 
   Component.prototype.mount = function() {
