@@ -12,7 +12,7 @@ util = require './util'
 class Component extends EventEmitter
     # @el 真实的 DOM
     # @virtualEl 虚拟 el
-    constructor: (@el, @virtualEl)->
+    constructor: (@el, @virtualEl = null)->
         @init()
         @watch()
 
@@ -66,7 +66,7 @@ class Component extends EventEmitter
         if util.isFunction parentView[proxyEventName]
             parentView[proxyEventName].apply parentView, args
 
-            
+
     # 取代理事件名
     getProxyEventName: (eventName)->
         return null if !@virtualEl or !@virtualEl.props

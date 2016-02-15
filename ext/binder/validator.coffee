@@ -28,7 +28,7 @@ _isMobileReg = /^1[3-9]\d{9}$/
  * 座机：仅中国座机支持；区号可有 3、4位数并且以 0 开头；电话号不以 0 开头，最 8 位数，最少 7 位数
  * 但 400/800 除头开外，适应电话，电话本身是 7 位数
  * 0755-29819991 | 0755 29819991 | 400-6927972 | 4006927927 | 800...
- * 
+ *
 ###
 _isTelReg = /^(?:(?:0\d{2,3}[- ]?[1-9]\d{6,7})|(?:[48]00[- ]?[1-9]\d{6}))$/
 
@@ -156,7 +156,7 @@ parseValidator = ($el, rules = [])->
                 err = _errMsg[ruleType].apply $el[0], msgArgs
             else
                 err = _errMsg[ruleType] or 'error'
-   
+
         args[0] = $el
         args[1] = @$el.find(args[1]).eq 0 if ruleType == 'equals'
 
@@ -203,7 +203,7 @@ Template.binders['validator'] =
             data = $form.serializeObject()
             err = null
 
-            $.each rules, (k, v)=>
+            $.each rules, (k, v)->
                 $el = v.args[0]
                 _value = getNameValue data, v.name, $el
 
@@ -225,7 +225,7 @@ Template.binders['validator'] =
                         $form: $form
                     return false
 
-            
+
             callback err, data
 
             false
@@ -248,4 +248,3 @@ module.exports =
         return false if !rule[type]
 
         _rule[type].apply(null, args)
-
