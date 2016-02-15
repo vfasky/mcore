@@ -7,7 +7,7 @@
 _id = 0
 
 Template = require './template'
-{setElementAttr, each} = require './util'
+{setElementAttr, each, isFunction} = require './util'
 
 class Element
     constructor: (tagName, @props = {}, @children = [])->
@@ -59,6 +59,10 @@ class Element
                     childEl = document.createTextNode child
 
                 el.appendChild childEl
+
+            for binder in @_binders
+                binder.binder.rendered.call @, el, binder.value if binder.binder.rendered
+
         el
 
 
@@ -124,7 +128,7 @@ class Element
                     # update
                     if binder.binder.update
                         binder.binder.update.call @, el, value
-                    else
+                    else if isFunction(binder.binder)
                         binder.binder.call @, el, value
 
                     binder.value = value

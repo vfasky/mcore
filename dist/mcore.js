@@ -102,14 +102,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @date 2016-01-21 19:34:48
 	 */
 	'use strict';
-	var Element, Template, _id, each, ref, setElementAttr,
+	var Element, Template, _id, each, isFunction, ref, setElementAttr,
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	_id = 0;
 
 	Template = __webpack_require__(3);
 
-	ref = __webpack_require__(6), setElementAttr = ref.setElementAttr, each = ref.each;
+	ref = __webpack_require__(6), setElementAttr = ref.setElementAttr, each = ref.each, isFunction = ref.isFunction;
 
 	Element = (function() {
 	  function Element(tagName, props, children) {
@@ -137,7 +137,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  Element.prototype.render = function() {
-	    var attr, el, ref1, value;
+	    var attr, binder, el, j, len, ref1, ref2, value;
 	    el = this.bindComponent();
 	    if (false === el) {
 	      el = document.createElement(this.tagName);
@@ -159,6 +159,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return el.appendChild(childEl);
 	      });
+	      ref2 = this._binders;
+	      for (j = 0, len = ref2.length; j < len; j++) {
+	        binder = ref2[j];
+	        if (binder.binder.rendered) {
+	          binder.binder.rendered.call(this, el, binder.value);
+	        }
+	      }
 	    }
 	    return el;
 	  };
@@ -226,7 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          if (binder.binder.update) {
 	            binder.binder.update.call(this, el, value);
-	          } else {
+	          } else if (isFunction(binder.binder)) {
 	            binder.binder.call(this, el, value);
 	          }
 	          binder.value = value;
@@ -1519,6 +1526,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return el.checked = value && true || false;
 	};
 
+	exports['html'] = function(el, value) {
+	  return el.innerHTML = value != null ? value : '';
+	};
+
+	exports['text'] = function(el, value) {
+	  if (el.textContent != null) {
+	    return el.textContent = value != null ? value : '';
+	  } else {
+	    return el.innerText = value != null ? value : '';
+	  }
+	};
+
 
 /***/ },
 /* 13 */
@@ -1533,13 +1552,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var Component, EventEmitter, Template,
+	var Component, EventEmitter, Template, util,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
 	EventEmitter = __webpack_require__(4);
 
 	Template = __webpack_require__(3);
+
+	util = __webpack_require__(6);
 
 	Component = (function(superClass) {
 	  extend(Component, superClass);
@@ -1608,9 +1629,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
+	  Component.prototype.emitEvent = function(eventName, args) {
+	    var parentView, proxyEventName;
+	    proxyEventName = this.getProxyEventName(eventName);
+	    parentView = this.el._element.template._proxy;
+	    if (!parentView) {
+	      return;
+	    }
+	    if (util.isFunction(parentView[proxyEventName])) {
+	      return parentView[proxyEventName].apply(parentView, args);
+	    }
+	  };
+
+	  Component.prototype.getProxyEventName = function(eventName) {
+	    if (!this.virtualEl || !this.virtualEl.props) {
+	      return null;
+	    }
+	    return this.virtualEl.props['on-' + eventName];
+	  };
+
 	  Component.prototype.destroy = function() {
 	    if (this.template) {
-	      return this.template.destroy();
+	      this.template.destroy();
+	      return this.template = null;
 	    }
 	  };
 

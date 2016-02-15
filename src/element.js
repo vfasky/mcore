@@ -5,14 +5,14 @@
  * @date 2016-01-21 19:34:48
  */
 'use strict';
-var Element, Template, _id, each, ref, setElementAttr,
+var Element, Template, _id, each, isFunction, ref, setElementAttr,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 _id = 0;
 
 Template = require('./template');
 
-ref = require('./util'), setElementAttr = ref.setElementAttr, each = ref.each;
+ref = require('./util'), setElementAttr = ref.setElementAttr, each = ref.each, isFunction = ref.isFunction;
 
 Element = (function() {
   function Element(tagName, props, children) {
@@ -40,7 +40,7 @@ Element = (function() {
   }
 
   Element.prototype.render = function() {
-    var attr, el, ref1, value;
+    var attr, binder, el, j, len, ref1, ref2, value;
     el = this.bindComponent();
     if (false === el) {
       el = document.createElement(this.tagName);
@@ -62,6 +62,13 @@ Element = (function() {
         }
         return el.appendChild(childEl);
       });
+      ref2 = this._binders;
+      for (j = 0, len = ref2.length; j < len; j++) {
+        binder = ref2[j];
+        if (binder.binder.rendered) {
+          binder.binder.rendered.call(this, el, binder.value);
+        }
+      }
     }
     return el;
   };
@@ -129,7 +136,7 @@ Element = (function() {
           }
           if (binder.binder.update) {
             binder.binder.update.call(this, el, value);
-          } else {
+          } else if (isFunction(binder.binder)) {
             binder.binder.call(this, el, value);
           }
           binder.value = value;

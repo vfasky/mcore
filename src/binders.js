@@ -18,3 +18,15 @@ exports['hide'] = function(el, value) {
 exports['checked'] = function(el, value) {
   return el.checked = value && true || false;
 };
+
+exports['html'] = function(el, value) {
+  return el.innerHTML = value != null ? value : '';
+};
+
+exports['text'] = function(el, value) {
+  if (el.textContent != null) {
+    return el.textContent = value != null ? value : '';
+  } else {
+    return el.innerText = value != null ? value : '';
+  }
+};

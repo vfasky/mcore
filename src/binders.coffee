@@ -14,3 +14,14 @@ exports['hide'] = (el, value)->
 
 exports['checked'] = (el, value)->
     el.checked = value and true or false
+
+exports['html'] = (el, value)->
+    el.innerHTML = if value? then value else ''
+
+exports['text'] = (el, value)->
+    if el.textContent?
+        el.textContent = if value? then value else ''
+    else
+        el.innerText = if value? then value else ''
+
+

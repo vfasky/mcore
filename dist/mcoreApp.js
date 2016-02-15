@@ -630,25 +630,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	Component.prototype.emitEvent = function(eventName, args) {
-	  var pEventName, parentView, ref1, ref2;
-	  pEventName = this.getProxyEventName(eventName);
-	  parentView = (ref1 = this.el._element) != null ? (ref2 = ref1.template) != null ? ref2._proxy : void 0 : void 0;
-	  if (!parentView) {
-	    return;
-	  }
-	  if (util.isFunction(parentView[pEventName])) {
-	    return parentView[pEventName].apply(parentView, args);
-	  }
-	};
-
-	Component.prototype.getProxyEventName = function(eventName) {
-	  if (!this.virtualEl || !this.virtualEl.props) {
-	    return null;
-	  }
-	  return this.virtualEl.props['on-' + eventName];
-	};
-
 	loadPromise = function(data) {
 	  var dtd, keys, promises;
 	  dtd = $.Deferred();
@@ -731,18 +712,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return dtd.promise();
 	  };
 
-	  BaseClass.prototype.set = function(key, value) {
+	  BaseClass.prototype.set = function(key, value, doneOrAsync) {
 	    if (!this.template) {
 	      return;
 	    }
 	    if (util.isFunction(value.then)) {
 	      return value.then((function(_this) {
 	        return function(val) {
-	          return _this.template.set(key, val);
+	          return _this.template.set(key, val, doneOrAsync);
 	        };
 	      })(this));
 	    } else {
-	      return this.template.set(key, value);
+	      return this.template.set(key, value, doneOrAsync);
 	    }
 	  };
 
