@@ -130,16 +130,16 @@ Component = (function(superClass) {
   ```coffee
   class Tabs extends Component
   
-  init: ->
-      @.$el = $ @el
-      @render require('../tpl/tag/tabs.html'),
-          index: 0
-          items: []
+      init: ->
+          @.$el = $ @el
+          @render require('../tpl/tag/tabs.html'),
+              index: 0
+              items: []
   
-  #当时间点击tab时，参数原路回传
-  changeTab: ->
-      @emitEvent 'change-tab', arguments
-      false
+      #当用户点击tab时，参数原路回传
+      changeTab: ->
+          @emitEvent 'change-tab', arguments
+          false
   ```
   
   ```html
