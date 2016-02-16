@@ -1,20 +1,51 @@
-<!DOCTYPE html><html lang="en"><head><title>binders</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="binders"><meta name="groc-project-path" content="src/binders.coffee"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/binders.coffee</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> date 2016-01-14 21:25:51, author vfasky <a href="&#109;&#x61;&#105;&#108;&#116;&#111;&#58;&#x76;&#102;&#97;&#x73;&#107;&#x79;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#x76;&#102;&#97;&#x73;&#107;&#x79;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a>, and link <a href="http://vfasky.com">http://vfasky.com</a></span></p>
-<p>dom attr binders</p></div></div><div class="code"><div class="wrapper"><span class="hljs-string">'use strict'</span>
+<!DOCTYPE html><html lang="en"><head><title>binders</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="binders"><meta name="groc-project-path" content="src/binders.coffee"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/binders.coffee</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> date 2016-01-14 21:25:51, author vfasky <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#x76;&#x66;&#97;&#115;&#107;&#121;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;">&#x76;&#x66;&#97;&#115;&#107;&#121;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a>, and link <a href="http://vfasky.com">http://vfasky.com</a></span></p>
+<h1 id="dom-attr-binders">dom attr binders</h1>
+<p>自定义的 dom 属性</p></div></div><div class="code"><div class="wrapper"><span class="hljs-string">'use strict'</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="-js">属性值可以执行 js</h2>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">mc-for</span>=<span class="hljs-value">"v , k in list"</span>&gt;</span>
+        {v} - {k + 1}
+        <span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">mc-show</span>=<span class="hljs-value">"k &gt; 1"</span>
+         <span class="hljs-attribute">mc-class</span>=<span class="hljs-value">"'item' + (k == 1 ? 'one' : '')"</span>&gt;</span>
+            {k | toString}
+        <span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span></code></pre>
+<h2 id="mc-for">mc-for</h2>
+<p>遍历数组或对象，生成DOM</p>
+<p><strong>Array</strong></p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">mc-for</span>=<span class="hljs-value">"v in list"</span>&gt;</span>{v}<span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span></code></pre>
+<p>下标的访问</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">mc-for</span>=<span class="hljs-value">"v , k in list"</span>&gt;</span>{v} - {k}<span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span></code></pre>
+<p><strong>Object</strong></p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">mc-for</span>=<span class="hljs-value">"key of data"</span>&gt;</span>{key}<span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span>
 
-exports[<span class="hljs-string">'show'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
-    el.style.display = <span class="hljs-keyword">if</span> value <span class="hljs-keyword">then</span> <span class="hljs-string">''</span> <span class="hljs-keyword">else</span> <span class="hljs-string">'none'</span>
-
-exports[<span class="hljs-string">'hide'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
-    el.style.display = <span class="hljs-keyword">if</span> value <span class="hljs-keyword">then</span> <span class="hljs-string">'none'</span> <span class="hljs-keyword">else</span> <span class="hljs-string">''</span>
-
-exports[<span class="hljs-string">'checked'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
-    el.checked = value <span class="hljs-keyword">and</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">or</span> <span class="hljs-literal">false</span>
-
-exports[<span class="hljs-string">'html'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
-    el.innerHTML = <span class="hljs-keyword">if</span> value? <span class="hljs-keyword">then</span> value <span class="hljs-keyword">else</span> <span class="hljs-string">''</span>
-
-exports[<span class="hljs-string">'text'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
-    <span class="hljs-keyword">if</span> el.textContent?
-        el.textContent = <span class="hljs-keyword">if</span> value? <span class="hljs-keyword">then</span> value <span class="hljs-keyword">else</span> <span class="hljs-string">''</span>
-    <span class="hljs-keyword">else</span>
-        el.innerText = <span class="hljs-keyword">if</span> value? <span class="hljs-keyword">then</span> value <span class="hljs-keyword">else</span> <span class="hljs-string">''</span></div></div></div></div></body></html>
+<span class="hljs-tag">&lt;<span class="hljs-title">ul</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">mc-for</span>=<span class="hljs-value">"key, val of data"</span>&gt;</span>{key} : {val}<span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span></code></pre>
+<h2 id="mc-if">mc-if</h2>
+<p>当值为 true 时，生成</p>
+<blockquote>
+<p><strong>注意</strong> 在 mc-if 的 DOM 及其子DOM 中，不要绑定 <code>mc-on-*</code> 的方法
+因为初始渲染时，DOM可能并没有生成，对应的事件并不保证能注册到。
+要确保事件能注册，请使用 <code>mc-show</code> 代替 <code>mc-if</code></p>
+</blockquote>
+<h2 id="mc-unless">mc-unless</h2>
+<p>当值为 true 时, 移除DOM</p>
+<h2 id="mc-on-">mc-on-*</h2>
+<p>绑定事件，如：<code>mc-on-click</code> <code>mc-on-submit</code> 等</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="mc-show">mc-show</h2>
+<p>当值为 true 时，显示 DOM</p></div></div><div class="code"><div class="wrapper">exports[<span class="hljs-string">'show'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
+    el.style.display = <span class="hljs-keyword">if</span> value <span class="hljs-keyword">then</span> <span class="hljs-string">''</span> <span class="hljs-keyword">else</span> <span class="hljs-string">'none'</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="mc-hide">mc-hide</h2>
+<p>当值为 true 时，隐藏 DOM</p></div></div><div class="code"><div class="wrapper">exports[<span class="hljs-string">'hide'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
+    el.style.display = <span class="hljs-keyword">if</span> value <span class="hljs-keyword">then</span> <span class="hljs-string">'none'</span> <span class="hljs-keyword">else</span> <span class="hljs-string">''</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="mc-checked">mc-checked</h2>
+<p>当值为 true 时， 选中</p></div></div><div class="code"><div class="wrapper">exports[<span class="hljs-string">'checked'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
+    el.checked = value <span class="hljs-keyword">and</span> <span class="hljs-literal">true</span> <span class="hljs-keyword">or</span> <span class="hljs-literal">false</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="mc-html">mc-html</h2>
+<p>在DOM中写入HTML, 模板中值都只会是安全的String,除非用该属性设置html</p></div></div><div class="code"><div class="wrapper">exports[<span class="hljs-string">'html'</span>] = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
+    el.innerHTML = <span class="hljs-keyword">if</span> value? <span class="hljs-keyword">then</span> value <span class="hljs-keyword">else</span> <span class="hljs-string">''</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="mc-">mc-*</h2>
+<p>设置对应属性的值(没有找到对应的自定义属性，就会执行该方式)
+如 <code>mc-style</code> ，是设置 style； &#39;mc-height&#39; 设置高度等</p></div></div></div></div></body></html>
