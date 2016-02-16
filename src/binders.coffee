@@ -98,4 +98,26 @@ exports['html'] = (el, value)->
 ## mc-*
 设置对应属性的值(没有找到对应的自定义属性，就会执行该方式)
 如 `mc-style` ，是设置 style； 'mc-height' 设置高度等
+
+## 注册自定义属性
+
+```coffee
+{Template} = require 'mcore'
+
+Template.binders['test'] = (el, value)->
+    console.log el, value
+
+
+#注册有状态的属性
+Template.binders['look'] =
+    #初始化时执行
+    init: ->
+    #DOM生成后执行
+    rendered: (el, value)->
+    #属性更新时执行
+    update: (el, value)->
+    #dom移除时执行
+    remove: (el)->
+
+```
 ###

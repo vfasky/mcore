@@ -1,6 +1,7 @@
 {
   "glob": [
       "README.md",
-      "src/*.coffee"
+      "src/template.coffee",
+      "src/binders.coffee"
   ]
 }
