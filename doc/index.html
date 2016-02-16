@@ -1,0 +1,123 @@
+<!DOCTYPE html><html lang="en"><head><title>index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h2 id="-virtual-dom-">基于 virtual-dom 的前端框架</h2>
+<p> 框架分为两部分</p>
+<ul>
+<li><code>mcore</code> 模板引擎（Core),  无依赖，支持（IE6+)</li>
+<li><code>mcoreApp</code> SPA（单页应用）框架，依赖 <code>jQuery</code> , <code>mcore</code> 支持（IE6+）</li>
+</ul>
+<blockquote>
+<p>注：开发时，依赖 webpack 及 <a href="https://www.npmjs.com/package/h2svd-loader">h2svd-loader</a></p>
+</blockquote>
+<p><strong>webpack 配置</strong></p>
+<pre><code class="lang-javascript"><span class="hljs-comment">//webpack.config.js</span>
+<span class="hljs-keyword">var</span> webpack = <span class="hljs-built_in">require</span>(<span class="hljs-string">'webpack'</span>);
+
+<span class="hljs-comment">// h2svd-loader</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">'h2svd-loader'</span>);
+
+<span class="hljs-built_in">module</span>.exports = {
+    ...
+    <span class="hljs-built_in">module</span>: {
+        loaders: [
+            {<span class="hljs-comment">// 引入 html 转 mcore virtual-dom 的 loader</span>
+                  test: <span class="hljs-regexp">/\/tpl\/.*(\.html)$/</span>, 
+                loader: <span class="hljs-string">'h2svd-loader'</span> 
+            }
+        ]
+    }
+};</code></pre>
+<h3 id="mcore-">mcore 模板引擎</h3>
+<h4 id="">原理</h4>
+<h5 id="">渲染流程</h5>
+<pre><code class="lang-flow">template=&gt;start: Template: 模板引擎
+
+render=&gt;operation: @render Html, scope
+
+virtualDomDefine=&gt;operation: Html -&gt; Virtual Dom define 依赖：h2svd-loader(开发时，通过 webpack 实现)
+
+newVirtualDomDefine=&gt;operation: new virtual dom = (Virtual Dom define)(scope)
+
+checkOldVirtualDom=&gt;condition: 是否存在 old virtual dom
+
+diffVirtualDom=&gt;operation: diff VirtualDom
+
+changeNode=&gt;end: 应用变更到 dom
+
+buildNode=&gt;end: 生成 dom
+
+template-&gt;render-&gt;virtualDomDefine-&gt;newVirtualDomDefine-&gt;checkOldVirtualDom
+checkOldVirtualDom(no)-&gt;buildNode
+checkOldVirtualDom(yes)-&gt;diffVirtualDom-&gt;changeNode</code></pre>
+<h5 id="component-">component 实现流程</h5>
+<pre><code class="lang-flow">virtualDomDefine=&gt;start: Virtual Dom define
+build=&gt;operation: build Virtual Dom
+findNodeTagName=&gt;condition: find Template.components[Node.tagName]
+buildNode=&gt;end: 生成 dom
+buildComponent=&gt;end: new Template.components[Node.tagName]
+
+virtualDomDefine-&gt;build-&gt;findNodeTagName
+findNodeTagName(yes)-&gt;buildComponent
+findNodeTagName(no)-&gt;buildNode</code></pre>
+<blockquote>
+<p>diff VirtualDom 时，component 当成没有子树的 Node (只 diff 属性),
+component 的 dom 变更，由 component 自身维护</p>
+</blockquote>
+<h4 id="demo">DEMO</h4>
+<blockquote>
+<p>模板中，变量都在 <code>scope</code> 名字空间下 （事件除外）</p>
+</blockquote>
+<pre><code class="lang-html"><span class="hljs-comment">&lt;!-- ./tpl/test.html --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">ul</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">mc-for</span>=<span class="hljs-value">"v , k in scope.list"</span> <span class="hljs-attribute">mc-on-click</span>=<span class="hljs-value">"showIx(v)"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">mc-data-ix</span>=<span class="hljs-value">"k + 1"</span>&gt;</span>{v.name}<span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span></code></pre>
+<pre><code class="lang-coffeescript"><span class="hljs-comment"># demo.coffee</span>
+{Template} = <span class="hljs-built_in">require</span> <span class="hljs-string">'mcore'</span>
+
+<span class="hljs-comment"># init tpl</span>
+tpl = <span class="hljs-keyword">new</span> Template()
+
+<span class="hljs-comment"># bind click event</span>
+tpl.showIx = <span class="hljs-function"><span class="hljs-params">(v, el, event)</span>-&gt;</span>
+    <span class="hljs-built_in">console</span>.log v, el, event
+
+ <span class="hljs-comment"># render</span>
+tpl.render <span class="hljs-built_in">require</span>(<span class="hljs-string">'./tpl/test.html'</span>),
+    <span class="hljs-attribute">list</span>: [
+       {name : <span class="hljs-string">'ok1'</span>}
+       {name : <span class="hljs-string">'ok2'</span>}
+    ]
+ , <span class="hljs-function">-&gt;</span> <span class="hljs-comment"># rendered</span>
+    <span class="hljs-built_in">document</span>.body.appendChild tpl.refs</code></pre>
+<h4 id="binders-">binders 自定义属性</h4>
+<pre><code class="lang-coffeescript">{Template} = <span class="hljs-built_in">require</span> <span class="hljs-string">'mcore'</span>
+
+Template.binders.color = <span class="hljs-function"><span class="hljs-params">(el, value)</span>-&gt;</span>
+    el.style.color = value</code></pre>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">button</span> <span class="hljs-attribute">mc-color</span>=<span class="hljs-value">"scope.color"</span>&gt;</span>Apply<span class="hljs-tag">&lt;/<span class="hljs-title">button</span>&gt;</span></code></pre>
+<h4 id="components-">components 自定义组件</h4>
+<pre><code class="lang-coffeescript">{Template, Component} = <span class="hljs-built_in">require</span> <span class="hljs-string">'mcore'</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Time</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span></span>
+    <span class="hljs-attribute">init</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-property">@on</span> <span class="hljs-string">'rendered'</span>, <span class="hljs-function">=&gt;</span>
+            setTimeout =&gt;
+                <span class="hljs-property">@set</span> <span class="hljs-string">'time'</span>, <span class="hljs-keyword">new</span> Date()
+            , <span class="hljs-number">1000</span>
+
+        <span class="hljs-property">@render</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">'./tpl/tagTime.html'</span>),
+            <span class="hljs-attribute">time</span>: <span class="hljs-keyword">new</span> Date()
+
+Template.components.time = Time</code></pre>
+<pre><code class="lang-html"><span class="hljs-comment">&lt;!-- ./tpl/tagTime.html --&gt;</span>
+{scope.time}</code></pre>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">time</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">time</span>&gt;</span></code></pre>
+<h4 id="formatters-">formatters 过滤函数</h4>
+<pre><code class="lang-coffeescript">{Template} = <span class="hljs-built_in">require</span> <span class="hljs-string">'mcore'</span>
+
+Temaplat.formatters.formNow = <span class="hljs-function"><span class="hljs-params">(value)</span>-&gt;</span>
+    moment(value).formNow()
+
+Template.formatters.toString = <span class="hljs-function"><span class="hljs-params">(value)</span>-&gt;</span>
+    String value <span class="hljs-keyword">or</span> <span class="hljs-string">''</span></code></pre>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">span</span>&gt;</span>{scope.date | formNow | toString }<span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span></code></pre></div></div></div></div></body></html>

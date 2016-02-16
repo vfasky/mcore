@@ -1,6 +1,6 @@
 
-/**
- * 基于 virtual dom 的模板引擎
+/*
+ * # 基于 virtual dom 的模板引擎
  * @date 2016-01-09 16:39:56
  * @author vfasky <vfasky@gmail.com>
  * @link http://vfasky.com
@@ -22,6 +22,47 @@ patch = require('./patch');
 Template = (function(superClass) {
   extend1(Template, superClass);
 
+
+  /*
+  ## demo
+  
+  ```coffee
+  {Template} = require 'mcore'
+  tpl = new Template()
+  
+  
+  tpl.showIx = (event, el, v, k)->
+      console.log v, k
+  
+  tpl.render require('./tpl/test.html'),
+      list: [
+         {name : 'ok1'}
+         {name : 'ok2'}
+      ]
+  , -> # rendered
+      document.body.appendChild tpl.refs
+  ```
+  
+  ```html
+  <!-- ./tpl/test.html -->
+  <ul>
+    <li mc-for="v , k in scope.list" mc-on-click="showIx(v, k)">
+      <span mc-data-ix="k + 1">{v.name}</span>
+    </li>
+  </ul>
+  
+  ```
+  
+  > **注：模板事件回调至少传入二个参数**
+  > * 第一个参数：event
+  > * 第二个参数：DOM
+  > * ... 模板中定义的参数，如：
+  > `mc-on-click="showIx(v, k)"` 中接收 v, k
+  > 需要这样 `tpl.showIx = (event, el, v, k)->`
+  
+  > *如果事件不需要传参，且不需要 `()`, 否则 h2svd-loader 编绎时，会报错*
+   */
+
   function Template() {
     this._status = 0;
     this._queueId = null;
@@ -36,6 +77,42 @@ Template = (function(superClass) {
     this.init();
   }
 
+
+  /*
+  ## 更新 `scope` 值
+  ```coffee
+  #清空 `scope.list`
+  tpl.set 'list', []
+  ```
+  **注意!**
+  
+  `key` 只能是 scope 的属性，不能更新子属性
+  如: `tpl.set 'list[0].name', 'test'` 是不正确的
+  
+  正确的做法是:
+  ```coffee
+  list = tpl.get 'list'
+  list[0].name = 'test'
+  tpl.set 'list', list
+  ```
+  
+  你可以不停地更改 scope 的值，而不用担心性能问题，
+  因为 scope 的更改，会放入队列中，放到浏览器的 nextTick 中渲染。
+  换言之，你更改N次 scope , 模板引擎只更新一次 DOM
+  
+  如果你需要在值应用到DOM后，执行回调，可以传入第三个参数
+  ```coffee
+  tpl.set 'list', list, ->
+      console.log 'dom change'
+  ```
+  
+  你也可以强制模板引擎马上渲染DOM,而不是放入队列(当然，不推荐这样做，因为会阻塞后面的代码)
+  ```coffee
+  tpl.set 'list', list, true
+  console.log 'dom change'
+  ```
+   */
+
   Template.prototype.set = function(key, value, doneOrAsync) {
     if (doneOrAsync == null) {
       doneOrAsync = null;
@@ -48,6 +125,15 @@ Template = (function(superClass) {
     this.emit('change:' + key, value);
     return this.renderQueue(doneOrAsync);
   };
+
+
+  /*
+  ## 删除 scope 的 key
+  ```coffee
+  list = tpl.remove 'list'
+  ```
+  > 同样，第二个参数，可以是回调或者强制马上渲染
+   */
 
   Template.prototype.remove = function(key, doneOrAsync) {
     if (doneOrAsync == null) {
@@ -65,6 +151,14 @@ Template = (function(superClass) {
     return this.renderQueue(doneOrAsync);
   };
 
+
+  /*
+  ## 取值
+  ```coffee
+  list = tpl.get 'list'
+  ```
+   */
+
   Template.prototype.get = function(key, defaultVal) {
     if (defaultVal == null) {
       defaultVal = null;
@@ -75,6 +169,12 @@ Template = (function(superClass) {
     return defaultVal;
   };
 
+
+  /*
+  ## 销毁实例
+  已经插入 DOM Tree 的，会被移除
+   */
+
   Template.prototype.destroy = function() {
     if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
       this.refs.parentNode.removeChild(this.refs);
@@ -82,10 +182,53 @@ Template = (function(superClass) {
     this.virtualDomDefine = null;
     this.virtualDom = null;
     this.scope = null;
-    return this.refs = null;
+    this.refs = null;
+    this._events = null;
+    this._initTask = null;
+    this._eventReged = null;
+    return this._eventListener = null;
   };
 
+
+  /*
+  ## 预留接口 , extnds 时，直接重写
+   */
+
   Template.prototype.init = function() {};
+
+
+  /*
+  ## 渲染
+   - {Function} virtualDomDefine 用于生成 virtual dom 的函数
+   - {Object} scope
+   - {Null | Function | Boolean} doneOrAsync 渲染成功时回调或者马上渲染，不放入队列
+   */
+
+  Template.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
+    var ix, scopeKeys, scopeLen;
+    this.virtualDomDefine = virtualDomDefine;
+    if (scope == null) {
+      scope = {};
+    }
+    if (doneOrAsync == null) {
+      doneOrAsync = function() {};
+    }
+    this._status = 1;
+    this.emit('beforeRender');
+    scopeKeys = objectKeys(scope);
+    scopeLen = scopeKeys.length;
+    if (scopeLen === 0) {
+      this.renderQueue(doneOrAsync);
+    } else {
+      ix = scopeLen - 1;
+      each(scopeKeys, (function(_this) {
+        return function(v, k) {
+          return _this.set(v, scope[v], k === ix && doneOrAsync || null);
+        };
+      })(this));
+    }
+    return this;
+  };
 
   Template.prototype._render = function(done) {
     var patches, scope, virtualDom;
@@ -227,32 +370,6 @@ Template = (function(superClass) {
       this.regEventCallback(event);
       return addEvent(this.refs, event, this._eventListener[event]);
     }
-  };
-
-  Template.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
-    var ix, scopeKeys, scopeLen;
-    this.virtualDomDefine = virtualDomDefine;
-    if (scope == null) {
-      scope = {};
-    }
-    if (doneOrAsync == null) {
-      doneOrAsync = function() {};
-    }
-    this._status = 1;
-    this.emit('beforeRender');
-    scopeKeys = objectKeys(scope);
-    scopeLen = scopeKeys.length;
-    if (scopeLen === 0) {
-      this.renderQueue(doneOrAsync);
-    } else {
-      ix = scopeLen - 1;
-      each(scopeKeys, (function(_this) {
-        return function(v, k) {
-          return _this.set(v, scope[v], k === ix && doneOrAsync || null);
-        };
-      })(this));
-    }
-    return this;
   };
 
   return Template;

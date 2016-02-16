@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="en"><head><title>util</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="util"><meta name="groc-project-path" content="src/util.coffee"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/util.coffee</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> date 2016-01-11 20:41:14, author vfasky <a href="&#x6d;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#102;&#x61;&#x73;&#107;&#x79;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#109;">&#118;&#102;&#x61;&#x73;&#107;&#x79;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#109;</a>, and link <a href="http://vfasky.com">http://vfasky.com</a></span></p></div></div><div class="code"><div class="wrapper"><span class="hljs-string">'use strict'</span>
+
+<span class="hljs-keyword">if</span> <span class="hljs-built_in">window</span>.Node &amp;&amp; Node.prototype &amp;&amp; !Node.prototype.contains
+    Node.prototype.contains = <span class="hljs-function"><span class="hljs-params">(arg)</span>-&gt;</span> !!(<span class="hljs-keyword">this</span>.compareDocumentPosition(arg) &amp; <span class="hljs-number">16</span>)
+
+
+_isNumberReg = <span class="hljs-regexp">/^-{0,1}\d*\.{0,1}\d+$/</span>
+
+exports.isNumber = <span class="hljs-function"><span class="hljs-params">(x)</span>-&gt;</span>
+    _isNumberReg.test x
+
+
+exports.isArray = <span class="hljs-function"><span class="hljs-params">(x)</span>-&gt;</span>
+    <span class="hljs-keyword">return</span> Array.isArray(x) <span class="hljs-keyword">if</span> Array.isArray
+    <span class="hljs-attribute">Object</span>::toString.call(x) == <span class="hljs-string">'[object Array]'</span>
+ 
+
+exports.isObject = <span class="hljs-function"><span class="hljs-params">(x)</span>-&gt;</span>
+    <span class="hljs-attribute">Object</span>::toString.call(x) == <span class="hljs-string">'[object Object]'</span>
+
+
+exports.isString = <span class="hljs-function"><span class="hljs-params">(x)</span>-&gt;</span>
+    <span class="hljs-attribute">Object</span>::toString.call(x) == <span class="hljs-string">'[object String]'</span>
+
+
+exports.isFunction = <span class="hljs-function"><span class="hljs-params">(x)</span>-&gt;</span>
+    <span class="hljs-attribute">Object</span>::toString.call(x) == <span class="hljs-string">'[object Function]'</span>
+
+
+exports.isPlainObject = <span class="hljs-function"><span class="hljs-params">(x)</span>-&gt;</span>
+    <span class="hljs-keyword">if</span> !x <span class="hljs-keyword">or</span> <span class="hljs-attribute">Object</span>::toString.call(x) != <span class="hljs-string">'[object Object]'</span> <span class="hljs-keyword">or</span>
+    x.nodeType <span class="hljs-keyword">or</span> x.setInterval
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+
+    hasOwnConstructor = Object.hasOwnProperty.call x, <span class="hljs-string">'constructor'</span>
+    hasIsPropertyOfMethod = Object.hasOwnProperty.call x.constructor.prototype, <span class="hljs-string">'isPrototypeOf'</span>
+
+    <span class="hljs-keyword">if</span> x.constructor <span class="hljs-keyword">and</span> !hasOwnConstructor <span class="hljs-keyword">and</span> !hasIsPropertyOfMethod
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+
+    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">of</span> x
+        lastKey = key
+
+    <span class="hljs-keyword">typeof</span> lastKey == <span class="hljs-string">'undefined'</span> <span class="hljs-keyword">or</span> Object.hasOwnProperty.call x, lastKey
+
+
+exports.extend = <span class="hljs-function">-&gt;</span>
+    target = arguments[<span class="hljs-number">0</span>] <span class="hljs-keyword">or</span> {}
+    length = arguments.length
+    deep = <span class="hljs-literal">false</span>
+    start = <span class="hljs-number">1</span>
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> target == <span class="hljs-string">'boolean'</span>
+        deep = target
+        target = arguments[<span class="hljs-number">1</span>] <span class="hljs-keyword">or</span> {}
+        start = <span class="hljs-number">2</span>
+
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> target != <span class="hljs-string">'object'</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> target != <span class="hljs-string">'function'</span>
+        target = {}
+
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [start...length]
+        <span class="hljs-keyword">if</span> (options = arguments[i]) != <span class="hljs-literal">null</span>
+            <span class="hljs-keyword">for</span> name <span class="hljs-keyword">of</span> options
+                src = target[name]
+                copy = options[name]
+
+                <span class="hljs-keyword">continue</span> <span class="hljs-keyword">if</span> target == copy
+
+                <span class="hljs-keyword">if</span> deep <span class="hljs-keyword">and</span> copy <span class="hljs-keyword">and</span> ( exports.isPlainObject(copy) <span class="hljs-keyword">or</span> exports.isArray(copy) )
+                    clone = {}
+                    <span class="hljs-keyword">if</span> src <span class="hljs-keyword">and</span> ( exports.isPlainObject(src) <span class="hljs-keyword">or</span> exports.isArray(src) )
+                        clone = exports.isArray(copy) <span class="hljs-keyword">and</span> [] <span class="hljs-keyword">or</span> {}
+
+                    target[name] = exports.extend deep, clone, copy
+
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> copy != <span class="hljs-string">'undefined'</span>
+                    target[name] = copy
+
+    target
+
+
+exports.setElementAttr = <span class="hljs-function"><span class="hljs-params">(el, attrName, value, noHash)</span>-&gt;</span>
+    <span class="hljs-keyword">if</span> attrName == <span class="hljs-string">'style'</span>
+        <span class="hljs-keyword">return</span> el.style.cssText = value
+
+    tagName = (el.tagName <span class="hljs-keyword">or</span> <span class="hljs-string">''</span>).toLowerCase()
+
+    <span class="hljs-keyword">if</span> attrName == <span class="hljs-string">'value'</span> <span class="hljs-keyword">and</span> tagName <span class="hljs-keyword">in</span> [<span class="hljs-string">'input'</span>, <span class="hljs-string">'textarea'</span>]
+        <span class="hljs-keyword">return</span> el.value = value
+
+    <span class="hljs-keyword">if</span> el._element <span class="hljs-keyword">and</span> el._element.setAttribute <span class="hljs-keyword">and</span> !noHash
+        el._element.setAttribute el, attrName, value
+    <span class="hljs-keyword">else</span>
+        el.setAttribute attrName, value
+
+
+exports.removeElementAttr = <span class="hljs-function"><span class="hljs-params">(el, attrName)</span>-&gt;</span>
+    <span class="hljs-keyword">if</span> el._element <span class="hljs-keyword">and</span> el._element.removeAttribute
+        el._element.removeAttribute attrName
+    <span class="hljs-keyword">else</span>
+        el.removeAttribute attrName
+
+
+exports.toArray = <span class="hljs-function"><span class="hljs-params">(listLike)</span>-&gt;</span>
+    <span class="hljs-keyword">return</span> [] <span class="hljs-keyword">if</span> !listLike
+    list = []
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..listLike.length]
+        list.push listLike[i]
+    list
+
+
+exports.each = <span class="hljs-function"><span class="hljs-params">(arr, done)</span>-&gt;</span>
+    <span class="hljs-keyword">for</span> v, k <span class="hljs-keyword">in</span> arr
+        res = done v, k
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> <span class="hljs-literal">false</span> == res
+
+
+exports.objectKeys = <span class="hljs-function"><span class="hljs-params">(obj = {})</span>-&gt;</span>
+    <span class="hljs-keyword">return</span> Object.keys(obj) <span class="hljs-keyword">if</span> Object.keys
+    keys = []
+    <span class="hljs-keyword">for</span> key <span class="hljs-keyword">of</span> obj
+        keys.push key
+
+    keys
+
+exports.nodeContains = <span class="hljs-function"><span class="hljs-params">(parentNode, node)</span>-&gt;</span>
+    parentNode.contains node
+
+exports.addEvent = <span class="hljs-function"><span class="hljs-params">(node, type, callback)</span>-&gt;</span>
+    <span class="hljs-keyword">if</span> node.addEventListener
+        node.addEventListener type, callback
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> node.attachEvent
+        node[<span class="hljs-string">'e'</span> + type + callback] = callback
+        node[type + callback] = <span class="hljs-function">-&gt;</span>
+            event = <span class="hljs-built_in">window</span>.event
+            event.target = event.srcElement
+            node[<span class="hljs-string">'e'</span> + type + callback] event
+        node.attachEvent <span class="hljs-string">'on'</span> + type, node[type + callback]
+
+        
+exports.removeEvent = <span class="hljs-function"><span class="hljs-params">(node, type, callback)</span>-&gt;</span>
+    <span class="hljs-keyword">if</span> node.removeEventListener
+        node.removeEventListener type, callback
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> node.detachEvent
+        node.detachEvent <span class="hljs-string">'on'</span> + type, node[type + callback]
+        node[type + callback] = <span class="hljs-literal">null</span>
+
+        </div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>放到下一帧执行</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">do</span> -&gt;
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">window</span>.requestAnimationFrame
+        exports.nextTick = <span class="hljs-function"><span class="hljs-params">(fun)</span>-&gt;</span>
+            <span class="hljs-built_in">window</span>.requestAnimationFrame -&gt; fun()
+
+        exports.nextTick.clear = <span class="hljs-function"><span class="hljs-params">(id)</span>-&gt;</span>
+            <span class="hljs-built_in">window</span>.cancelAnimationFrame id <span class="hljs-keyword">if</span> id
+
+    <span class="hljs-keyword">else</span>
+        exports.nextTick = <span class="hljs-function"><span class="hljs-params">(fun)</span>-&gt;</span>
+            setTimeout fun, <span class="hljs-number">0</span>
+
+        exports.nextTick.clear = <span class="hljs-function"><span class="hljs-params">(id)</span>-&gt;</span>
+            clearTimeout id <span class="hljs-keyword">if</span> id</div></div></div></div></body></html>
