@@ -130,7 +130,7 @@ Template = (function(superClass) {
   /*
   ## 删除 scope 的 key
   ```coffee
-  list = tpl.remove 'list'
+  tpl.remove 'list'
   ```
   > 同样，第二个参数，可以是回调或者强制马上渲染
    */

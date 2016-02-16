@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head><title>src/component</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="src/component"><meta name="groc-project-path" content="src/component.coffee"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src/component.coffee</div></div><div id="document"><div class="segment"><div class="comments doc-section"><div class="wrapper"><p><span class='doc-section-header'> date 2016-01-23 16:46:42, author vfasky <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#118;&#x66;&#97;&#x73;&#107;&#x79;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#x6d;">&#118;&#x66;&#97;&#x73;&#107;&#x79;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#x6d;</a>, and link <a href="http://vfasky.com">http://vfasky.com</a></span></p>
+<h1 id="">组件</h1></div></div><div class="code"><div class="wrapper"><span class="hljs-string">'use strict'</span>
+EventEmitter = <span class="hljs-built_in">require</span> <span class="hljs-string">'./eventEmitter'</span>
+Template = <span class="hljs-built_in">require</span> <span class="hljs-string">'./template'</span>
+util = <span class="hljs-built_in">require</span> <span class="hljs-string">'./util'</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="demo">demo</h2>
+<pre><code class="lang-coffeescript">{Template, Component} = <span class="hljs-built_in">require</span> <span class="hljs-string">'mcore'</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Time</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span></span>
+    <span class="hljs-attribute">init</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-comment">#渲染完成时执行</span>
+        <span class="hljs-property">@on</span> <span class="hljs-string">'rendered'</span>, <span class="hljs-function">=&gt;</span>
+            <span class="hljs-comment">#1秒后，更新time值，当渲染完成时</span>
+            <span class="hljs-comment">#会执行 rendered, 等同于，每秒</span>
+            <span class="hljs-comment">#更新一次time值</span>
+            setTimeout =&gt;
+                <span class="hljs-property">@set</span> <span class="hljs-string">'time'</span>, <span class="hljs-keyword">new</span> Date()
+            , <span class="hljs-number">1000</span>
+
+        <span class="hljs-property">@render</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">'./tpl/tagTime.html'</span>),
+            <span class="hljs-attribute">time</span>: <span class="hljs-keyword">new</span> Date(),
+            <span class="hljs-attribute">id</span>: <span class="hljs-number">2</span>
+
+<span class="hljs-comment">#注册组件</span>
+Template.components.time = Time</code></pre>
+<p><strong>模板可以只是一个变量</strong></p>
+<pre><code class="lang-html"><span class="hljs-comment">&lt;!-- ./tpl/tagTime.html --&gt;</span>
+{scope.time}</code></pre>
+<p>注册组件后，在其它模板中使用该TAG: <code>time</code></p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"test"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">time</span> <span class="hljs-attribute">mc-id</span>=<span class="hljs-value">"scope.id"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">time</span>&gt;</span>
+    <span class="hljs-comment">&lt;!--render:&lt;time id="2"&gt;Tue Feb 16 2016 16:11:58 GMT+0800 (CST)&lt;/time&gt;--&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span></code></pre></div></div><div class="code"><div class="wrapper"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Component</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EventEmitter</span></span>
+    <span class="hljs-comment">## @el 真实的 DOM</span>
+    <span class="hljs-comment">## @virtualEl 虚拟 el</span>
+    <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@el</span>, <span class="hljs-property">@virtualEl</span> = <span class="hljs-literal">null</span>)</span>-&gt;</span>
+        <span class="hljs-property">@init</span>()
+        <span class="hljs-property">@watch</span>()
+
+    <span class="hljs-comment">## 初始化</span>
+    <span class="hljs-attribute">init</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="">观察属性更新</h2>
+<pre><code class="lang-coffee"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Time</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span></span>
+    <span class="hljs-attribute">watch</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-comment">#&lt;time mc-id="scope.id"&gt;&lt;/time&gt;</span>
+        <span class="hljs-comment">#当 id 属性更新时，执行</span>
+        <span class="hljs-property">@on</span> <span class="hljs-string">'change:id'</span>, <span class="hljs-function"><span class="hljs-params">(value)</span>-&gt;</span>
+            <span class="hljs-built_in">console</span>.log value</code></pre></div></div><div class="code"><div class="wrapper">    <span class="hljs-attribute">watch</span>: <span class="hljs-function">-&gt;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="-parent-dom-">向 parent dom 发送自定义事件</h2>
+<p>当组件有自定义事件，向上级DOM对发送事件</p>
+<p>如： <time> 有一个自定义事件 &#39;change-time&#39;</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">time</span> <span class="hljs-attribute">mc-on-change-time</span>=<span class="hljs-value">"chageTime"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-title">time</span>&gt;</span></code></pre>
+<p>当 scope.time 更新时，需要通知调用它的模板引擎</p>
+<pre><code class="lang-coffee"><span class="hljs-comment">#自定义组件</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Time</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span></span>
+    <span class="hljs-attribute">init</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-comment">#渲染完成时执行</span>
+        <span class="hljs-property">@on</span> <span class="hljs-string">'rendered'</span>, <span class="hljs-function">=&gt;</span>
+            <span class="hljs-comment">#1秒后，更新time值，当渲染完成时</span>
+            <span class="hljs-comment">#会执行 rendered, 等同于，每秒</span>
+            <span class="hljs-comment">#更新一次time值</span>
+            setTimeout =&gt;
+                time = <span class="hljs-keyword">new</span> Date()
+                <span class="hljs-property">@set</span> <span class="hljs-string">'time'</span>, time
+                <span class="hljs-comment">#触发自定义事件，并传参 time</span>
+                <span class="hljs-property">@emitEvent</span> <span class="hljs-string">'change-time'</span>, [time]
+            , <span class="hljs-number">1000</span>
+
+        <span class="hljs-property">@render</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">'./tpl/tagTime.html'</span>),
+            <span class="hljs-attribute">time</span>: <span class="hljs-keyword">new</span> Date(),
+            <span class="hljs-attribute">id</span>: <span class="hljs-number">2</span>
+
+<span class="hljs-comment">#template</span>
+tpl = <span class="hljs-keyword">new</span> Template()
+tpl.changeTime = <span class="hljs-function"><span class="hljs-params">(time)</span>-&gt;</span>
+    <span class="hljs-built_in">console</span>.log time</code></pre>
+<blockquote>
+<p><strong>约定</strong> 如果是<code>click</code>等标准事件触发的自定义事件
+需将 event, el 这两个参数传回, 如</p>
+</blockquote>
+<pre><code class="lang-coffee"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Tabs</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Component</span></span>
+
+<span class="hljs-attribute">init</span>: <span class="hljs-function">-&gt;</span>
+    @.$el = $ <span class="hljs-property">@el</span>
+    <span class="hljs-property">@render</span> <span class="hljs-built_in">require</span>(<span class="hljs-string">'../tpl/tag/tabs.html'</span>),
+        <span class="hljs-attribute">index</span>: <span class="hljs-number">0</span>
+        <span class="hljs-attribute">items</span>: []
+
+<span class="hljs-comment">#当时间点击tab时，参数原路回传</span>
+<span class="hljs-attribute">changeTab</span>: <span class="hljs-function">-&gt;</span>
+    <span class="hljs-property">@emitEvent</span> <span class="hljs-string">'change-tab'</span>, arguments
+    <span class="hljs-literal">false</span></code></pre>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">ul</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"tab"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">li</span> <span class="hljs-attribute">mc-for</span>=<span class="hljs-value">"v, i in scope.items"</span>
+        <span class="hljs-attribute">mc-class</span>=<span class="hljs-value">"'item ' + (i == scope.index ? 'current' : '')"</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">a</span> <span class="hljs-attribute">mc-data-ix</span>=<span class="hljs-value">"i"</span>
+           <span class="hljs-attribute">mc-on-click</span>=<span class="hljs-value">"changeTab(v, i)"</span>
+           <span class="hljs-attribute">class</span>=<span class="hljs-value">"link"</span>&gt;</span>{v.title}<span class="hljs-tag">&lt;/<span class="hljs-title">a</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">ul</span>&gt;</span></code></pre></div></div><div class="code"><div class="wrapper">    <span class="hljs-attribute">emitEvent</span>: <span class="hljs-function"><span class="hljs-params">(eventName, args)</span>-&gt;</span>
+        proxyEventName = <span class="hljs-property">@getProxyEventName</span> eventName
+        parentView = <span class="hljs-property">@el</span>._element.template._proxy
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> !parentView
+
+        <span class="hljs-keyword">if</span> util.isFunction parentView[proxyEventName]
+            parentView[proxyEventName].apply parentView, args</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="--template-">渲染, 同 Template 方法</h2>
+<ul>
+<li>{Function} virtualDomDefine 用于生成 virtual dom 的函数</li>
+<li>{Object} scope</li>
+<li>{Null | Function | Boolean} doneOrAsync 渲染成功时回调或者马上渲染，不放入队列</li>
+</ul></div></div><div class="code"><div class="wrapper">    <span class="hljs-attribute">render</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@virtualDomDefine</span>, scope = {}, doneOrAsync = <span class="hljs-literal">true</span>)</span>-&gt;</span>
+        <span class="hljs-keyword">if</span> !<span class="hljs-property">@template</span>
+            <span class="hljs-property">@template</span> = <span class="hljs-keyword">new</span> Template()
+            <span class="hljs-property">@template</span>._proxy = @
+            <span class="hljs-property">@template</span>.once <span class="hljs-string">'rendered'</span>, <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@refs</span>)</span>=&gt;</span> <span class="hljs-property">@mount</span>()
+            <span class="hljs-property">@template</span>.<span class="hljs-literal">on</span> <span class="hljs-string">'rendered'</span>, <span class="hljs-function"><span class="hljs-params">(refs)</span>=&gt;</span> <span class="hljs-property">@emit</span> <span class="hljs-string">'rendered'</span>, refs
+
+        <span class="hljs-property">@template</span>.render <span class="hljs-property">@virtualDomDefine</span>, scope, doneOrAsync
+
+
+
+    <span class="hljs-comment">## 插入渲染完成的DOM</span>
+    <span class="hljs-attribute">mount</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-property">@el</span>.appendChild <span class="hljs-property">@refs</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="-scope-template-">更新 <code>scope</code> 同 Template 方法</h2></div></div><div class="code"><div class="wrapper">    <span class="hljs-attribute">set</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-property">@template</span>.set.apply <span class="hljs-property">@template</span>, arguments <span class="hljs-keyword">if</span> <span class="hljs-property">@template</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="-scope-template-">取 <code>scope</code>值 同 Template 方法</h2></div></div><div class="code"><div class="wrapper">    <span class="hljs-attribute">get</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-property">@template</span>.get.apply <span class="hljs-property">@template</span>, arguments <span class="hljs-keyword">if</span> <span class="hljs-property">@template</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="-scope-template-">移除 <code>scope</code>值 同 Template 方法</h2></div></div><div class="code"><div class="wrapper">    <span class="hljs-attribute">remove</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-property">@template</span>.remove.apply <span class="hljs-property">@template</span>, arguments <span class="hljs-keyword">if</span> <span class="hljs-property">@template</span>
+
+
+    <span class="hljs-comment">##属性有更新</span>
+    <span class="hljs-attribute">update</span>: <span class="hljs-function"><span class="hljs-params">(attrName, value)</span>-&gt;</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@get</span>(attrName) != value
+            <span class="hljs-property">@set</span> attrName, value
+            <span class="hljs-property">@emit</span> <span class="hljs-string">'update'</span>, attrName, value
+            <span class="hljs-property">@emit</span> <span class="hljs-string">'change:'</span> + attrName, value
+
+
+
+    <span class="hljs-comment">##取代理事件名</span>
+    <span class="hljs-attribute">getProxyEventName</span>: <span class="hljs-function"><span class="hljs-params">(eventName)</span>-&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span> <span class="hljs-keyword">if</span> !<span class="hljs-property">@virtualEl</span> <span class="hljs-keyword">or</span> !<span class="hljs-property">@virtualEl</span>.props
+        <span class="hljs-property">@virtualEl</span>.props[<span class="hljs-string">'on-'</span> + eventName]
+
+
+    <span class="hljs-attribute">destroy</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">if</span> <span class="hljs-property">@template</span>
+            <span class="hljs-property">@template</span>.destroy()
+            <span class="hljs-property">@template</span> = <span class="hljs-literal">null</span>
+
+<span class="hljs-built_in">module</span>.exports = Component</div></div></div></div></body></html>

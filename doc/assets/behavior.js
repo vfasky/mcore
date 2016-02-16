@@ -19,91 +19,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "pageTitle": "index",
         "title": "index"
       },
-      "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "基于 virtual-dom 的前端框架",
-            "slug": "-virtual-dom-"
-          },
-          "depth": 2,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 3,
-                "title": "mcore 模板引擎",
-                "slug": "mcore-"
-              },
-              "depth": 3,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 4,
-                    "title": "原理",
-                    "slug": ""
-                  },
-                  "depth": 4,
-                  "children": [
-                    {
-                      "type": "heading",
-                      "data": {
-                        "level": 5,
-                        "title": "渲染流程",
-                        "slug": ""
-                      },
-                      "depth": 5
-                    }, {
-                      "type": "heading",
-                      "data": {
-                        "level": 5,
-                        "title": "component 实现流程",
-                        "slug": "component-"
-                      },
-                      "depth": 5
-                    }
-                  ]
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 4,
-                    "title": "DEMO",
-                    "slug": "demo"
-                  },
-                  "depth": 4
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 4,
-                    "title": "binders 自定义属性",
-                    "slug": "binders-"
-                  },
-                  "depth": 4
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 4,
-                    "title": "components 自定义组件",
-                    "slug": "components-"
-                  },
-                  "depth": 4
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 4,
-                    "title": "formatters 过滤函数",
-                    "slug": "formatters-"
-                  },
-                  "depth": 4
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      "depth": 1
     }, {
       "type": "folder",
       "data": {
@@ -132,14 +48,35 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "pageTitle": "src/binders",
             "title": "binders"
           },
+          "depth": 2
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee", "Cakefile"],
+              "pygmentsLexer": "coffee-script",
+              "highlightJS": "coffeescript",
+              "multiLineComment": ["###*", " *", " ###", "###", "#", "###", "###*", "#", "###"],
+              "strictMultiLineEnd": false,
+              "singleLineComment": ["#"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/vfasky/git/wechat-platform-frontend/js/vendor/mcore/src/component.coffee",
+            "projectPath": "src/component.coffee",
+            "targetPath": "src/component",
+            "pageTitle": "src/component",
+            "title": "component"
+          },
           "depth": 2,
           "outline": [
             {
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "dom attr binders",
-                "slug": "dom-attr-binders"
+                "title": "组件",
+                "slug": ""
               },
               "depth": 1,
               "children": [
@@ -147,88 +84,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "属性值可以执行 js",
-                    "slug": "-js"
+                    "title": "demo",
+                    "slug": "demo"
                   },
                   "depth": 2
                 }, {
                   "type": "heading",
                   "data": {
                     "level": 2,
-                    "title": "mc-for",
-                    "slug": "mc-for"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-if",
-                    "slug": "mc-if"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-unless",
-                    "slug": "mc-unless"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-on-*",
-                    "slug": "mc-on-"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-show",
-                    "slug": "mc-show"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-hide",
-                    "slug": "mc-hide"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-checked",
-                    "slug": "mc-checked"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-html",
-                    "slug": "mc-html"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "mc-*",
-                    "slug": "mc-"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "注册自定义属性",
+                    "title": "观察属性更新",
                     "slug": ""
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "向 parent dom 发送自定义事件",
+                    "slug": "-parent-dom-"
+                  },
+                  "depth": 2
+                }, {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "渲染, 同 Template 方法",
+                    "slug": "--template-"
                   },
                   "depth": 2
                 }
@@ -255,101 +136,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "pageTitle": "src/template",
             "title": "template"
           },
-          "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "基于 virtual dom 的模板引擎",
-                "slug": "-virtual-dom-"
-              },
-              "depth": 1,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "demo",
-                    "slug": "demo"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "删除 scope 的 key",
-                    "slug": "-scope--key"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "取值",
-                    "slug": ""
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "销毁实例",
-                    "slug": ""
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "预留接口 , extnds 时，直接重写",
-                    "slug": "--extnds-"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "渲染",
-                    "slug": ""
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "过滤函数",
-                    "slug": ""
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "组件",
-                    "slug": ""
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "属性",
-                    "slug": ""
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "用于从 DOM 的 String 属性取得对应 Template 的 Function",
-                    "slug": "-dom--string--template--function"
-                  },
-                  "depth": 2
-                }
-              ]
-            }
-          ]
+          "depth": 2
         }
       ]
     }
