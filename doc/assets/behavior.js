@@ -69,51 +69,61 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "pageTitle": "src/component",
             "title": "component"
           },
+          "depth": 2
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".coffee", "Cakefile"],
+              "pygmentsLexer": "coffee-script",
+              "highlightJS": "coffeescript",
+              "multiLineComment": ["###*", " *", " ###", "###", "#", "###", "###*", "#", "###"],
+              "strictMultiLineEnd": false,
+              "singleLineComment": ["#"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "CoffeeScript"
+            },
+            "sourcePath": "/Users/vfasky/git/wechat-platform-frontend/js/vendor/mcore/src/formatters.coffee",
+            "projectPath": "src/formatters.coffee",
+            "targetPath": "src/formatters",
+            "pageTitle": "src/formatters",
+            "title": "formatters"
+          },
           "depth": 2,
           "outline": [
             {
               "type": "heading",
               "data": {
-                "level": 1,
-                "title": "组件",
+                "level": 2,
+                "title": "过滤函数",
                 "slug": ""
               },
-              "depth": 1,
-              "children": [
-                {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "demo",
-                    "slug": "demo"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "观察属性更新",
-                    "slug": ""
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "向 parent dom 发送自定义事件",
-                    "slug": "-parent-dom-"
-                  },
-                  "depth": 2
-                }, {
-                  "type": "heading",
-                  "data": {
-                    "level": 2,
-                    "title": "渲染, 同 Template 方法",
-                    "slug": "--template-"
-                  },
-                  "depth": 2
-                }
-              ]
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "将值转 Number",
+                "slug": "-number"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "toFixed",
+                "slug": "tofixed"
+              },
+              "depth": 2
+            }, {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "添加过滤函数",
+                "slug": ""
+              },
+              "depth": 2
             }
           ]
         }, {

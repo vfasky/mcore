@@ -3,6 +3,7 @@
       "README.md",
       "src/template.coffee",
       "src/component.coffee",
+      "src/formatters.coffee",
       "src/binders.coffee"
   ]
 }
