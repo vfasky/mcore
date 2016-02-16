@@ -13,7 +13,7 @@
 
 ```html
 <ul>
-    <li mc-for="v , k in list">
+    <li mc-for="v , k in scope.list">
         {v} - {k + 1}
         <span mc-show="k > 1"
          mc-class="'item' + (k == 1 ? 'one' : '')">
@@ -30,25 +30,25 @@
 
 ```html
 <ul>
-    <li mc-for="v in list">{v}</li>
+    <li mc-for="v in scope.list">{v}</li>
 </ul>
 ```
 下标的访问
 
 ```html
 <ul>
-    <li mc-for="v , k in list">{v} - {k}</li>
+    <li mc-for="v , k in lscope.ist">{v} - {k}</li>
 </ul>
 ```
 
 **Object**
 ```html
 <ul>
-    <li mc-for="key of data">{key}</li>
+    <li mc-for="key of scope.data">{key}</li>
 </ul>
 
 <ul>
-    <li mc-for="key, val of data">{key} : {val}</li>
+    <li mc-for="key, val of scope.data">{key} : {val}</li>
 </ul>
 ```
 
@@ -63,6 +63,15 @@
 
 ## mc-on-*
 绑定事件，如：`mc-on-click` `mc-on-submit` 等
+
+> **注：模板事件回调至少传入二个参数**
+> * 第一个参数：event
+> * 第二个参数：DOM
+> * ... 模板中定义的参数，如：
+> `mc-on-click="showIx(v, k)"` 中接收 v, k
+> 需要这样 `tpl.showIx = (event, el, v, k)->`
+
+> *如果事件不需要传参，侧不需要 `()`, 否则 h2svd-loader 编绎时，会报错*
 ###
 
 # ## mc-show

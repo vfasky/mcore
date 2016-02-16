@@ -60,7 +60,7 @@ Template = (function(superClass) {
   > `mc-on-click="showIx(v, k)"` 中接收 v, k
   > 需要这样 `tpl.showIx = (event, el, v, k)->`
   
-  > *如果事件不需要传参，且不需要 `()`, 否则 h2svd-loader 编绎时，会报错*
+  > *如果事件不需要传参，侧不需要 `()`, 否则 h2svd-loader 编绎时，会报错*
    */
 
   function Template() {
