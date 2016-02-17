@@ -1,8 +1,8 @@
 {
-  "name": "mcore",
+  "name": "mcoreapp",
   "version": "2.0.0",
   "description": "simple MVVM",
-  "main": "index.js",
+  "main": "dist/mcoreApp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,15 +12,16 @@
   },
   "keywords": [
     "vfasky",
-    "mcore"
+    "mcore2"
   ],
   "author": "vfasky@gmail.com",
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/vfasky/mcore/issues"
   },
-  "homepage": "https://github.com/vfasky/mcore#readme",
-  "dependencies": {
+  "homepage": "https://github.com/vfasky/mcore/tree/2.0#readme",
+  "dependencies": {},
+  "devDependencies": {
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.10.0",
     "eventemitter3": "^1.1.1",

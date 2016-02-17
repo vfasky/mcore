@@ -1,5 +1,5 @@
 ###*
-# 
+#
 # @date 2016-01-26 15:20:09
 # @author vfasky <vfasky@gmail.com>
 # @link http://vfasky.com
@@ -72,7 +72,7 @@ Template::removeEvent = (event, el, id)->
     # 移除事件
     if @_events[event].length == 0
         $(@refs).off event
-        
+
 
 loadPromise = (data)->
     dtd = $.Deferred()
@@ -98,7 +98,7 @@ loadPromise = (data)->
             dtd.resolve vData
         .fail (err)->
             dtd.reject err
-        
+
     dtd.promise()
 
 class BaseClass extends EventEmitter
@@ -140,7 +140,7 @@ class BaseClass extends EventEmitter
             @template._proxy = @
 
         dtd = $.Deferred()
-        
+
         loadPromise(scope).then (scope)=>
             @template.render @virtualDomDefine, scope, (refs)=>
                 @emit 'rendered', refs
@@ -149,7 +149,7 @@ class BaseClass extends EventEmitter
             dtd.reject err
 
         dtd.promise()
-        
+
 
     set: (key, value, doneOrAsync)->
         return if !@template
@@ -165,12 +165,12 @@ class BaseClass extends EventEmitter
 
     remove: ->
         @template.remove.apply @template, arguments if @template
-        
+
 
     clone: (value)->
         util.extend true, value
 
-        
+
     destroy: ->
         @template.destroy() if @template
 

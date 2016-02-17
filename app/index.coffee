@@ -1,17 +1,17 @@
 ###*
-# 
+#
 # @date 2016-01-26 11:37:47
 # @author vfasky <vfasky@gmail.com>
 # @link http://vfasky.com
 ###
 'use strict'
 
-mcore = require 'mcore'
+mcoreApp = require 'mcore'
 
-mcore.App = require './app'
-mcore.Route = require './route'
-mcore.BaseClass = require './baseClass'
-mcore.View = require './view'
-mcore.http = require './http'
+mcoreApp.App = require './app'
+mcoreApp.Route = require './route'
+mcoreApp.BaseClass = require './baseClass'
+mcoreApp.View = require './view'
+mcoreApp.http = require './http'
 
-module.exports = mcore
+module.exports = mcoreApp

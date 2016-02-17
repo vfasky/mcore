@@ -20,7 +20,9 @@ module.exports = {
     ],
     resolve: {
         extensions: ['', '.coffee', '.js'],
-        alias: {}
+        alias: {
+            mcore: __dirname + '/dist/mcore.js'
+        }
     },
     module: {
         loaders: [{
@@ -28,5 +30,5 @@ module.exports = {
             loader: "coffee-loader"
         }, ]
     },
-    externals: ['jquery', 'mcore']
+    externals: ['jquery']
 };

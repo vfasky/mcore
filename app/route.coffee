@@ -2,7 +2,7 @@
  * 路由
  * @module mcore/route
  * @author vfasky <vfasky@gmail.com>
- * @example 
+ * @example
  * route = new mcore.Route()
  *
  * route.add '/index/:id', (id)->
@@ -10,10 +10,10 @@
  *
  * route.add '/show/*', (name)->
  *     console.log name
- * 
+ *
  * route.add '/get/:id?', (id)->
  *     console.log id # or undefined
- * 
+ *
  * route.add 'user user/:id', (id)->
  *     console.log route.lookup('user', id:1) #/user/1
  *
@@ -24,9 +24,9 @@
 {util} = require 'mcore'
 
 ###*
- * 将路径转化为正则 
+ * 将路径转化为正则
  * @author vfasky <vfasky@gmail.com>
- * 
+ *
 ###
 pathToRegexp = (path, keys = [], sensitive = false, strict = false)->
 
@@ -55,13 +55,13 @@ pathToRegexp = (path, keys = [], sensitive = false, strict = false)->
                .replace /\*/g, '(.*)'
 
     new RegExp('^' + path + '$', sensitive and '' or 'i')
-                   
+
 
 
 ###*
  * 将 url 的参数转换为对象
  * @author vfasky <vfasky@gmail.com>
- * 
+ *
 ###
 pathToObject = (url)->
     url = String url
@@ -91,13 +91,13 @@ pathToObject = (url)->
             value = decodeURIComponent value
         data[key] = value
         return
-    
+
     data
 
 ###*
  * 路由
  * @author vfasky <vfasky@gmail.com>
- * 
+ *
 ###
 Route = (
     @hashchange = Route.changeByLocationHash,
@@ -111,7 +111,7 @@ Route = (
 ###*
  * 开始监听路由
  * @author vfasky <vfasky@gmail.com>
- * 
+ *
 ###
 Route::run = ->
     @hashchange (url)=>
@@ -134,7 +134,7 @@ Route::add = (path, fn)->
         reg: reg
         keys: keys
         fn: fn
-        
+
     @
 
 
@@ -163,7 +163,7 @@ Route::match = (url)->
 
         isMatch = true
         context = pathToObject argStr
-        
+
         data = {}
         args = []
         for i in [1...ref.length]
@@ -186,7 +186,7 @@ Route::match = (url)->
             context: context
             keys: v.keys
             data: data
-        
+
         v.fn.apply env, args
         return
 
@@ -196,7 +196,7 @@ Route::match = (url)->
 ###*
  * 通过 hashchange 触发
  * @author vfasky <vfasky@gmail.com>
- * 
+ *
 ###
 Route.changeByLocationHash = (emit)->
     hashChanged = ->
@@ -233,4 +233,3 @@ exports = module.exports =
     pathToRegexp: pathToRegexp
     pathToObject: pathToObject
     Route: Route
-

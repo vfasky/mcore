@@ -11,18 +11,24 @@ module.exports = {
         libraryTarget: 'umd'
     },
     module: {
-        loaders: [
-            { test: /\/tpl\/.*(\.html)$/, loader: 'h2svd-loader' }
-        ]
+        loaders: [{
+            test: /\/tpl\/.*(\.html)$/,
+            loader: 'h2svd-loader'
+        }, {
+            test: /\.coffee$/,
+            loader: "coffee-loader"
+        }]
     },
     resolve: {
+        extensions: ['', '.coffee', '.js'],
+
         jquery: 'jQuery',
         alias: {
             mcore: __dirname + '/../../dist/mcore.js',
             mcoreApp: __dirname + '/../../dist/mcoreApp.js'
         }
     },
-    externals: { 
+    externals: {
         jquery: 'jQuery'
     }
 };

@@ -19,3 +19,8 @@ coverage
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 *.swp
+
+src/*.js
+app/*.js
+ext/binder/*.js
+ext/ui/*.js

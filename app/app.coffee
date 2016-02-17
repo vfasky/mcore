@@ -26,14 +26,14 @@ class App extends EventEmitter
 
         # 中间件
         @_middlewares = []
-        
+
         return
-    
+
     route: (path, viewName)->
         self = @
         @router.add path, ->
             self.runView viewName, @, arguments
-        
+
         @
 
     # 添加中间件
@@ -110,7 +110,7 @@ class App extends EventEmitter
                 @curView = null
 
         @_onLoadViw = true
-    
+
         @_initView View, viewName
 
     run: ->

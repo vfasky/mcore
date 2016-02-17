@@ -1,5 +1,5 @@
 ###*
-# view 
+# view
 # @date 2016-01-26 15:10:13
 # @author vfasky <vfasky@gmail.com>
 # @link http://vfasky.com
@@ -23,7 +23,7 @@ class View extends require('./baseClass')
         return if document.title == @title
 
         document.title = @title
-        
+
         if @isWeixinBrowser and @isIOS
             $iframe = $ '<iframe src="/favicon.ico"></iframe>'
 
