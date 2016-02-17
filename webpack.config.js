@@ -7,8 +7,8 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: {
-        mcore: './src/index.js',
-        mcoreApp: './app/index.js',
+        mcore: './src/index',
+        mcoreApp: './app/index',
     },
     output: {
         path: __dirname + '/dist',
@@ -19,8 +19,14 @@ module.exports = {
         new webpack.IgnorePlugin(/jsdom$/)
     ],
     resolve: {
-        alias: {
-        }
+        extensions: ['', '.coffee', '.js'],
+        alias: {}
+    },
+    module: {
+        loaders: [{
+            test: /\.coffee$/,
+            loader: "coffee-loader"
+        }, ]
     },
     externals: ['jquery', 'mcore']
 };
