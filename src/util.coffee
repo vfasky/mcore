@@ -1,5 +1,5 @@
 ###*
-# 
+#
 # @date 2016-01-11 20:41:14
 # @author vfasky <vfasky@gmail.com>
 # @link http://vfasky.com
@@ -19,7 +19,7 @@ exports.isNumber = (x)->
 exports.isArray = (x)->
     return Array.isArray(x) if Array.isArray
     Object::toString.call(x) == '[object Array]'
- 
+
 
 exports.isObject = (x)->
     Object::toString.call(x) == '[object Object]'
@@ -89,6 +89,9 @@ exports.setElementAttr = (el, attrName, value, noHash)->
     if attrName == 'style'
         return el.style.cssText = value
 
+    if attrName == 'class'
+        return el.className = value
+
     tagName = (el.tagName or '').toLowerCase()
 
     if attrName == 'value' and tagName in ['input', 'textarea']
@@ -143,7 +146,7 @@ exports.addEvent = (node, type, callback)->
             node['e' + type + callback] event
         node.attachEvent 'on' + type, node[type + callback]
 
-        
+
 exports.removeEvent = (node, type, callback)->
     if node.removeEventListener
         node.removeEventListener type, callback
@@ -151,7 +154,7 @@ exports.removeEvent = (node, type, callback)->
         node.detachEvent 'on' + type, node[type + callback]
         node[type + callback] = null
 
-        
+
 
 # 放到下一帧执行
 do ->

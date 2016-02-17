@@ -1077,7 +1077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		
 		/**
-		 * 
+		 *
 		 * @date 2016-01-11 20:41:14
 		 * @author vfasky <vfasky@gmail.com>
 		 * @link http://vfasky.com
@@ -1173,6 +1173,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		  var tagName;
 		  if (attrName === 'style') {
 		    return el.style.cssText = value;
+		  }
+		  if (attrName === 'class') {
+		    return el.className = value;
 		  }
 		  tagName = (el.tagName || '').toLowerCase();
 		  if (attrName === 'value' && (tagName === 'input' || tagName === 'textarea')) {

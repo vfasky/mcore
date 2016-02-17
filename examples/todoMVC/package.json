@@ -12,5 +12,9 @@
     "h2svd-loader": "^1.0.5",
     "todomvc-app-css": "^2.0.4",
     "webpack": "^1.12.12"
+  },
+  "dependencies": {
+    "coffee-loader": "^0.7.2",
+    "coffee-script": "^1.10.0"
   }
 }
