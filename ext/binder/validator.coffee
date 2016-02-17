@@ -7,7 +7,6 @@
 'use strict'
 
 $ = require 'jquery'
-{Template, util} = require 'mcore'
 
 require '../vendor/jquery.serialize-object'
 
@@ -123,124 +122,126 @@ _errMsg =
     isMobile: '手机格式不正确'
     isTel: '座机格式不正确'
 
+module.exports = (mcore)->
+    {Template, util} = mcore
 
-# 解释验证规则
-parseValidator = ($el, rules = [])->
-    name = $el.attr 'name'
-    return false if !name
+    # 解释验证规则
+    parseValidator = ($el, rules = [])->
+        name = $el.attr 'name'
+        return false if !name
 
-    util.each $el.attr('validator').split('|'), (v)->
-        ix = String(v).indexOf ' err:'
-        if ix != -1
-            eT = v.split(' err:')
-            v = eT[0]
-            diyErr = eT[1]
+        util.each $el.attr('validator').split('|'), (v)->
+            ix = String(v).indexOf ' err:'
+            if ix != -1
+                eT = v.split(' err:')
+                v = eT[0]
+                diyErr = eT[1]
 
-        args = $.grep v.split(' '), (s)=>
-            $.trim(s).length > 0
+            args = $.grep v.split(' '), (s)=>
+                $.trim(s).length > 0
 
 
-        ruleType = args[0]
-        checkRule = _rule[ruleType]
+            ruleType = args[0]
+            checkRule = _rule[ruleType]
 
-        if !checkRule
-            console.log "validator rule: #{ruleType} undefined"
-            return
+            if !checkRule
+                console.log "validator rule: #{ruleType} undefined"
+                return
 
-        if diyErr
-            err = diyErr
-        else
-            if $.isFunction(_errMsg[ruleType])
-                msgArgs = args.slice 0
-                msgArgs.splice 0, 1
-                err = _errMsg[ruleType].apply $el[0], msgArgs
+            if diyErr
+                err = diyErr
             else
-                err = _errMsg[ruleType] or 'error'
+                if $.isFunction(_errMsg[ruleType])
+                    msgArgs = args.slice 0
+                    msgArgs.splice 0, 1
+                    err = _errMsg[ruleType].apply $el[0], msgArgs
+                else
+                    err = _errMsg[ruleType] or 'error'
 
-        args[0] = $el
-        args[1] = @$el.find(args[1]).eq 0 if ruleType == 'equals'
+            args[0] = $el
+            args[1] = @$el.find(args[1]).eq 0 if ruleType == 'equals'
 
-        rules.push
-            name: name
-            type: ruleType
-            rule: checkRule
-            args: args
-            err: err
+            rules.push
+                name: name
+                type: ruleType
+                rule: checkRule
+                args: args
+                err: err
 
-# 取规则
-getRules = ($form)->
-    rules = []
+    # 取规则
+    getRules = ($form)->
+        rules = []
 
-    $form.find('[validator]').each ->
-        parseValidator $(@), rules
+        $form.find('[validator]').each ->
+            parseValidator $(@), rules
 
-    rules
+        rules
 
-# 取对应name的值
-getNameValue = (data, name, $el)->
-    name = String(name)
-    if -1 == name.indexOf('[')
-        return data[name] or ''
+    # 取对应name的值
+    getNameValue = (data, name, $el)->
+        name = String(name)
+        if -1 == name.indexOf('[')
+            return data[name] or ''
 
-    $el.val().trim()
+        $el.val().trim()
 
 
-Template.binders['validator'] =
-    rendered: (el, value)->
-        if el.tagName.toLowerCase() != 'form' or !el._element
-            return el.setAttribute 'validator', value
+    Template.binders['validator'] =
+        rendered: (el, value)->
+            if el.tagName.toLowerCase() != 'form' or !el._element
+                return el.setAttribute 'validator', value
 
-        callback = Template.strToFun(el, value) or ->
+            callback = Template.strToFun(el, value) or ->
 
-        $form = $ el
+            $form = $ el
 
-        $form.off('submit.validator').on 'submit.validator', ->
-            rules = getRules $form
-            data = $form.serializeObject()
-            err = null
+            $form.off('submit.validator').on 'submit.validator', ->
+                rules = getRules $form
+                data = $form.serializeObject()
+                err = null
 
-            $.each rules, (k, v)->
-                $el = v.args[0]
-                _value = getNameValue data, v.name, $el
+                $.each rules, (k, v)->
+                    $el = v.args[0]
+                    _value = getNameValue data, v.name, $el
 
-                if v.type != 'required' and (_value == '' or _value == undefined)
-                    return
+                    if v.type != 'required' and (_value == '' or _value == undefined)
+                        return
 
-                value =
-                    toString: -> String _value
-                    toNumber: -> Number _value
-                    $el: $el
-                    $form: $form
-
-                v.args[0] = value
-
-                if false == v.rule.apply(null, v.args)
-                    err =
+                    value =
+                        toString: -> String _value
+                        toNumber: -> Number _value
                         $el: $el
-                        err: v.err
                         $form: $form
-                    return false
+
+                    v.args[0] = value
+
+                    if false == v.rule.apply(null, v.args)
+                        err =
+                            $el: $el
+                            err: v.err
+                            $form: $form
+                        return false
 
 
-            callback err, data
+                callback err, data
 
-            false
-
-
-module.exports =
-    add: (x, fun, errMsg)->
-        _rule[x] = fun
-        _errMsg[x] = errMsg if errMsg
-
-    addErrMsg: (type, msg)->
-        _errMsg[type] = msg
+                false
 
 
-    check: (args...)->
-        return false if args.length < 2
-        type = args[0]
-        args.splice(0, 1)
+    validator =
+        add: (x, fun, errMsg)->
+            _rule[x] = fun
+            _errMsg[x] = errMsg if errMsg
 
-        return false if !rule[type]
+        addErrMsg: (type, msg)->
+            _errMsg[type] = msg
 
-        _rule[type].apply(null, args)
+
+        check: (args...)->
+            return false if args.length < 2
+            type = args[0]
+            args.splice(0, 1)
+
+            return false if !rule[type]
+
+            _rule[type].apply(null, args)

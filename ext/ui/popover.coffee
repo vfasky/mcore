@@ -6,52 +6,54 @@
 'use strict'
 
 $ = require 'jquery'
-{Component} = require 'mcore'
 $doc = $ document
 
-class Popover extends Component
+module.exports = (mcore)->
+    {Component} = mcore
 
-    init: ->
-        @showTime = 3000
-        @hideTimeId = null
+    class Popover extends Component
 
-    showError: (@errData)->
-        $el = @errData.$el.data('proxyEl') or @errData.$el
+        init: ->
+            @showTime = 3000
+            @hideTimeId = null
 
-        $el.off('focus.popover').focus().on 'focus.popover', =>
-            $el.removeClass 'error'
-            @hideError()
+        showError: (@errData)->
+            $el = @errData.$el.data('proxyEl') or @errData.$el
 
-        # add .error class
-        $el.addClass 'error'
-
-        # 定位
-        offset = $el.offset()
-
-        className = 'popover-top'
-        if offset.top > $doc.height() * 0.8
-            offset.top -= ($el.height() or 20)
-        else
-            offset.top += ($el.height() or 20)
-            className = 'popover-bottom'
-
-        clearTimeout @hideTimeId if @hideTimeId
-
-        @render require('./tpl/popover.html'),
-            err: @errData.err
-            className: className + ' active '
-        , =>
-            @.$el = $ @refs if !@.$el
-            @.$el.css offset
-
-            @hideTimeId = setTimeout =>
+            $el.off('focus.popover').focus().on 'focus.popover', =>
+                $el.removeClass 'error'
                 @hideError()
-            , @showTime
+
+            # add .error class
+            $el.addClass 'error'
+
+            # 定位
+            offset = $el.offset()
+
+            className = 'popover-top'
+            if offset.top > $doc.height() * 0.8
+                offset.top -= ($el.height() or 20)
+            else
+                offset.top += ($el.height() or 20)
+                className = 'popover-bottom'
+
+            clearTimeout @hideTimeId if @hideTimeId
+
+            @render require('./tpl/popover.html'),
+                err: @errData.err
+                className: className + ' active '
+            , =>
+                @.$el = $ @refs if !@.$el
+                @.$el.css offset
+
+                @hideTimeId = setTimeout =>
+                    @hideError()
+                , @showTime
 
 
-    hideError: ->
-        @set 'className', ''
+        hideError: ->
+            @set 'className', ''
 
 
 
-module.exports = Popover
+    Popover
