@@ -35,7 +35,7 @@ applyPatches = (node, currentPatches) ->
     for currentPatch in currentPatches
         switch currentPatch.type
             when REPLACE
-              node.parentNode.replaceChild currentPatch.node.render(), node
+                node.parentNode.replaceChild currentPatch.node.render(), node
             when REORDER
                 reorderChildren node, currentPatch.moves
             when PROPS
@@ -66,6 +66,8 @@ reorderChildren = (node, moves) ->
     each staticNodeList, (node) ->
         if node.nodeType == 1
             key = node.getAttribute('key')
+            # if !key and node._element
+            #     key = node._element._id
         if key
             maps[key] = node
         return
@@ -83,6 +85,9 @@ reorderChildren = (node, moves) ->
         else if move.type == 1
             # insert item
             insertNode = if maps[move.item.key] then maps[move.item.key] else if typeof move.item == 'object' then move.item.render() else document.createTextNode(move.item)
+
+
+
             staticNodeList.splice index, 0, insertNode
             node.insertBefore insertNode, node.childNodes[index] or null
         return

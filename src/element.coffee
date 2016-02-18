@@ -1,5 +1,5 @@
 ###*
-# 修改自 simple-virtual-dom 
+# 修改自 simple-virtual-dom
 # @date 2016-01-21 19:34:48
 ###
 'use strict'
@@ -46,7 +46,7 @@ class Element
             if @template
                 el._element = @
                 @el = el
-                
+
             for attr, value of @props
                 @setAttribute el, attr, value
 
@@ -82,7 +82,7 @@ class Element
 
         @el.removeAttribute attrName
 
-    
+
     destroy: ->
         return if !@template
 
@@ -99,7 +99,7 @@ class Element
 
     # 设置属性值
     setAttribute: (el, attrName, value)->
-        
+
         attrName = String(attrName).toLowerCase()
 
         # 通知组件更新
@@ -108,7 +108,7 @@ class Element
 
         # 已经绑定模板引擎
         if @template
-            
+
             # 事件注册
             if attrName.indexOf('on-') == 0
                 @template.addEvent attrName.replace('on-', ''), el, value, @_id
@@ -132,12 +132,12 @@ class Element
                         binder.binder.call @, el, value
 
                     binder.value = value
-                        
+
                     return
 
         setElementAttr el, attrName, value, true
 
-        
+
     # 绑定自定义组件
     bindComponent: ->
 

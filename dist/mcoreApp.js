@@ -193,7 +193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		
 		/**
-		 * 修改自 simple-virtual-dom 
+		 * 修改自 simple-virtual-dom
 		 * @date 2016-01-21 19:34:48
 		 */
 		'use strict';

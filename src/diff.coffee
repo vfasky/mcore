@@ -15,6 +15,7 @@ diff = (oldTree, newTree) ->
     patches = {}
     #console.log oldTree, newTree
     dfsWalk oldTree, newTree, index, patches
+    #console.log patches
     patches
 
 dfsWalk = (oldNode, newNode, index, patches) ->
@@ -24,7 +25,7 @@ dfsWalk = (oldNode, newNode, index, patches) ->
     # node is removed
     if newNode == null
         # will be removed when perform reordering, so has no needs to do anthings in here
-        # textNode content replacing
+    # textNode content replacing
     else if isString(oldNode) and isString(newNode)
         if newNode != oldNode
             currentPatch.push
@@ -41,12 +42,12 @@ dfsWalk = (oldNode, newNode, index, patches) ->
 
         # diff props
         propsPatches = diffProps(oldNode, newNode)
-        
+
         if propsPatches
             currentPatch.push
                 type: patch.PROPS
                 props: propsPatches
-            
+
         if !oldNode._component
             # diff children
             diffChildren oldNode.children, newNode.children, index, patches, currentPatch
@@ -94,7 +95,7 @@ diffProps = (oldNode, newNode) ->
         if newProps[key] != value
             count++
             propsPatches[key] = newProps[key]
-    
+
     # find out new property
     for key, value in newProps
         if !oldProps.hasOwnProperty(key)
@@ -103,7 +104,7 @@ diffProps = (oldNode, newNode) ->
 
     return null if count == 0
 
-    
+
     propsPatches
 
 
