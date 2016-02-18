@@ -186,14 +186,14 @@ module.exports = (mcore)->
         $el.val().trim()
 
 
-    Template.binders['validator'] = (el, value)->
+    Template.binders['validator'] =
+        rendered:(el, value)->
             if el.tagName.toLowerCase() != 'form' or !el._element
                 return el.setAttribute 'validator', value
 
             callback = Template.strToFun(el, value) or ->
 
             $form = $ el
-            $form.attr 'validator', 'rendered'
 
             $form.off('submit.validator').on 'submit.validator', ->
                 rules = getRules $form
