@@ -1356,12 +1356,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	applyPatches = function(node, currentPatches) {
-	  var currentPatch, j, len1;
+	  var currentPatch, j, len1, newNode;
 	  for (j = 0, len1 = currentPatches.length; j < len1; j++) {
 	    currentPatch = currentPatches[j];
 	    switch (currentPatch.type) {
 	      case REPLACE:
-	        node.parentNode.replaceChild(currentPatch.node.render(), node);
+	        if (typeof currentPatch.node === 'string') {
+	          newNode = document.createTextNode(currentPatch.node);
+	        } else {
+	          newNode = currentPatch.node.render();
+	        }
+	        node.parentNode.replaceChild(newNode, node);
 	        break;
 	      case REORDER:
 	        reorderChildren(node, currentPatch.moves);

@@ -35,7 +35,13 @@ applyPatches = (node, currentPatches) ->
     for currentPatch in currentPatches
         switch currentPatch.type
             when REPLACE
-                node.parentNode.replaceChild currentPatch.node.render(), node
+                if typeof currentPatch.node == 'string'
+                    newNode = document.createTextNode currentPatch.node
+                else
+                    newNode = currentPatch.node.render()
+
+                node.parentNode.replaceChild newNode, node
+                
             when REORDER
                 reorderChildren node, currentPatch.moves
             when PROPS
