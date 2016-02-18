@@ -18,11 +18,11 @@ module.exports = {
     resolve: {
         jquery: 'jQuery',
         alias: {
-            mcore: __dirname + '/../../dist/mcore.js',
-            mcoreApp: __dirname + '/../../dist/mcoreApp.js'
+            mcoreApp: __dirname + '/../../dist/mcoreApp.js',
+            mcore: 'mcoreApp'
         }
     },
-    externals: { 
+    externals: {
         jquery: 'jQuery'
     }
 };
