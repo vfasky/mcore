@@ -1184,7 +1184,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		  if (el._element && el._element.setAttribute && !noHash) {
 		    return el._element.setAttribute(el, attrName, value);
 		  } else {
-		    return el.setAttribute(attrName, value);
+		    if (exports.isString(value) || exports.isNumber(value)) {
+		      return el.setAttribute(attrName, value);
+		    }
 		  }
 		};
 
@@ -2187,11 +2189,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return;
 	  }
 
-	  App.prototype.route = function(path, viewName) {
+	  App.prototype.route = function(path, view) {
 	    var self;
 	    self = this;
 	    this.router.add(path, function() {
-	      return self.runView(viewName, this, arguments);
+	      return self.runView(view, this, arguments);
 	    });
 	    return this;
 	  };

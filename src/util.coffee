@@ -100,7 +100,8 @@ exports.setElementAttr = (el, attrName, value, noHash)->
     if el._element and el._element.setAttribute and !noHash
         el._element.setAttribute el, attrName, value
     else
-        el.setAttribute attrName, value
+        if exports.isString(value) or exports.isNumber(value)
+            el.setAttribute attrName, value
 
 
 exports.removeElementAttr = (el, attrName)->
