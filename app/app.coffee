@@ -29,10 +29,10 @@ class App extends EventEmitter
 
         return
 
-    route: (path, viewName)->
+    route: (path, view)->
         self = @
         @router.add path, ->
-            self.runView viewName, @, arguments
+            self.runView view, @, arguments
 
         @
 
