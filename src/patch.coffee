@@ -18,8 +18,12 @@ patch = (node, patches) ->
 
 dfsWalk = (node, walker, patches) ->
     currentPatches = patches[walker.index]
-    #console.log node
+    #console.log node._element._noDiffChild if node._element
     len = if node.childNodes then node.childNodes.length else 0
+
+    if node._element
+        len = 0 if node._element._noDiffChild or node._element._component
+
     len = 0 if node._component
     i = 0
     while i < len
@@ -41,7 +45,7 @@ applyPatches = (node, currentPatches) ->
                     newNode = currentPatch.node.render()
 
                 node.parentNode.replaceChild newNode, node
-                
+
             when REORDER
                 reorderChildren node, currentPatch.moves
             when PROPS
@@ -85,14 +89,13 @@ reorderChildren = (node, moves) ->
             if staticNodeList[index] == node.childNodes[index]
                 # maybe have been removed for inserting
                 el = node.childNodes[index]
-                el._element.destroy() if el._element and el._element.destroy
-                node.removeChild el
+                if el
+                    el._element.destroy() if el._element and el._element.destroy
+                    node.removeChild el
             staticNodeList.splice index, 1
         else if move.type == 1
             # insert item
             insertNode = if maps[move.item.key] then maps[move.item.key] else if typeof move.item == 'object' then move.item.render() else document.createTextNode(move.item)
-
-
 
             staticNodeList.splice index, 0, insertNode
             node.insertBefore insertNode, node.childNodes[index] or null

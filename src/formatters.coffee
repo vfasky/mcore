@@ -18,6 +18,15 @@ exports['toFixed'] = (x, len = 1)->
     Number(x).toFixed len
 
 ###
+## in 是否在指参数中
+```html
+<span mc-show="scope.id | in 1 2 3"></span>
+```
+###
+exports['in'] = (x, arr...)->
+    x in arr
+
+###
 ## 添加过滤函数
 
 ```coffee

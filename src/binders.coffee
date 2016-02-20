@@ -93,6 +93,8 @@ exports['checked'] = (el, value)->
 # 在DOM中写入HTML, 模板中值都只会是安全的String,除非用该属性设置html
 exports['html'] = (el, value)->
     el.innerHTML = if value? then value else ''
+    # 声明不要diff子节点
+    el._element._noDiffChild = true
 
 ###
 ## mc-*

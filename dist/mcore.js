@@ -1243,7 +1243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        props: propsPatches
 	      });
 	    }
-	    if (!oldNode._component) {
+	    if (!oldNode._component && true !== oldNode._noDiffChild) {
 	      diffChildren(oldNode.children, newNode.children, index, patches, currentPatch);
 	    }
 	  } else {
@@ -1342,6 +1342,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var child, currentPatches, i, len;
 	  currentPatches = patches[walker.index];
 	  len = node.childNodes ? node.childNodes.length : 0;
+	  if (node._element) {
+	    if (node._element._noDiffChild || node._element._component) {
+	      len = 0;
+	    }
+	  }
 	  if (node._component) {
 	    len = 0;
 	  }
@@ -1426,10 +1431,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (move.type === 0) {
 	      if (staticNodeList[index] === node.childNodes[index]) {
 	        el = node.childNodes[index];
-	        if (el._element && el._element.destroy) {
-	          el._element.destroy();
+	        if (el) {
+	          if (el._element && el._element.destroy) {
+	            el._element.destroy();
+	          }
+	          node.removeChild(el);
 	        }
-	        node.removeChild(el);
 	      }
 	      staticNodeList.splice(index, 1);
 	    } else if (move.type === 1) {
@@ -1622,7 +1629,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var util;
+	var util,
+	  slice = [].slice,
+	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	util = __webpack_require__(6);
 
@@ -1638,6 +1647,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    len = 1;
 	  }
 	  return Number(x).toFixed(len);
+	};
+
+
+	/*
+	## in 是否在指参数中
+	```html
+	<span mc-show="scope.id | in 1 2 3"></span>
+	```
+	 */
+
+	exports['in'] = function() {
+	  var arr, x;
+	  x = arguments[0], arr = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+	  return indexOf.call(arr, x) >= 0;
 	};
 
 
@@ -1756,7 +1779,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	exports['html'] = function(el, value) {
-	  return el.innerHTML = value != null ? value : '';
+	  el.innerHTML = value != null ? value : '';
+	  return el._element._noDiffChild = true;
 	};
 
 

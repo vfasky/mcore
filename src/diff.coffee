@@ -48,7 +48,7 @@ dfsWalk = (oldNode, newNode, index, patches) ->
                 type: patch.PROPS
                 props: propsPatches
 
-        if !oldNode._component
+        if !oldNode._component and true != oldNode._noDiffChild
             # diff children
             diffChildren oldNode.children, newNode.children, index, patches, currentPatch
     # nodes are not the same, replace the old node with new node
