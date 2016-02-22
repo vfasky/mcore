@@ -2858,9 +2858,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.$el = $el;
 	    this.app = app;
 	    View.__super__.constructor.call(this);
+	    this.el = this.$el[0];
 	    this.once('rendered', (function(_this) {
 	      return function(refs) {
-	        return _this.$el[0].appendChild(refs);
+	        return _this.el.appendChild(refs);
 	      };
 	    })(this));
 	  }

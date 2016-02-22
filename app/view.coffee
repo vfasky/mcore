@@ -14,9 +14,10 @@ class View extends require('./baseClass')
 
     constructor: (@$el, @app)->
         super()
+        @el = @$el[0]
 
         @once 'rendered', (refs)=>
-            @$el[0].appendChild refs
+            @el.appendChild refs
 
 
     setTitle: (@title)->
