@@ -22,41 +22,7 @@
 "use strict"
 
 {util} = require 'mcore'
-
-###*
- * 将路径转化为正则
- * @author vfasky <vfasky@gmail.com>
- *
-###
-pathToRegexp = (path, keys = [], sensitive = false, strict = false)->
-
-    return path if path instanceof RegExp
-
-    toKeys = (_, slash, format, key, capture, optional) ->
-        keys.push
-            name: key
-            optional: !!optional
-
-        slash = slash or ''
-
-        '' + (optional and '' or slash) +
-        '(?:' + (optional and slash or '') +
-        (format or '') +
-        (capture or (format and '([^/.]+?)' or '([^/]+?)')) + ')' +
-        (optional or '')
-
-
-    path = path.concat strict and '' or '/?'
-               .replace /\/\(/g, '(?:/'
-               .replace /\+/g, '__plus__'
-               .replace /(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, toKeys
-               .replace /([\/.])/g, '\\$1'
-               .replace /__plus__/g, '(.+)'
-               .replace /\*/g, '(.*)'
-
-    new RegExp('^' + path + '$', sensitive and '' or 'i')
-
-
+pathToRegexp = require 'path-to-regexp'
 
 ###*
  * 将 url 的参数转换为对象
