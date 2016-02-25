@@ -30,12 +30,12 @@ module.exports = (mcore)->
             # 定位
             offset = $el.offset()
 
-            className = 'popover-top'
+            className = 'mc-popover-top'
             if offset.top > $doc.height() * 0.8
                 offset.top -= ($el.height() or 20)
             else
                 offset.top += ($el.height() or 20)
-                className = 'popover-bottom'
+                className = 'mc-popover-bottom'
 
             clearTimeout @hideTimeId if @hideTimeId
 

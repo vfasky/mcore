@@ -2,7 +2,7 @@
 $color-red: #FF3666 !default;
 
 /* 提示框 */
-.popover {
+.mc-popover {
     position: fixed;
     top: 0;
     left: 0;
@@ -36,7 +36,7 @@ $color-red: #FF3666 !default;
 
 }
 
-.popover-inner {
+.mc-popover-inner {
     position: relative;
     background: $color-red;
     padding: 8px 16px;
@@ -47,7 +47,7 @@ $color-red: #FF3666 !default;
 
 }
 
-.popover-caret {
+.mc-popover-caret {
     position: absolute;
     left: 5px;
     top: 0;
@@ -66,11 +66,11 @@ $color-red: #FF3666 !default;
     overflow: hidden;
 }
 
-.popover-bottom .popover-caret {
+.mc-popover-bottom .mc-popover-caret {
     top: -8px;
 }
 
-.popover-top .popover-caret {
+.mc-popover-top .mc-popover-caret {
     top: auto;
     bottom: -8px;
     -webkit-transform: rotate(180deg);
