@@ -1881,6 +1881,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		  return el._element._noDiffChild = true;
 		};
 
+		exports['no-diff-child'] = function(el, value) {
+		  return el._element._noDiffChild = value && true || false;
+		};
+
 
 		/*
 		## mc-*
@@ -2118,7 +2122,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		  };
 
 		  Component.prototype.mount = function() {
-		    return this.el.appendChild(this.refs);
+		    this.el.appendChild(this.refs);
+		    return this.emit('mount', this.refs);
 		  };
 
 		  Component.prototype.set = function() {

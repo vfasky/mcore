@@ -169,6 +169,7 @@ class Component extends EventEmitter
     ## 插入渲染完成的DOM
     mount: ->
         @el.appendChild @refs
+        @emit 'mount', @refs
 
     # ## 更新 `scope` 同 Template 方法
     set: ->
