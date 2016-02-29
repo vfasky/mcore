@@ -389,14 +389,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		 * @link http://vfasky.com
 		 */
 		'use strict';
-		var EventEmitter, Template, addEvent, diff, each, extend, isArray, isFunction, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
+		var EventEmitter, Template, addEvent, diff, each, extend, isArray, isFunction, isPlainObject, nextTick, nodeContains, objectKeys, patch, ref, removeEvent,
 		  extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 		  hasProp = {}.hasOwnProperty,
 		  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 		EventEmitter = __webpack_require__(4);
 
-		ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, isArray = ref.isArray, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
+		ref = __webpack_require__(6), extend = ref.extend, nextTick = ref.nextTick, each = ref.each, isFunction = ref.isFunction, isArray = ref.isArray, isPlainObject = ref.isPlainObject, objectKeys = ref.objectKeys, addEvent = ref.addEvent, removeEvent = ref.removeEvent, nodeContains = ref.nodeContains;
 
 		diff = __webpack_require__(7);
 
@@ -511,6 +511,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 		  /*
+		  ## 取值
+		  ```coffee
+		  list = tpl.get 'list'
+		  ```
+		   */
+
+		  Template.prototype.get = function(key, defaultVal) {
+		    if (defaultVal == null) {
+		      defaultVal = null;
+		    }
+		    if (this.scope.hasOwnProperty(key)) {
+		      if (isPlainObject(this.scope[key])) {
+		        return extend(true, {}, this.scope[key]);
+		      } else if (isArray(this.scope[key])) {
+		        return extend(true, [], this.scope[key]);
+		      } else {
+		        return this.scope[key];
+		      }
+		    }
+		    return defaultVal;
+		  };
+
+
+		  /*
 		  ## 删除 scope 的 key
 		  ```coffee
 		  tpl.remove 'list'
@@ -532,24 +556,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		    this.emit('removeScope', this.scope, key);
 		    this.emit('change:' + key, null);
 		    return this.renderQueue(doneOrAsync);
-		  };
-
-
-		  /*
-		  ## 取值
-		  ```coffee
-		  list = tpl.get 'list'
-		  ```
-		   */
-
-		  Template.prototype.get = function(key, defaultVal) {
-		    if (defaultVal == null) {
-		      defaultVal = null;
-		    }
-		    if (this.scope.hasOwnProperty(key)) {
-		      return this.scope[key];
-		    }
-		    return defaultVal;
 		  };
 
 

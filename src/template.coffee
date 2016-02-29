@@ -9,7 +9,7 @@
 EventEmitter = require './eventEmitter'
 
 {
-    extend, nextTick, each, isFunction, isArray,
+    extend, nextTick, each, isFunction, isArray, isPlainObject,
     objectKeys, addEvent, removeEvent, nodeContains
 } = require './util'
 
@@ -137,6 +137,23 @@ class Template extends EventEmitter
         @emit 'change:' + key, value
         @renderQueue doneOrAsync
 
+    ###
+    ## 取值
+    ```coffee
+    list = tpl.get 'list'
+    ```
+    ###
+    get: (key, defaultVal = null)->
+        if @scope.hasOwnProperty(key)
+            if isPlainObject(@scope[key])
+                return extend true, {}, @scope[key]
+            else if isArray(@scope[key])
+                return extend true, [], @scope[key]
+            else
+                return @scope[key]
+
+        return defaultVal
+
 
     ###
     ## 删除 scope 的 key
@@ -156,17 +173,6 @@ class Template extends EventEmitter
         @emit 'change:' + key, null
         @renderQueue doneOrAsync
 
-
-    ###
-    ## 取值
-    ```coffee
-    list = tpl.get 'list'
-    ```
-    ###
-    get: (key, defaultVal = null)->
-        if @scope.hasOwnProperty(key)
-            return @scope[key]
-        return defaultVal
 
 
     ###
