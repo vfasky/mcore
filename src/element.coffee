@@ -134,7 +134,6 @@ class Element
                     binder.value = value
 
                     return
-
         setElementAttr el, attrName, value, true
 
 

@@ -1793,6 +1793,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return el._element._noDiffChild = value && true || false;
 	};
 
+	exports['selected'] = {
+	  rendered: function(el, value) {
+	    return el.value = value;
+	  }
+	};
+
 
 	/*
 	## mc-*

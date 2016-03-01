@@ -102,6 +102,9 @@ exports['no-diff-child'] = (el, value)->
     # 声明不要diff子节点
     el._element._noDiffChild = value and true or false
 
+exports['selected'] = 
+    rendered: (el, value)->
+        el.value = value
 ###
 ## mc-*
 设置对应属性的值(没有找到对应的自定义属性，就会执行该方式)
