@@ -137,6 +137,7 @@ class Template extends EventEmitter
         @emit 'change:' + key, value
         @renderQueue doneOrAsync
 
+
     ###
     ## 取值
     ```coffee
@@ -153,6 +154,7 @@ class Template extends EventEmitter
                 return @scope[key]
 
         return defaultVal
+
 
 
     ###
@@ -172,7 +174,6 @@ class Template extends EventEmitter
         @emit 'removeScope', @scope, key
         @emit 'change:' + key, null
         @renderQueue doneOrAsync
-
 
 
     ###
