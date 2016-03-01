@@ -1891,6 +1891,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Component(el, virtualEl) {
 	    this.el = el;
 	    this.virtualEl = virtualEl != null ? virtualEl : null;
+	    this.template = new Template();
+	    this.template._proxy = this;
+	    this._isInit = false;
 	    this.init();
 	    this.watch();
 	  }
@@ -2011,9 +2014,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (doneOrAsync == null) {
 	      doneOrAsync = true;
 	    }
-	    if (!this.template) {
-	      this.template = new Template();
-	      this.template._proxy = this;
+	    if (false === this._isInit) {
+	      this._isInit = true;
 	      this.template.once('rendered', (function(_this) {
 	        return function(refs1) {
 	          _this.refs = refs1;
