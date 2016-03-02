@@ -92,10 +92,8 @@ class Template extends EventEmitter
         ## 必须是可被序列化成JSON的值
         @scope = {}
 
-        @_plus()
         @init()
 
-    _plus: ->
 
     ###
     ## 更新 `scope` 值
@@ -185,6 +183,8 @@ class Template extends EventEmitter
     已经插入 DOM Tree 的，会被移除
     ###
     destroy: ->
+        @emit 'destroy'
+        
         if @refs and @refs.parentNode and @refs.parentNode.removeChild
             @refs.parentNode.removeChild @refs
 
@@ -219,9 +219,9 @@ class Template extends EventEmitter
         if scopeLen == 0
             @renderQueue doneOrAsync
         else
-            ix = scopeLen - 1
-            each scopeKeys, (v, k)=>
-                @set v, scope[v], k == ix and doneOrAsync or null
+            #ix = scopeLen - 1
+            each scopeKeys, (v)=> @set v, scope[v]
+            @renderQueue doneOrAsync
 
         this
 
@@ -231,6 +231,7 @@ class Template extends EventEmitter
         scope = extend true, @scope
 
         {virtualDom} = @virtualDomDefine scope, @
+        @_status = 2
         ## 未渲染，不用对比
         if @virtualDom == null
             @virtualDom = virtualDom
@@ -246,9 +247,10 @@ class Template extends EventEmitter
             ## 更新dom
             patch @refs, patches
 
-        @_status = 2
+        @_status = 3
         @emit 'rendered', @refs
-        done @refs if isFunction done
+        if isFunction done
+            done @refs
 
 
     ## 渲染队列

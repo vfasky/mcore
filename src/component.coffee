@@ -55,9 +55,12 @@ class Component extends EventEmitter
         @template._proxy = @
 
         @_isInit = false
+        @_plus()
 
         @init()
         @watch()
+
+    _plus: ->
 
     ## 初始化
     init: ->

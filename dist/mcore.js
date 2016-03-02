@@ -359,11 +359,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.virtualDomDefine = null;
 	    this.virtualDom = null;
 	    this.scope = {};
-	    this._plus();
 	    this.init();
 	  }
-
-	  Template.prototype._plus = function() {};
 
 
 	  /*
@@ -474,6 +471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 	  Template.prototype.destroy = function() {
+	    this.emit('destroy');
 	    if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
 	      this.refs.parentNode.removeChild(this.refs);
 	    }
@@ -503,7 +501,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 	  Template.prototype.render = function(virtualDomDefine, scope, doneOrAsync) {
-	    var ix, scopeKeys, scopeLen;
+	    var scopeKeys, scopeLen;
 	    this.virtualDomDefine = virtualDomDefine;
 	    if (scope == null) {
 	      scope = {};
@@ -518,12 +516,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (scopeLen === 0) {
 	      this.renderQueue(doneOrAsync);
 	    } else {
-	      ix = scopeLen - 1;
 	      each(scopeKeys, (function(_this) {
-	        return function(v, k) {
-	          return _this.set(v, scope[v], k === ix && doneOrAsync || null);
+	        return function(v) {
+	          return _this.set(v, scope[v]);
 	        };
 	      })(this));
+	      this.renderQueue(doneOrAsync);
 	    }
 	    return this;
 	  };
@@ -532,6 +530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var patches, scope, virtualDom;
 	    scope = extend(true, this.scope);
 	    virtualDom = this.virtualDomDefine(scope, this).virtualDom;
+	    this._status = 2;
 	    if (this.virtualDom === null) {
 	      this.virtualDom = virtualDom;
 	      this.refs = this.virtualDom.render();
@@ -544,7 +543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.virtualDom = virtualDom;
 	      patch(this.refs, patches);
 	    }
-	    this._status = 2;
+	    this._status = 3;
 	    this.emit('rendered', this.refs);
 	    if (isFunction(done)) {
 	      return done(this.refs);
@@ -1907,9 +1906,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.template = new Template();
 	    this.template._proxy = this;
 	    this._isInit = false;
+	    this._plus();
 	    this.init();
 	    this.watch();
 	  }
+
+	  Component.prototype._plus = function() {};
 
 	  Component.prototype.init = function() {};
 
