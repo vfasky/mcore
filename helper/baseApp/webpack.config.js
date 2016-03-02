@@ -1,5 +1,9 @@
-var webpack = require('webpack');
+require('coffee-script/register');
+
 var path = require('path');
+var webpack = require('webpack');
+var buildHtml = require('./tool/buildHtml');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
     entry: {
