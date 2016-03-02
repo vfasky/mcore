@@ -1,0 +1,21 @@
+<ul class="pagination" mc-show="scope.pageInfo.totalPage > 1">
+    <li mc-if="scope.pageInfo.currentPage > 1" mc-on-click="changePage(scope.prevPage)">
+        <a>
+            <i class="glyphicon glyphicon-chevron-left"></i>
+        </a>
+    </li>
+
+    <li mc-for="v in scope.pages">
+        <a mc-if="v.page"
+           mc-on-click="changePage(v.page)"
+           mc-class="v.cur ? 's_active' : ''">{v.page}</a>
+
+        <a mc-unless="v.page">...</a>
+    </li>
+
+    <li mc-if="scope.pageInfo.currentPage < scope.pageInfo.totalPage" mc-on-click="changePage(scope.nextPage)">
+        <a>
+            <i class="glyphicon glyphicon-chevron-right"></i>
+        </a>
+    </li>
+</ul>

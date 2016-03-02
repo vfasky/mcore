@@ -14,10 +14,14 @@ class View extends require('./baseClass')
 
     constructor: (@$el, @app)->
         super()
+        @_plus()
         @el = @$el[0]
 
         @once 'rendered', (refs)=>
             @el.appendChild refs
+
+
+    _plus: ->
 
 
     setTitle: (@title)->

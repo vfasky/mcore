@@ -170,7 +170,7 @@ class BaseClass extends EventEmitter
 
 
     destroy: ->
-        @template.destroy() if @template
+        @template.destroy()
 
 
     when: ->

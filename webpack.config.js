@@ -21,7 +21,7 @@ module.exports = {
     resolve: {
         extensions: ['', '.coffee', '.js'],
         alias: {
-            mcore: __dirname + '/dist/mcore.js'
+            mcore: __dirname + '/dist/mcore.js',
         }
     },
     module: {

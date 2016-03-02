@@ -92,8 +92,10 @@ class Template extends EventEmitter
         ## 必须是可被序列化成JSON的值
         @scope = {}
 
+        @_plus()
         @init()
 
+    _plus: ->
 
     ###
     ## 更新 `scope` 值
@@ -130,11 +132,13 @@ class Template extends EventEmitter
     ```
     ###
     set: (key, value, doneOrAsync = null)->
+        isChange = @scope[key] != value
         @scope[key] = value
         return if @_status == 0
 
-        @emit 'changeScope', @scope, key, value
-        @emit 'change:' + key, value
+        if isChange
+            @emit 'changeScope', @scope, key, value
+            @emit 'change:' + key, value
         @renderQueue doneOrAsync
 
 

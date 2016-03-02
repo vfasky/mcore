@@ -457,8 +457,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		    this.virtualDomDefine = null;
 		    this.virtualDom = null;
 		    this.scope = {};
+		    this._plus();
 		    this.init();
 		  }
+
+		  Template.prototype._plus = function() {};
 
 
 		  /*
@@ -497,15 +500,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		   */
 
 		  Template.prototype.set = function(key, value, doneOrAsync) {
+		    var isChange;
 		    if (doneOrAsync == null) {
 		      doneOrAsync = null;
 		    }
+		    isChange = this.scope[key] !== value;
 		    this.scope[key] = value;
 		    if (this._status === 0) {
 		      return;
 		    }
-		    this.emit('changeScope', this.scope, key, value);
-		    this.emit('change:' + key, value);
+		    if (isChange) {
+		      this.emit('changeScope', this.scope, key, value);
+		      this.emit('change:' + key, value);
+		    }
 		    return this.renderQueue(doneOrAsync);
 		  };
 
@@ -3199,9 +3206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  BaseClass.prototype.destroy = function() {
-	    if (this.template) {
-	      return this.template.destroy();
-	    }
+	    return this.template.destroy();
 	  };
 
 	  BaseClass.prototype.when = function() {
@@ -3244,6 +3249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.$el = $el;
 	    this.app = app;
 	    View.__super__.constructor.call(this);
+	    this._plus();
 	    this.el = this.$el[0];
 	    this.once('rendered', (function(_this) {
 	      return function(refs) {
@@ -3251,6 +3257,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    })(this));
 	  }
+
+	  View.prototype._plus = function() {};
 
 	  View.prototype.setTitle = function(title) {
 	    var $iframe;

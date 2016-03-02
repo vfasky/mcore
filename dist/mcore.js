@@ -359,8 +359,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.virtualDomDefine = null;
 	    this.virtualDom = null;
 	    this.scope = {};
+	    this._plus();
 	    this.init();
 	  }
+
+	  Template.prototype._plus = function() {};
 
 
 	  /*
@@ -399,15 +402,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 
 	  Template.prototype.set = function(key, value, doneOrAsync) {
+	    var isChange;
 	    if (doneOrAsync == null) {
 	      doneOrAsync = null;
 	    }
+	    isChange = this.scope[key] !== value;
 	    this.scope[key] = value;
 	    if (this._status === 0) {
 	      return;
 	    }
-	    this.emit('changeScope', this.scope, key, value);
-	    this.emit('change:' + key, value);
+	    if (isChange) {
+	      this.emit('changeScope', this.scope, key, value);
+	      this.emit('change:' + key, value);
+	    }
 	    return this.renderQueue(doneOrAsync);
 	  };
 
