@@ -79,7 +79,15 @@ http = do ->
 
         .fail (xhr, status)->
             dtd.reject xhr, status
-            networkErrCallback xhr, status, hideError
+            if !xhr.statusCode().status
+                networkErrCallback xhr, status, hideError
+            else
+                try
+                    res = $.parseJSON xhr.responseText
+                catch e
+                    res = {}
+
+                errCallback res, hideError
 
         promise = dtd.promise()
         promise.xhr = xhr
