@@ -3383,6 +3383,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      options.dataType = 'jsonp';
 	    }
 	    xhr = $.ajax(url, options);
+	    xhr.sendData = options.data;
 	    xhr.then(function(res) {
 	      if (http.isSuccess(res, this)) {
 	        return dtd.resolve(http.responseFormat(res));

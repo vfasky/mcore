@@ -42,6 +42,11 @@ module.exports = {
 
         jquery: 'jQuery',
         alias: {
+            mcoreApp: 'mcoreapp',
+            mcoreExtBinderValidator: 'mcoreapp/ext/binder/validator',
+            mcoreExtUiPopover: 'mcoreapp/ext/ui/popover',
+            mcoreExtTagPagination: 'mcoreapp/ext/tag/pagination',
+            mcoreExtPlusWatch: 'mcoreapp/ext/plus/watch'
         }
     },
     externals: {

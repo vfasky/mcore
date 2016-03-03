@@ -13,11 +13,11 @@ $ = require 'jquery'
 #默认：错误处理, 网络层面
 networkErrCallback = (xhr, status, hideError)->
     msg = 'Network Error'
-    
+
     # 后端是否返回错误信息
     if xhr.responseText
         try
-            res = JSON.parse xhr.responseText
+            res = $.parseJSON xhr.responseText
             msg = res.error if res.error
         catch error
 
@@ -62,14 +62,15 @@ http = do ->
         if  type == 'jsonp'
             options.type = 'GET'
             options.dataType = 'jsonp'
-        
+
         #console.log options
 
         xhr = $.ajax(
             url,
             options
         )
-        
+        xhr.sendData = options.data
+
         xhr.then (res)->
             if http.isSuccess(res, @)
                 dtd.resolve http.responseFormat res
@@ -79,7 +80,15 @@ http = do ->
 
         .fail (xhr, status)->
             dtd.reject xhr, status
-            networkErrCallback xhr, status, hideError
+            if !xhr.statusCode().status
+                networkErrCallback xhr, status, hideError
+            else
+                try
+                    res = $.parseJSON xhr.responseText
+                catch error
+                    res = {}
+                    
+                errCallback res, hideError
 
         promise = dtd.promise()
         promise.xhr = xhr
@@ -118,4 +127,3 @@ http.responseFormat = (res)-> res
 http.sendDataFormat = (data)-> data
 
 module.exports = http
-

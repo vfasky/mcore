@@ -25,6 +25,16 @@ module.exports = (mcore)->
 
             @_watchReg = {}
 
+        unwatchByPath: (path)->
+            reg = @_watchReg[path]
+            return !reg
+            # 取消观察
+            if reg.type == 'object'
+                Object.unobserve reg.obj, reg.observer
+            else
+                Array.unobserve reg.obj, reg.observer
+            delete @_watchReg[path]
+
         watch: (obj, root = '')->
             # 已经注册
             return if @_watchReg[root]
@@ -42,14 +52,15 @@ module.exports = (mcore)->
                     if change.type == 'add'
                         if util.isPlainObject(obj[change.name]) or util.isArray(obj[change.name])
                             @watch obj[change.name], root + '.' + change.name
+
                     else if change.type == 'delete' and @_watchReg[root + '.' + change.name]
-                        reg = @_watchReg[root + '.' + change.name]
-                        # 取消观察
-                        if reg.type == 'object'
-                            Object.unobserve reg.obj, reg.observer
-                        else
-                            Array.unobserve reg.obj, reg.observer
-                        delete @_watchReg[root + '.' + change.name]
+                        @unwatchByPath root + '.' + change.name
+
+                    else if change.type in ['reconfigure', 'update']
+                        @unwatchByPath root + '.' + change.name
+
+                        if util.isPlainObject(obj[change.name]) or util.isArray(obj[change.name])
+                            @watch obj[change.name], root + '.' + change.name
 
                 @syncScope root
 

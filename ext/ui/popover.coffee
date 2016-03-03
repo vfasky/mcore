@@ -29,6 +29,7 @@ module.exports = (mcore)->
 
             # 定位
             offset = $el.offset()
+            offset.top = offset.top - document.body.scrollTop
 
             className = 'mc-popover-top'
             if offset.top > $doc.height() * 0.8
