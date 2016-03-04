@@ -2581,7 +2581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Route.changeByHistory = function(emit) {
 	  var historyChange;
 	  if (!window.history) {
-	    Route.changeByLocationHash(emit);
+	    return Route.changeByLocationHash(emit);
 	  }
 	  historyChange = function() {
 	    return emit(window.location.hash.substring(1));
@@ -3332,7 +3332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  msg = 'Network Error';
 	  if (xhr.responseText) {
 	    try {
-	      res = JSON.parse(xhr.responseText);
+	      res = $.parseJSON(xhr.responseText);
 	      if (res.error) {
 	        msg = res.error;
 	      }
@@ -3392,8 +3392,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return errCallback(res, hideError);
 	      }
 	    }).fail(function(xhr, status) {
+	      var error, error1, res;
 	      dtd.reject(xhr, status);
-	      return networkErrCallback(xhr, status, hideError);
+	      if (!xhr.statusCode().status) {
+	        return networkErrCallback(xhr, status, hideError);
+	      } else {
+	        try {
+	          res = $.parseJSON(xhr.responseText);
+	        } catch (error1) {
+	          error = error1;
+	          res = {};
+	        }
+	        return errCallback(res, hideError);
+	      }
 	    });
 	    promise = dtd.promise();
 	    promise.xhr = xhr;

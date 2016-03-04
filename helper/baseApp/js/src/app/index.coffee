@@ -9,7 +9,7 @@
 mcoreApp = require 'mcoreapp'
 $ = require 'jquery'
 
-# 在IE9 以下浏览器，可启动该扩展，直接操作 @scope, 省去 get() set() remove()
+# 在IE9 以上浏览器，可启动该扩展，直接操作 @scope, 省去 get() set() remove()
 #require('mcoreExtPlusWatch') mcoreApp
 
 app = new mcoreApp.App $('body')

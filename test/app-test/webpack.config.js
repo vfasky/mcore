@@ -1,17 +1,9 @@
-/**
- *
- * @date 2016-01-07 21:45:16
- * @author vfasky <vfasky@gmail.com>
- */
-
 module.exports = {
     entry: {
-        mcore: './src/index',
-        mcoreApp: './app/index',
-        mcoreTest: './app-test/index'
+        test: './test',
     },
     output: {
-        path: __dirname + '/dist',
+        path: __dirname,
         filename: '[name].js',
         libraryTarget: 'umd'
     },
@@ -19,15 +11,21 @@ module.exports = {
     ],
     resolve: {
         extensions: ['', '.coffee', '.js'],
+        jquery: 'jQuery',
         alias: {
-            mcore: __dirname + '/dist/mcore.js',
+            mcoreapp: __dirname + '/../../app-test/index'
         }
     },
     module: {
         loaders: [{
             test: /\.coffee$/,
             loader: "coffee-loader"
-        }, ]
+        }, {
+            test: /\/tpl\/.*(\.html)$/,
+            loader: 'h2svd-loader?mcoreName=mcoreapp'
+        }]
     },
-    externals: ['jquery']
+    externals: {
+        jquery: 'jQuery'
+    }
 };

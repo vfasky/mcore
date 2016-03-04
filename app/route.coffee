@@ -183,7 +183,7 @@ Route.changeByLocationHash = (emit)->
 ###
 Route.changeByHistory = (emit) ->
     if !window.history
-        Route.changeByLocationHash emit
+        return Route.changeByLocationHash emit
 
     historyChange = ->
         emit window.location.hash.substring(1)
