@@ -46,7 +46,8 @@ module.exports = {
             mcoreExtBinderValidator: 'mcoreapp/ext/binder/validator',
             mcoreExtUiPopover: 'mcoreapp/ext/ui/popover',
             mcoreExtTagPagination: 'mcoreapp/ext/tag/pagination',
-            mcoreExtPlusWatch: 'mcoreapp/ext/plus/watch'
+            mcoreExtPlusWatch: 'mcoreapp/ext/plus/watch',
+            mcoreExtPlusErrorCatch: 'mcoreapp/ext/plus/errorCatch',
         }
     },
     externals: {
