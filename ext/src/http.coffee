@@ -63,7 +63,7 @@ http = do ->
             options.type = 'GET'
             options.dataType = 'jsonp'
         
-        #console.log options
+        # console.log options
 
         xhr = $.ajax(
             url,
