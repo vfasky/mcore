@@ -7,7 +7,7 @@
 		var a = typeof exports === 'object' ? factory(require("jquery")) : factory(root["jquery"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function(__WEBPACK_EXTERNAL_MODULE_16__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_17__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -66,15 +66,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	mcoreApp = __webpack_require__(14);
 
-	mcoreApp.App = __webpack_require__(15);
+	mcoreApp.util = __webpack_require__(15);
 
-	mcoreApp.Route = __webpack_require__(17);
+	mcoreApp.Template = __webpack_require__(16);
 
-	mcoreApp.BaseClass = __webpack_require__(20);
+	mcoreApp.Component = __webpack_require__(18);
 
-	mcoreApp.View = __webpack_require__(21);
+	mcoreApp.App = __webpack_require__(19);
 
-	mcoreApp.http = __webpack_require__(22);
+	mcoreApp.Route = __webpack_require__(20);
+
+	mcoreApp.BaseClass = __webpack_require__(23);
+
+	mcoreApp.View = __webpack_require__(24);
+
+	mcoreApp.http = __webpack_require__(25);
 
 	module.exports = mcoreApp;
 
@@ -2207,6 +2213,261 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/**
+	 *
+	 * 扩展 util
+	 * @author vfasky <vfasky@gmail.com>
+	 */
+	'use strict';
+	var each, util,
+	  slice = [].slice;
+
+	util = __webpack_require__(14).util;
+
+	each = util.each;
+
+	util.loadPromise = function(data) {
+	  var dtd, keys, promises;
+	  if (data == null) {
+	    data = {};
+	  }
+	  dtd = $.Deferred();
+	  keys = util.objectKeys(data);
+	  if (keys.length === 0) {
+	    dtd.resolve({});
+	  } else {
+	    promises = [];
+	    each(keys, function(v) {
+	      return promises.push(data[v]);
+	    });
+	    $.when.apply(null, promises).done(function() {
+	      var args, vData;
+	      args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+	      vData = {};
+	      each(args, (function(_this) {
+	        return function(v, k) {
+	          var key;
+	          key = keys[k];
+	          if (key) {
+	            if (util.isArray(v) && v.length === 3 && v[2].promise) {
+	              v = v[0];
+	            }
+	            return vData[key] = v;
+	          }
+	        };
+	      })(this));
+	      return dtd.resolve(vData);
+	    }).fail(function(err) {
+	      return dtd.reject(err);
+	    });
+	  }
+	  return dtd.promise();
+	};
+
+	module.exports = util;
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/**
+	 *
+	 * 扩展 template
+	 * @author vfasky <vfasky@gmail.com>
+	 */
+	'use strict';
+	var $, Template, _keyCode, mcore, util,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty,
+	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+	mcore = __webpack_require__(14);
+
+	$ = __webpack_require__(17);
+
+	util = mcore.util;
+
+	_keyCode = {
+	  keyenter: 13,
+	  keyesc: 27
+	};
+
+	Template = (function(superClass) {
+	  extend(Template, superClass);
+
+	  function Template() {
+	    return Template.__super__.constructor.apply(this, arguments);
+	  }
+
+	  Template.prototype.set = function(key, value, doneOrAsync) {
+	    if (value && util.isFunction(value.then)) {
+	      return value.then((function(_this) {
+	        return function(val) {
+	          return Template.__super__.set.call(_this, key, val, doneOrAsync);
+	        };
+	      })(this));
+	    } else {
+	      return Template.__super__.set.call(this, key, value, doneOrAsync);
+	    }
+	  };
+
+	  Template.prototype.addEventListener = function(event) {
+	    var $refs;
+	    if (!this.refs) {
+	      this._initTask.push((function(_this) {
+	        return function() {
+	          return _this.addEventListener(event);
+	        };
+	      })(this));
+	      return;
+	    }
+	    if (indexOf.call(this._eventReged, event) < 0) {
+	      this.regEventCallback(event);
+	      $refs = $(this.refs);
+	      if (event !== 'blur' && event !== 'focus') {
+	        if (_keyCode.hasOwnProperty(event)) {
+	          return $refs.on('keyup', (function(_this) {
+	            return function(e) {
+	              if (e.keyCode === _keyCode[event]) {
+	                return _this._eventListener[event].apply(_this, arguments);
+	              }
+	            };
+	          })(this));
+	        } else {
+	          return $refs.on(event, (function(_this) {
+	            return function() {
+	              return _this._eventListener[event].apply(_this, arguments);
+	            };
+	          })(this));
+	        }
+	      } else {
+	        return $refs.on(event, 'input, textarea', (function(_this) {
+	          return function() {
+	            return _this._eventListener[event].apply(_this, arguments);
+	          };
+	        })(this));
+	      }
+	    }
+	  };
+
+	  Template.prototype.removeEvent = function(event, el, id) {
+	    if (!this.refs) {
+	      return;
+	    }
+	    event = event.toLowerCase();
+	    if (false === this._events.hasOwnProperty(event)) {
+	      return;
+	    }
+	    util.each(this._events[event], (function(_this) {
+	      return function(e, i) {
+	        if (e.id === id) {
+	          _this._events[event].splice(i, 1);
+	          return false;
+	        }
+	      };
+	    })(this));
+	    if (this._events[event].length === 0) {
+	      return $(this.refs).off(event);
+	    }
+	  };
+
+	  return Template;
+
+	})(mcore.Template);
+
+	module.exports = Template;
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_17__;
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/**
+	 *
+	 * 扩展组件
+	 * @author vfasky <vfasky@gmail.com>
+	 */
+	'use strict';
+	var $, $body, $win, Component, Template, isFunction, loadPromise, mcore, ref,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(17);
+
+	mcore = __webpack_require__(14);
+
+	Template = __webpack_require__(16);
+
+	ref = __webpack_require__(15), loadPromise = ref.loadPromise, isFunction = ref.isFunction;
+
+	$win = $(window);
+
+	$body = $('body');
+
+	Component = (function(superClass) {
+	  extend(Component, superClass);
+
+	  function Component(el, virtualEl) {
+	    this.el = el;
+	    this.virtualEl = virtualEl != null ? virtualEl : null;
+	    this.$win = $win;
+	    this.$body = $body;
+	    this.template = new Template();
+	    this.template._proxy = this;
+	    this._isInit = false;
+	    this._plus();
+	    this.init();
+	    this.watch();
+	  }
+
+	  Component.prototype.render = function(virtualDomDefine, scope, doneOrSync) {
+	    var dtd;
+	    if (scope == null) {
+	      scope = {};
+	    }
+	    if (doneOrSync == null) {
+	      doneOrSync = null;
+	    }
+	    if (true === doneOrSync) {
+	      return Component.__super__.render.call(this, virtualDomDefine, scope, doneOrSync);
+	    }
+	    dtd = $.Deferred();
+	    loadPromise(scope).then((function(_this) {
+	      return function(scope) {
+	        return Component.__super__.render.call(_this, virtualDomDefine, scope, function(refs) {
+	          dtd.resolve(refs);
+	          if (isFunction(doneOrSync)) {
+	            return doneOrSync(refs);
+	          }
+	        });
+	      };
+	    })(this)).fail(function(err) {
+	      return dtd.reject(err);
+	    });
+	    return dtd.promise();
+	  };
+
+	  return Component;
+
+	})(mcore.Component);
+
+	module.exports = Component;
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/**
 	 * app
 	 * @module mcore/app
 	 * @author vfasky <vfasky@gmail.com>
@@ -2216,9 +2477,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	$ = __webpack_require__(16);
+	$ = __webpack_require__(17);
 
-	route = __webpack_require__(17);
+	route = __webpack_require__(20);
 
 	ref = __webpack_require__(14), util = ref.util, EventEmitter = ref.EventEmitter;
 
@@ -2360,13 +2621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_16__;
-
-/***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2396,7 +2651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	util = __webpack_require__(14).util;
 
-	pathToRegexp = __webpack_require__(18);
+	pathToRegexp = __webpack_require__(21);
 
 
 	/**
@@ -2600,10 +2855,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isarray = __webpack_require__(19)
+	var isarray = __webpack_require__(22)
 
 	/**
 	 * Expose `pathToRegexp`.
@@ -2996,7 +3251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports) {
 
 	module.exports = Array.isArray || function (arr) {
@@ -3005,7 +3260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3016,17 +3271,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
-	var $, $body, $win, BaseClass, Component, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, _keyCode, each, loadPromise, ref, util,
-	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-	  slice = [].slice,
+	var $, $body, $win, BaseClass, EventEmitter, Template, _id, _isIOS, _isWeixinBrowser, each, loadPromise, util,
 	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  hasProp = {}.hasOwnProperty;
 
-	ref = __webpack_require__(14), EventEmitter = ref.EventEmitter, Template = ref.Template, Component = ref.Component, util = ref.util;
+	EventEmitter = __webpack_require__(14).EventEmitter;
 
-	$ = __webpack_require__(16);
+	Template = __webpack_require__(16);
 
-	each = util.each;
+	$ = __webpack_require__(17);
+
+	util = __webpack_require__(15);
+
+	each = util.each, loadPromise = util.loadPromise;
 
 	$win = $(window);
 
@@ -3037,106 +3294,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	_isIOS = /iphone|ipad/gi.test(window.navigator.appVersion);
 
 	_id = 0;
-
-	_keyCode = {
-	  keyenter: 13,
-	  keyesc: 27
-	};
-
-	Template.prototype.addEventListener = function(event) {
-	  var $refa;
-	  if (!this.refs) {
-	    this._initTask.push((function(_this) {
-	      return function() {
-	        return _this.addEventListener(event);
-	      };
-	    })(this));
-	    return;
-	  }
-	  if (indexOf.call(this._eventReged, event) < 0) {
-	    this.regEventCallback(event);
-	    $refa = $(this.refs);
-	    if (event !== 'blur' && event !== 'focus') {
-	      if (_keyCode.hasOwnProperty(event)) {
-	        return $refa.on('keyup', (function(_this) {
-	          return function(e) {
-	            if (e.keyCode === _keyCode[event]) {
-	              return _this._eventListener[event].apply(_this, arguments);
-	            }
-	          };
-	        })(this));
-	      } else {
-	        return $refa.on(event, (function(_this) {
-	          return function() {
-	            return _this._eventListener[event].apply(_this, arguments);
-	          };
-	        })(this));
-	      }
-	    } else {
-	      return $refa.on(event, 'input, textarea', (function(_this) {
-	        return function() {
-	          return _this._eventListener[event].apply(_this, arguments);
-	        };
-	      })(this));
-	    }
-	  }
-	};
-
-	Template.prototype.removeEvent = function(event, el, id) {
-	  if (!this.refs) {
-	    return;
-	  }
-	  event = event.toLowerCase();
-	  if (false === this._events.hasOwnProperty(event)) {
-	    return;
-	  }
-	  util.each(this._events[event], (function(_this) {
-	    return function(e, i) {
-	      if (e.id === id) {
-	        _this._events[event].splice(i, 1);
-	        return false;
-	      }
-	    };
-	  })(this));
-	  if (this._events[event].length === 0) {
-	    return $(this.refs).off(event);
-	  }
-	};
-
-	loadPromise = function(data) {
-	  var dtd, keys, promises;
-	  dtd = $.Deferred();
-	  keys = util.objectKeys(data);
-	  if (keys.length === 0) {
-	    dtd.resolve({});
-	  } else {
-	    promises = [];
-	    each(keys, function(v) {
-	      return promises.push(data[v]);
-	    });
-	    $.when.apply(null, promises).done(function() {
-	      var args, vData;
-	      args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
-	      vData = {};
-	      util.each(args, (function(_this) {
-	        return function(v, k) {
-	          var key;
-	          key = keys[k];
-	          if (key) {
-	            if (util.isArray(v) && v.length === 3 && v[2].promise) {
-	              v = v[0];
-	            }
-	            return vData[key] = v;
-	          }
-	        };
-	      })(this));
-	      return dtd.resolve(vData);
-	    }).fail(function(err) {
-	      return dtd.reject(err);
-	    });
-	  }
-	  return dtd.promise();
-	};
 
 	BaseClass = (function(superClass) {
 	  extend(BaseClass, superClass);
@@ -3182,31 +3339,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return dtd.promise();
 	  };
 
-	  BaseClass.prototype.set = function(key, value, doneOrAsync) {
-	    if (!this.template) {
-	      return;
-	    }
-	    if (util.isFunction(value.then)) {
-	      return value.then((function(_this) {
-	        return function(val) {
-	          return _this.template.set(key, val, doneOrAsync);
-	        };
-	      })(this));
-	    } else {
-	      return this.template.set(key, value, doneOrAsync);
-	    }
+	  BaseClass.prototype.set = function() {
+	    return this.template.set.apply(this.template, arguments);
 	  };
 
 	  BaseClass.prototype.get = function() {
-	    if (this.template) {
-	      return this.template.get.apply(this.template, arguments);
-	    }
+	    return this.template.get.apply(this.template, arguments);
 	  };
 
 	  BaseClass.prototype.remove = function() {
-	    if (this.template) {
-	      return this.template.remove.apply(this.template, arguments);
-	    }
+	    return this.template.remove.apply(this.template, arguments);
 	  };
 
 	  BaseClass.prototype.clone = function(value) {
@@ -3231,7 +3373,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3248,7 +3390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	ref = __webpack_require__(14), Template = ref.Template, util = ref.util;
 
-	$ = __webpack_require__(16);
+	$ = __webpack_require__(17);
 
 	View = (function(superClass) {
 	  extend(View, superClass);
@@ -3305,13 +3447,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return View;
 
-	})(__webpack_require__(20));
+	})(__webpack_require__(23));
 
 	module.exports = View;
 
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3325,7 +3467,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var $, errCallback, http, networkErrCallback;
 
-	$ = __webpack_require__(16);
+	$ = __webpack_require__(17);
 
 	networkErrCallback = function(xhr, status, hideError) {
 	  var error, error1, httpCode, msg, res;
