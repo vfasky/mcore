@@ -4007,14 +4007,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		      hideError = false;
 		    }
 		    dtd = $.Deferred();
+		    data = http.sendDataFormat(data || {});
 		    options = {
 		      cache: false,
-		      data: http.sendDataFormat(data || {}),
+		      data: data,
 		      dataType: 'json',
 		      type: type || 'GET',
 		      timeout: timeout,
 		      headers: http.buildHeaders()
 		    };
+		    if (window['FormData'] && data instanceof FormData) {
+		      options.processData = false;
+		      options.contentType = false;
+		    }
 		    if (type === 'jsonp') {
 		      options.type = 'GET';
 		      options.dataType = 'jsonp';

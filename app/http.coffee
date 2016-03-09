@@ -50,14 +50,19 @@ http = do ->
         dtd = $.Deferred()
         #console.log http.buildHeaders()
 
-        options = {
+        data = http.sendDataFormat data or {}
+
+        options =
             cache: false
-            data: http.sendDataFormat data or {}
+            data: data
             dataType: 'json'
             type: type or 'GET'
             timeout: timeout
             headers: http.buildHeaders()
-        }
+
+        if window['FormData'] and data instanceof FormData
+            options.processData = false
+            options.contentType = false
 
         if  type == 'jsonp'
             options.type = 'GET'
@@ -87,7 +92,7 @@ http = do ->
                     res = $.parseJSON xhr.responseText
                 catch error
                     res = {}
-                    
+
                 errCallback res, hideError
 
         promise = dtd.promise()
