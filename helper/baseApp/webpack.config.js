@@ -5,7 +5,7 @@ var webpack = require('webpack');
 var buildHtml = require('./tool/buildHtml');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-module.exports = {
+var config = module.exports = {
     staticPath: '.',
     env: 'dev',
     entry: {

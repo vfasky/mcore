@@ -8,6 +8,10 @@
 
 mcoreApp = require 'mcore'
 
+mcoreApp.util = require './util'
+mcoreApp.Template = require './template'
+mcoreApp.Component = require './component'
+
 mcoreApp.App = require './app'
 mcoreApp.Route = require './route'
 mcoreApp.BaseClass = require './baseClass'

@@ -24,3 +24,15 @@ src/*.js
 app/*.js
 ext/binder/*.js
 ext/ui/*.js
+
+.sync/*
+
+.me_configs.data
+
+.z_sync_configs.data
+
+sync_changes.log
+
+sync_hook.script
+
+**/.Archive
