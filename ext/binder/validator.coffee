@@ -126,7 +126,7 @@ module.exports = (mcore)->
     {Template, util} = mcore
 
     # 解释验证规则
-    parseValidator = ($el, rules = [])->
+    parseValidator = ($el, rules = [], $form)->
         name = $el.attr 'name'
         return false if !name
 
@@ -159,7 +159,7 @@ module.exports = (mcore)->
                     err = _errMsg[ruleType] or 'error'
 
             args[0] = $el
-            args[1] = @$el.find(args[1]).eq 0 if ruleType == 'equals'
+            args[1] = $form.find(args[1]).eq 0 if ruleType == 'equals'
 
             rules.push
                 name: name
@@ -173,7 +173,7 @@ module.exports = (mcore)->
         rules = []
 
         $form.find('[validator]').each ->
-            parseValidator $(@), rules
+            parseValidator $(@), rules, $form
 
         rules
 
