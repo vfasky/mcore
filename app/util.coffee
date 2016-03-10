@@ -7,6 +7,7 @@
 
 {util} = require 'mcore'
 each = util.each
+$ = require 'jquery'
 
 util.loadPromise = (data = {})->
     dtd = $.Deferred()
