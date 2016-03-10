@@ -7,7 +7,7 @@
 		var a = typeof exports === 'object' ? factory(require("jquery")) : factory(root["jquery"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function(__WEBPACK_EXTERNAL_MODULE_17__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_16__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -98,13 +98,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 13 */,
 /* 14 */,
 /* 15 */,
-/* 16 */,
-/* 17 */
+/* 16 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_17__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_16__;
 
 /***/ },
+/* 17 */,
 /* 18 */,
 /* 19 */,
 /* 20 */,
@@ -495,14 +495,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	(function webpackUniversalModuleDefinition(root, factory) {
 		if(true)
-			module.exports = factory(__webpack_require__(17));
+			module.exports = factory(__webpack_require__(16));
 		else if(typeof define === 'function' && define.amd)
 			define(["jquery"], factory);
 		else {
 			var a = typeof exports === 'object' ? factory(require("jquery")) : factory(root["jquery"]);
 			for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 		}
-	})(this, function(__WEBPACK_EXTERNAL_MODULE_17__) {
+	})(this, function(__WEBPACK_EXTERNAL_MODULE_16__) {
 	return /******/ (function(modules) { // webpackBootstrap
 	/******/ 	// The module cache
 	/******/ 	var installedModules = {};
@@ -563,7 +563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		mcoreApp.util = __webpack_require__(15);
 
-		mcoreApp.Template = __webpack_require__(16);
+		mcoreApp.Template = __webpack_require__(17);
 
 		mcoreApp.Component = __webpack_require__(18);
 
@@ -2713,12 +2713,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		 * @author vfasky <vfasky@gmail.com>
 		 */
 		'use strict';
-		var each, util,
+		var $, each, util,
 		  slice = [].slice;
 
 		util = __webpack_require__(14).util;
 
 		each = util.each;
+
+		$ = __webpack_require__(16);
 
 		util.loadPromise = function(data) {
 		  var dtd, keys, promises;
@@ -2763,6 +2765,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/***/ },
 	/* 16 */
+	/***/ function(module, exports) {
+
+		module.exports = __WEBPACK_EXTERNAL_MODULE_16__;
+
+	/***/ },
+	/* 17 */
 	/***/ function(module, exports, __webpack_require__) {
 
 		
@@ -2779,7 +2787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		mcore = __webpack_require__(14);
 
-		$ = __webpack_require__(17);
+		$ = __webpack_require__(16);
 
 		util = mcore.util;
 
@@ -2875,12 +2883,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	/***/ },
-	/* 17 */
-	/***/ function(module, exports) {
-
-		module.exports = __WEBPACK_EXTERNAL_MODULE_17__;
-
-	/***/ },
 	/* 18 */
 	/***/ function(module, exports, __webpack_require__) {
 
@@ -2895,11 +2897,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 		  hasProp = {}.hasOwnProperty;
 
-		$ = __webpack_require__(17);
+		$ = __webpack_require__(16);
 
 		mcore = __webpack_require__(14);
 
-		Template = __webpack_require__(16);
+		Template = __webpack_require__(17);
 
 		ref = __webpack_require__(15), loadPromise = ref.loadPromise, isFunction = ref.isFunction;
 
@@ -2972,7 +2974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 		  hasProp = {}.hasOwnProperty;
 
-		$ = __webpack_require__(17);
+		$ = __webpack_require__(16);
 
 		route = __webpack_require__(20);
 
@@ -3772,9 +3774,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		EventEmitter = __webpack_require__(14).EventEmitter;
 
-		Template = __webpack_require__(16);
+		Template = __webpack_require__(17);
 
-		$ = __webpack_require__(17);
+		$ = __webpack_require__(16);
 
 		util = __webpack_require__(15);
 
@@ -3885,7 +3887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		ref = __webpack_require__(14), Template = ref.Template, util = ref.util;
 
-		$ = __webpack_require__(17);
+		$ = __webpack_require__(16);
 
 		View = (function(superClass) {
 		  extend(View, superClass);
@@ -3962,7 +3964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		"use strict";
 		var $, errCallback, http, networkErrCallback;
 
-		$ = __webpack_require__(17);
+		$ = __webpack_require__(16);
 
 		networkErrCallback = function(xhr, status, hideError) {
 		  var error, error1, httpCode, msg, res;
