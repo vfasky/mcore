@@ -242,6 +242,6 @@ module.exports = (mcore)->
             type = args[0]
             args.splice(0, 1)
 
-            return false if !rule[type]
+            return false if !_rule[type]
 
             _rule[type].apply(null, args)
