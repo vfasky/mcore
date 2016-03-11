@@ -24,11 +24,13 @@ util.loadPromise = (data = {})->
             vData = {}
             each args, (v, k)=>
                 key = keys[k]
-                if key
+                if key != undefined
                     # 坑
                     if util.isArray(v) and v.length == 3 and v[2].promise
                         v = v[0]
                     vData[key] = v
+
+                return
 
             dtd.resolve vData
         .fail (err)->

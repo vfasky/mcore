@@ -2249,11 +2249,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return function(v, k) {
 	          var key;
 	          key = keys[k];
-	          if (key) {
+	          if (key !== void 0) {
 	            if (util.isArray(v) && v.length === 3 && v[2].promise) {
 	              v = v[0];
 	            }
-	            return vData[key] = v;
+	            vData[key] = v;
 	          }
 	        };
 	      })(this));
