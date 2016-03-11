@@ -14,6 +14,7 @@ module.exports = (mcore)->
     class Watch
         constructor: (@scope, @syncScope = ->)->
             @_watchReg = {}
+            @_watchTotal = 0
             @watch @scope
 
         unwatch: ->
@@ -38,6 +39,8 @@ module.exports = (mcore)->
         watch: (obj, root = '')->
             # 已经注册
             return if @_watchReg[root]
+            @_watchTotal++
+            return if @_watchTotal > 2000
 
             type = 'undefined'
             if util.isPlainObject(obj)
