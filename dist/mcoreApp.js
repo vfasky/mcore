@@ -3533,6 +3533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    xhr = $.ajax(url, options);
 	    xhr.sendData = options.data;
+	    http.onBeforeSend(xhr);
 	    xhr.then(function(res) {
 	      if (http.isSuccess(res, this)) {
 	        return dtd.resolve(http.responseFormat(res));
@@ -3554,6 +3555,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return errCallback(res, hideError);
 	      }
+	    }).always(function() {
+	      return http.onComplete(xhr);
 	    });
 	    promise = dtd.promise();
 	    promise.xhr = xhr;
@@ -3585,6 +3588,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 	})();
+
+	http.onBeforeSend = function() {};
+
+	http.onComplete = function() {};
 
 	http.isSuccess = function(res) {
 	  return Number(res.code) === 1;

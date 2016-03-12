@@ -76,6 +76,8 @@ http = do ->
         )
         xhr.sendData = options.data
 
+        http.onBeforeSend xhr
+
         xhr.then (res)->
             if http.isSuccess(res, @)
                 dtd.resolve http.responseFormat res
@@ -94,6 +96,9 @@ http = do ->
                     res = {}
 
                 errCallback res, hideError
+                
+        .always ->
+            http.onComplete xhr
 
         promise = dtd.promise()
         promise.xhr = xhr
@@ -110,6 +115,12 @@ http = do ->
             ajax 'POST', url, data, hideError
         jsonp: (url, data, hideError = false) ->
             ajax 'jsonp', url, data, hideError
+
+# 注册开始发送请求事件
+http.onBeforeSend = ->
+
+# 注册请求完成事件（无论成功与否）
+http.onComplete = ->
 
 
 # 判断请求是否成功
