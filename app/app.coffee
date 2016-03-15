@@ -21,25 +21,21 @@ class App extends EventEmitter
         # 当前的 view
         @curView = null
 
-        # 标注是否正在加载view
-        @_onLoadViw = false
-
         # 中间件
         @_middlewares = []
 
-        return
 
     route: (path, view)->
         self = @
         @router.add path, ->
             self.runView view, @, arguments
 
-        @
+        this
 
     # 添加中间件
     use: (middleware)->
         @_middlewares.push middleware
-        @
+        this
 
     _runView: (done = ->)->
         @curView.instantiate.route = @env.route
@@ -80,12 +76,10 @@ class App extends EventEmitter
         @runMiddlewares =>
             @curView.instantiate.$el.appendTo @$el
             @curView.instantiate.afterRun()
-            @_onLoadViw = false
 
 
     # 启动view
     runView: (View, route, args)->
-        return if @_onLoadViw
 
         viewName = View.viewName
 
@@ -108,8 +102,6 @@ class App extends EventEmitter
                 @emit 'destroyView', @curView
                 @curView.instantiate.destroy()
                 @curView = null
-
-        @_onLoadViw = true
 
         @_initView View, viewName
 

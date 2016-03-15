@@ -2994,9 +2994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    }, options);
 		    this.router = new route.Route(this.options.routeChange);
 		    this.curView = null;
-		    this._onLoadViw = false;
 		    this._middlewares = [];
-		    return;
 		  }
 
 		  App.prototype.route = function(path, view) {
@@ -3069,17 +3067,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		    return this.runMiddlewares((function(_this) {
 		      return function() {
 		        _this.curView.instantiate.$el.appendTo(_this.$el);
-		        _this.curView.instantiate.afterRun();
-		        return _this._onLoadViw = false;
+		        return _this.curView.instantiate.afterRun();
 		      };
 		    })(this));
 		  };
 
 		  App.prototype.runView = function(View, route, args) {
 		    var viewName;
-		    if (this._onLoadViw) {
-		      return;
-		    }
 		    viewName = View.viewName;
 		    this.env = {
 		      route: route,
@@ -3102,7 +3096,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		        this.curView = null;
 		      }
 		    }
-		    this._onLoadViw = true;
 		    return this._initView(View, viewName);
 		  };
 
@@ -4028,6 +4021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    }
 		    xhr = $.ajax(url, options);
 		    xhr.sendData = options.data;
+		    http.onBeforeSend(xhr);
 		    xhr.then(function(res) {
 		      if (http.isSuccess(res, this)) {
 		        return dtd.resolve(http.responseFormat(res));
@@ -4049,6 +4043,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		        }
 		        return errCallback(res, hideError);
 		      }
+		    }).always(function() {
+		      return http.onComplete(xhr);
 		    });
 		    promise = dtd.promise();
 		    promise.xhr = xhr;
@@ -4080,6 +4076,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		    }
 		  };
 		})();
+
+		http.onBeforeSend = function() {};
+
+		http.onComplete = function() {};
 
 		http.isSuccess = function(res) {
 		  return Number(res.code) === 1;
