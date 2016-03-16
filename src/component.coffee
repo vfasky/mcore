@@ -60,10 +60,15 @@ class Component extends EventEmitter
         @init()
         @watch()
 
+
     _plus: ->
 
     ## 初始化
     init: ->
+
+    parent: ->
+        return @virtualEl.template._proxy if @virtualEl and @virtualEl.template
+        null
 
     ###
     ## 观察属性更新
@@ -150,7 +155,7 @@ class Component extends EventEmitter
     ###
     emitEvent: (eventName, args)->
         proxyEventName = @getProxyEventName eventName
-        parentView = @el._element.template._proxy
+        parentView = @parent()
         return if !parentView
 
         if util.isFunction parentView[proxyEventName]

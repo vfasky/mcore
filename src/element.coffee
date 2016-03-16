@@ -143,12 +143,12 @@ class Element
         return false if false == Template.components.hasOwnProperty @tagName
 
         el = document.createElement @tagName
+        el._element = @
         @_component = new Template.components[@tagName] el, @
 
         for attr, value of @props
             @setAttribute el, attr, value
 
-        el._element = @
         el._component = @_component
         el
 

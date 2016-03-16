@@ -351,13 +351,13 @@ return /******/ (function(modules) { // webpackBootstrap
 		      return false;
 		    }
 		    el = document.createElement(this.tagName);
+		    el._element = this;
 		    this._component = new Template.components[this.tagName](el, this);
 		    ref1 = this.props;
 		    for (attr in ref1) {
 		      value = ref1[attr];
 		      this.setAttribute(el, attr, value);
 		    }
-		    el._element = this;
 		    el._component = this._component;
 		    return el;
 		  };
@@ -2019,6 +2019,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		  Component.prototype.init = function() {};
 
+		  Component.prototype.parent = function() {
+		    if (this.virtualEl && this.virtualEl.template) {
+		      return this.virtualEl.template._proxy;
+		    }
+		    return null;
+		  };
+
 
 		  /*
 		  ## 观察属性更新
@@ -2108,7 +2115,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		  Component.prototype.emitEvent = function(eventName, args) {
 		    var parentView, proxyEventName;
 		    proxyEventName = this.getProxyEventName(eventName);
-		    parentView = this.el._element.template._proxy;
+		    parentView = this.parent();
 		    if (!parentView) {
 		      return;
 		    }
