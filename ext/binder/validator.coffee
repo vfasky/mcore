@@ -10,8 +10,14 @@ $ = require 'jquery'
 
 require '../vendor/jquery.serialize-object'
 
+if typeof String.prototype.trim != 'function'
+    String::trim = -> $.trim @
+
 # 是否字母
 _isAlphabetReg = /^[A-Za-z]+$/
+
+# 是否中文
+_isChrStr = /[^x00-xff]/
 
 # 是否邮箱
 _isEmailReg = /^(?:[a-z0-9]+[_\-+.]+)*[a-z0-9]+@(?:([a-z0-9]+-?)*[a-z0-9]+.)+([a-z]{2,})+$/i
@@ -68,6 +74,35 @@ _rule =
         len = Number len
         x = String(x).trim()
         x.length <= len
+
+    # 最大中文长度
+    maxChrLen: (x, len)->
+        len = Number len
+        x = String(x).trim()
+        strLen = 0
+        for i in [0...x.length]
+            v = x[i]
+            if v.match(_isChrStr)
+                strLen += 1
+            else
+                strLen += 0.5
+
+        strLen <= len
+
+    # 最小中文长度
+    minChrLen: (x, len)->
+        len = Number len
+        x = String(x).trim()
+        strLen = 0
+        for i in [0...x.length]
+            v = x[i]
+            if v.match(_isChrStr)
+                strLen += 1
+            else
+                strLen += 0.5
+
+        strLen >= len
+
     # 只能是数字
     isNumber: (x)-> $.isNumeric String(x)
     # 是否为整数
@@ -109,6 +144,10 @@ _errMsg =
     isAlphabet: '只能是字母'
     minlength: (len)->
         "最小 #{len} 位字符"
+    minChrLen: (len)->
+        "最小 #{len} 个中文 或  #{Number(len) * 2} 个英文"
+    maxChrLen: (len)->
+        "最多 #{len} 个中文 或  #{Number(len) * 2} 个英文"
     maxlength: (len)->
         "最多 #{len} 位字符"
     min: (min)->
