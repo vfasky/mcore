@@ -58,14 +58,14 @@ module.exports = (mcore)->
                             @watch obj[change.name], root + '.' + change.name
 
                     else if change.type == 'delete' and @_watchReg[root + '.' + change.name]
-                        @_watchTotal = 1
                         @unwatchByPath root + '.' + change.name
 
                     else if change.type in ['reconfigure', 'update']
-                        @_watchTotal = 1
                         @unwatchByPath root + '.' + change.name
+                        #console.log root + '.' + change.name
 
                         if util.isPlainObject(obj[change.name]) or util.isArray(obj[change.name])
+                            @_watchTotal = 1
                             @watch obj[change.name], root + '.' + change.name
 
                 @syncScope root
