@@ -38,9 +38,9 @@ module.exports = (mcore)->
 
         watch: (obj, root = '')->
             # 已经注册
-            return if @_watchReg[root]
-            @_watchTotal++
+            return if @_watchReg[root] and @_watchReg[root].obj == obj
             return if @_watchTotal > 2000
+            @_watchTotal++
 
             type = 'undefined'
             if util.isPlainObject(obj)
@@ -54,12 +54,15 @@ module.exports = (mcore)->
                 util.each changes, (change)=>
                     if change.type == 'add'
                         if util.isPlainObject(obj[change.name]) or util.isArray(obj[change.name])
+                            @_watchTotal = 1
                             @watch obj[change.name], root + '.' + change.name
 
                     else if change.type == 'delete' and @_watchReg[root + '.' + change.name]
+                        @_watchTotal = 1
                         @unwatchByPath root + '.' + change.name
 
                     else if change.type in ['reconfigure', 'update']
+                        @_watchTotal = 1
                         @unwatchByPath root + '.' + change.name
 
                         if util.isPlainObject(obj[change.name]) or util.isArray(obj[change.name])
