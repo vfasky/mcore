@@ -783,6 +783,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		Template.binders = __webpack_require__(12);
 
+		Template.getEnv = function(el) {
+		  var proxyEnv;
+		  proxyEnv = null;
+		  if (el._element.template._proxy) {
+		    proxyEnv = el._element.template._proxy;
+		  } else if (el._element.template[funName]) {
+		    proxyEnv = el._element.template;
+		  }
+		  return proxyEnv;
+		};
+
 		Template.strToFun = function(el, funName) {
 		  var callback, proxyEnv, proxyFun;
 		  if (!el._element) {

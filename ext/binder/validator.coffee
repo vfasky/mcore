@@ -231,10 +231,10 @@ module.exports = (mcore)->
                 return el.setAttribute 'validator', value
 
             callback = Template.strToFun(el, value) or ->
-
+            proxyEnv = Template.getEnv el
             $form = $ el
 
-            $form.off('submit.validator').on 'submit.validator', ->
+            validatorForm = (callback)->
                 rules = getRules $form
                 data = $form.serializeObject()
                 err = null
@@ -264,6 +264,19 @@ module.exports = (mcore)->
 
                 callback err, data
 
+            # 注入上下文
+            if proxyEnv and !proxyEnv[value + 'Check']
+                proxyEnv[value + 'Check'] = ->
+                    dtd = $.Deferred()
+                    validatorForm (err, data)->
+                        return dtd.reject err if err
+                        dtd.resolve data
+
+                    dtd.promise()
+
+
+            $form.off('submit.validator').on 'submit.validator', ->
+                validatorForm callback
                 false
 
 

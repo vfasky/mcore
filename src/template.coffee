@@ -184,7 +184,7 @@ class Template extends EventEmitter
     ###
     destroy: ->
         @emit 'destroy'
-        
+
         if @refs and @refs.parentNode and @refs.parentNode.removeChild
             @refs.parentNode.removeChild @refs
 
@@ -363,6 +363,17 @@ Template.components = {}
 
 # ## 属性
 Template.binders = require './binders'
+
+# ## 用于从 DOM 的 String 属性取得对应 Template
+Template.getEnv = (el)->
+    proxyEnv = null
+
+    if el._element.template._proxy
+        proxyEnv = el._element.template._proxy
+    else if el._element.template[funName]
+        proxyEnv = el._element.template
+
+    proxyEnv
 
 # ## 用于从 DOM 的 String 属性取得对应 Template 的 Function
 Template.strToFun = (el, funName)->
