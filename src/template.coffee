@@ -278,7 +278,7 @@ class Template extends EventEmitter
                 e.callback = callback
                 return false
         if false == isIn
-            @_events[event].push
+            @_events[event].splice 0, 0,
                 el: el
                 callback: callback
                 id: id

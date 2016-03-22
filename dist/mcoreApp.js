@@ -681,7 +681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		      }
 		    });
 		    if (false === isIn) {
-		      this._events[event].push({
+		      this._events[event].splice(0, 0, {
 		        el: el,
 		        callback: callback,
 		        id: id
