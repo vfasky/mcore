@@ -1128,24 +1128,26 @@ return /******/ (function(modules) { // webpackBootstrap
 			  Template.prototype._render = function(done) {
 			    var patches, scope, virtualDom;
 			    scope = extend(true, this.scope);
-			    virtualDom = this.virtualDomDefine(scope, this).virtualDom;
-			    this._status = 2;
-			    if (this.virtualDom === null) {
-			      this.virtualDom = virtualDom;
-			      this.refs = this.virtualDom.render();
-			      each(this._initTask, function(task) {
-			        return task();
-			      });
-			      this._initTask = [];
-			    } else {
-			      patches = diff(this.virtualDom, virtualDom);
-			      this.virtualDom = virtualDom;
-			      patch(this.refs, patches);
-			    }
-			    this._status = 3;
-			    this.emit('rendered', this.refs);
-			    if (isFunction(done)) {
-			      return done(this.refs);
+			    if (this.virtualDomDefine) {
+			      virtualDom = this.virtualDomDefine(scope, this).virtualDom;
+			      this._status = 2;
+			      if (this.virtualDom === null) {
+			        this.virtualDom = virtualDom;
+			        this.refs = this.virtualDom.render();
+			        each(this._initTask, function(task) {
+			          return task();
+			        });
+			        this._initTask = [];
+			      } else {
+			        patches = diff(this.virtualDom, virtualDom);
+			        this.virtualDom = virtualDom;
+			        patch(this.refs, patches);
+			      }
+			      this._status = 3;
+			      this.emit('rendered', this.refs);
+			      if (isFunction(done)) {
+			        return done(this.refs);
+			      }
 			    }
 			  };
 

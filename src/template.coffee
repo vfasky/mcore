@@ -230,27 +230,30 @@ class Template extends EventEmitter
     _render: (done)->
         scope = extend true, @scope
 
-        {virtualDom} = @virtualDomDefine scope, @
-        @_status = 2
-        ## 未渲染，不用对比
-        if @virtualDom == null
-            @virtualDom = virtualDom
-            @refs = @virtualDom.render()
+        if @virtualDomDefine
+            {virtualDom} = @virtualDomDefine scope, @
+            @_status = 2
+            ## 未渲染，不用对比
+            if @virtualDom == null
+                @virtualDom = virtualDom
+                @refs = @virtualDom.render()
 
-            each @_initTask, (task)-> task()
-            @_initTask = []
-        else
-            ## 对比
-            patches = diff @virtualDom, virtualDom
-            @virtualDom = virtualDom
+                each @_initTask, (task)-> task()
+                @_initTask = []
+            else
+                ## 对比
+                patches = diff @virtualDom, virtualDom
+                @virtualDom = virtualDom
 
-            ## 更新dom
-            patch @refs, patches
+                ## 更新dom
+                patch @refs, patches
 
-        @_status = 3
-        @emit 'rendered', @refs
-        if isFunction done
-            done @refs
+            @_status = 3
+            @emit 'rendered', @refs
+            if isFunction done
+                done @refs
+        # else
+        #     console.log @virtualDomDefine
 
 
     ## 渲染队列
