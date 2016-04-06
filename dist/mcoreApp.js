@@ -1919,6 +1919,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		exports['selected'] = {
 		  rendered: function(el, value) {
 		    return el.value = value;
+		  },
+		  update: function(el, value) {
+		    return el.value = value;
 		  }
 		};
 

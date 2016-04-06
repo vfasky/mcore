@@ -102,8 +102,11 @@ exports['no-diff-child'] = (el, value)->
     # 声明不要diff子节点
     el._element._noDiffChild = value and true or false
 
-exports['selected'] = 
+exports['selected'] =
     rendered: (el, value)->
+        el.value = value
+
+    update: (el, value)->
         el.value = value
 ###
 ## mc-*
