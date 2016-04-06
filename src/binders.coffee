@@ -108,6 +108,10 @@ exports['selected'] =
 
     update: (el, value)->
         el.value = value
+
+# 禁用，启用
+exports['disabled'] = (el, value)->
+    el.disabled = value
 ###
 ## mc-*
 设置对应属性的值(没有找到对应的自定义属性，就会执行该方式)

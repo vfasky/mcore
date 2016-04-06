@@ -1925,6 +1925,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		  }
 		};
 
+		exports['disabled'] = function(el, value) {
+		  return el.disabled = value;
+		};
+
 
 		/*
 		## mc-*
