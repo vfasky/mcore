@@ -1202,6 +1202,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		exports.setElementAttr = function(el, attrName, value, noHash) {
 		  var tagName;
+		  if (attrName === 'key') {
+		    return el._key = value;
+		  }
 		  if (attrName === 'style') {
 		    return el.style.cssText = value;
 		  }
@@ -1548,7 +1551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		  each(staticNodeList, function(node) {
 		    var key;
 		    if (node.nodeType === 1) {
-		      key = node.getAttribute('key');
+		      key = node.getAttribute('key') || node._key;
 		    }
 		    if (key) {
 		      maps[key] = node;
@@ -1918,10 +1921,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		exports['selected'] = {
 		  rendered: function(el, value) {
+		    el._rendered = true;
 		    return el.value = value;
 		  },
 		  update: function(el, value) {
-		    return el.value = value;
+		    if (el._rendered) {
+		      return el.value = value;
+		    }
 		  }
 		};
 

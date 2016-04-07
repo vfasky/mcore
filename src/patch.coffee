@@ -75,7 +75,7 @@ reorderChildren = (node, moves) ->
     maps = {}
     each staticNodeList, (node) ->
         if node.nodeType == 1
-            key = node.getAttribute('key')
+            key = node.getAttribute('key') or node._key
             # if !key and node._element
             #     key = node._element._id
         if key

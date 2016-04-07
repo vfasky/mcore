@@ -104,10 +104,11 @@ exports['no-diff-child'] = (el, value)->
 
 exports['selected'] =
     rendered: (el, value)->
+        el._rendered = true
         el.value = value
 
     update: (el, value)->
-        el.value = value
+        el.value = value if el._rendered
 
 # 禁用，启用
 exports['disabled'] = (el, value)->

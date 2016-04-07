@@ -86,6 +86,10 @@ exports.extend = ->
 
 
 exports.setElementAttr = (el, attrName, value, noHash)->
+    if attrName == 'key'
+        #el.setAttribute attrName, value
+        return el._key = value
+
     if attrName == 'style'
         return el.style.cssText = value
 
