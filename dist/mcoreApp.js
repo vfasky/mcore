@@ -3380,7 +3380,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  BaseClass.prototype.clone = function(value) {
-	    return util.extend(true, value);
+	    return util.extend(true, {}, value);
 	  };
 
 	  BaseClass.prototype.destroy = function() {

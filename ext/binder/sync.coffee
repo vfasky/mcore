@@ -7,8 +7,28 @@
 
 module.exports = (mcore)->
     {Template, util} = mcore
+    $ = require 'jquery'
 
     Template.binders['sync'] =
-        rendered:(el, value)->
+        rendered:(el, dataKey)->
             if el.tagName.toLowerCase() != 'form' or !el._element
-                return el.setAttribute 'sync', value
+                return el.setAttribute 'sync', dataKey
+
+            proxyEnv = Template.getEnv el
+
+            set = (name, value)->
+                if proxyEnv.scope
+                    #console.log dataKey, name, value
+                    proxyEnv.scope[dataKey][name] = value
+                else
+                    pData = proxyEnv.get dataKey
+                    pData[name] = value
+                    proxyEnv.set dataKey, dataKey
+
+            $form = $ el
+
+            $form.on 'change', '[name]', ->
+                $el = $ @
+                name = $el.attr 'name'
+                if name
+                    set name, @value

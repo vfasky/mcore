@@ -91,7 +91,7 @@ class BaseClass extends EventEmitter
 
 
     clone: (value)->
-        util.extend true, value
+        util.extend true, {}, value
 
 
     destroy: ->
