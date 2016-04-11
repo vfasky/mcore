@@ -286,7 +286,7 @@ class Template extends EventEmitter
                 callback: callback
                 id: id
 
-        @addEventListener event
+        @addEventListener event, el
 
     ## 移除事件
     removeEvent: (event, el, id)->

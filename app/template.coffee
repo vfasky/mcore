@@ -27,14 +27,21 @@ class Template extends mcore.Template
 
 
 
-    addEventListener: (event)->
+
+    addEventListener: (event, el)->
         if !@refs
-            @_initTask.push => @addEventListener event
+            @_initTask.push => @addEventListener event, el
             return
         if event not in @_eventReged
             @regEventCallback event
 
             $refs = $(@refs)
+
+            # 滚到事件的处理
+            if event == 'scroll'
+                $(el).on 'scroll', =>
+                    return @_eventListener[event].apply @, arguments
+                return
 
             if event not in ['blur', 'focus']
                 if _keyCode.hasOwnProperty(event)

@@ -585,7 +585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        id: id
 	      });
 	    }
-	    return this.addEventListener(event);
+	    return this.addEventListener(event, el);
 	  };
 
 	  Template.prototype.removeEvent = function(event, el, id) {

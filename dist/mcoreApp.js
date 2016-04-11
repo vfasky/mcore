@@ -689,7 +689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		        id: id
 		      });
 		    }
-		    return this.addEventListener(event);
+		    return this.addEventListener(event, el);
 		  };
 
 		  Template.prototype.removeEvent = function(event, el, id) {
@@ -2353,12 +2353,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Template.prototype.addEventListener = function(event) {
+	  Template.prototype.addEventListener = function(event, el) {
 	    var $refs;
 	    if (!this.refs) {
 	      this._initTask.push((function(_this) {
 	        return function() {
-	          return _this.addEventListener(event);
+	          return _this.addEventListener(event, el);
 	        };
 	      })(this));
 	      return;
@@ -2366,6 +2366,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (indexOf.call(this._eventReged, event) < 0) {
 	      this.regEventCallback(event);
 	      $refs = $(this.refs);
+	      if (event === 'scroll') {
+	        $(el).on('scroll', (function(_this) {
+	          return function() {
+	            return _this._eventListener[event].apply(_this, arguments);
+	          };
+	        })(this));
+	        return;
+	      }
 	      if (event !== 'blur' && event !== 'focus') {
 	        if (_keyCode.hasOwnProperty(event)) {
 	          return $refs.on('keyup', (function(_this) {
