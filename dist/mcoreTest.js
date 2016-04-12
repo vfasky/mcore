@@ -17362,7 +17362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		          })(this));
 		        }
 		      } else {
-		        return $refs.on(event, 'input, textarea', (function(_this) {
+		        return $refs.on(event, 'input, textarea, select', (function(_this) {
 		          return function() {
 		            return _this._eventListener[event].apply(_this, arguments);
 		          };
