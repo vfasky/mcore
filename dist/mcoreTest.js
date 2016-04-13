@@ -466,7 +466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/* WEBPACK VAR INJECTION */(function(global, Buffer) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+	var require;var require;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, Buffer) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 	(function (process){
 	module.exports = process.env.COV
 	  ? require('./lib-cov/mocha')
@@ -15482,6 +15482,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			    isChange = this.scope[key] !== value;
 			    this.scope[key] = value;
 			    if (this._status === 0) {
+			      if (isFunction(doneOrAsync)) {
+			        this._queueCallbacks.push(doneOrAsync);
+			      }
 			      return;
 			    }
 			    if (isChange) {
@@ -15602,8 +15605,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			    return this;
 			  };
 
-			  Template.prototype._render = function(done) {
-			    var j, len, patches, ref1, scope, virtualDom;
+			  Template.prototype._render = function() {
+			    var patches, scope, virtualDom;
 			    scope = this.scope;
 			    if (this.virtualDomDefine) {
 			      virtualDom = this.virtualDomDefine(scope, this).virtualDom;
@@ -15622,12 +15625,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			      }
 			      this._status = 3;
 			      this.emit('rendered', this.refs);
-			      ref1 = this._queueCallbacks;
-			      for (j = 0, len = ref1.length; j < len; j++) {
-			        done = ref1[j];
-			        done(this.refs);
-			      }
-			      return this._queueCallbacks = [];
+			      return each(this._queueCallbacks, (function(_this) {
+			        return function(done, k) {
+			          if (isFunction(done)) {
+			            done(_this.refs);
+			            return _this._queueCallbacks[k] = null;
+			          }
+			        };
+			      })(this));
 			    }
 			  };
 

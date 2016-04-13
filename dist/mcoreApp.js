@@ -511,6 +511,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		    isChange = this.scope[key] !== value;
 		    this.scope[key] = value;
 		    if (this._status === 0) {
+		      if (isFunction(doneOrAsync)) {
+		        this._queueCallbacks.push(doneOrAsync);
+		      }
 		      return;
 		    }
 		    if (isChange) {
@@ -631,8 +634,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		    return this;
 		  };
 
-		  Template.prototype._render = function(done) {
-		    var j, len, patches, ref1, scope, virtualDom;
+		  Template.prototype._render = function() {
+		    var patches, scope, virtualDom;
 		    scope = this.scope;
 		    if (this.virtualDomDefine) {
 		      virtualDom = this.virtualDomDefine(scope, this).virtualDom;
@@ -651,12 +654,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		      }
 		      this._status = 3;
 		      this.emit('rendered', this.refs);
-		      ref1 = this._queueCallbacks;
-		      for (j = 0, len = ref1.length; j < len; j++) {
-		        done = ref1[j];
-		        done(this.refs);
-		      }
-		      return this._queueCallbacks = [];
+		      return each(this._queueCallbacks, (function(_this) {
+		        return function(done, k) {
+		          if (isFunction(done)) {
+		            done(_this.refs);
+		            return _this._queueCallbacks[k] = null;
+		          }
+		        };
+		      })(this));
 		    }
 		  };
 

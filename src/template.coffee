@@ -135,7 +135,11 @@ class Template extends EventEmitter
     set: (key, value, doneOrAsync = null)->
         isChange = @scope[key] != value
         @scope[key] = value
-        return if @_status == 0
+        if @_status == 0
+            @_queueCallbacks.push doneOrAsync if isFunction doneOrAsync
+            return
+
+        #console.log doneOrAsync
 
         if isChange
             @emit 'changeScope', @scope, key, value
@@ -230,7 +234,7 @@ class Template extends EventEmitter
 
 
     ## 渲染操作
-    _render: (done)->
+    _render: ()->
         #scope = extend true, @scope
         scope = @scope
 
@@ -256,11 +260,14 @@ class Template extends EventEmitter
             @emit 'rendered', @refs
 
             # 执行回调
-            for done in @_queueCallbacks
-                done @refs
+            each @_queueCallbacks, (done, k)=>
+                #console.log done
+                if isFunction done
+                    done @refs
+                    @_queueCallbacks[k] = null
 
             # 清空回调
-            @_queueCallbacks = []
+            #@_queueCallbacks = []
             # if isFunction done
             #     done @refs
         # else
@@ -271,7 +278,9 @@ class Template extends EventEmitter
     renderQueue: (doneOrAsync)->
         # 加入成功回调队列
         if isFunction doneOrAsync
+            #console.log doneOrAsync
             @_queueCallbacks.push doneOrAsync
+            #console.log @_queueCallbacks
 
         nextTick.clear @_queueId
 
