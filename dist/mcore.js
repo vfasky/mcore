@@ -351,6 +351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Template() {
 	    this._status = 0;
 	    this._queueId = null;
+	    this._queueCallbacks = [];
 	    this._initTask = [];
 	    this._events = {};
 	    this._eventReged = [];
@@ -527,8 +528,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Template.prototype._render = function(done) {
-	    var patches, scope, virtualDom;
-	    scope = extend(true, this.scope);
+	    var j, len, patches, ref1, scope, virtualDom;
+	    scope = this.scope;
 	    if (this.virtualDomDefine) {
 	      virtualDom = this.virtualDomDefine(scope, this).virtualDom;
 	      this._status = 2;
@@ -546,13 +547,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      this._status = 3;
 	      this.emit('rendered', this.refs);
-	      if (isFunction(done)) {
-	        return done(this.refs);
+	      ref1 = this._queueCallbacks;
+	      for (j = 0, len = ref1.length; j < len; j++) {
+	        done = ref1[j];
+	        done(this.refs);
 	      }
+	      return this._queueCallbacks = [];
 	    }
 	  };
 
 	  Template.prototype.renderQueue = function(doneOrAsync) {
+	    if (isFunction(doneOrAsync)) {
+	      this._queueCallbacks.push(doneOrAsync);
+	    }
 	    nextTick.clear(this._queueId);
 	    if (true === doneOrAsync) {
 	      return this._render();
@@ -560,7 +567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._status = 1;
 	      return this._queueId = nextTick((function(_this) {
 	        return function() {
-	          return _this._render(doneOrAsync);
+	          return _this._render();
 	        };
 	      })(this));
 	    }
