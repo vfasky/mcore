@@ -28,6 +28,9 @@ _isDateReg = /^([1-2]\d{3})([-/.])?(1[0-2]|0?[1-9])([-/.])?([1-2]\d|3[01]|0?[1-9
 # 是否手机
 _isMobileReg = /^1[3-9]\d{9}$/
 
+# 是否是数字和字母
+_isDigitOrAlphaReg = /^(\d|\w)+$/
+
 ###*
  * 检查座机
  * 座机：仅中国座机支持；区号可有 3、4位数并且以 0 开头；电话号不以 0 开头，最 8 位数，最少 7 位数
@@ -64,6 +67,10 @@ _rule =
 
     # 是否字母
     isAlphabet: (x)-> _isAlphabetReg.test String(x)
+
+    # 是否是数字和字母
+    onlyDigitAndAlpha: (x)-> _isDigitOrAlphaReg.test String(x)
+
     # 最小长度
     minlength: (x, len)->
         len = Number len
@@ -142,6 +149,7 @@ _errMsg =
     required: '不能为空'
     isNumber: '只能是数字'
     isAlphabet: '只能是字母'
+    onlyDigitAndAlpha: '只能是字母和数字'
     minlength: (len)->
         "最小 #{len} 位字符"
     minChrLen: (len)->
@@ -273,7 +281,6 @@ module.exports = (mcore)->
                         dtd.resolve data
 
                     dtd.promise()
-
 
             $form.off('submit.validator').on 'submit.validator', ->
                 validatorForm callback
