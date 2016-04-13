@@ -54,7 +54,7 @@ class Template extends mcore.Template
                         return @_eventListener[event].apply @, arguments
 
             else
-                $refs.on event, 'input, textarea', =>
+                $refs.on event, 'input, textarea, select', =>
                     return @_eventListener[event].apply @, arguments
 
 
