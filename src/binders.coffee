@@ -120,7 +120,7 @@ exports['selected'] =
             el.value = value
             if el.value != value
                 if el._setValTime
-                    uti.nextTick.clear el._setValTime
+                    util.nextTick.clear el._setValTime
                 el._setValTime = util.nextTick ->
                     el.value = value
                     #console.log el.options
