@@ -7,6 +7,8 @@
 ###
 'use strict'
 
+util = require './util'
+
 ###
 
 ## 属性值可以执行 js
@@ -105,10 +107,25 @@ exports['no-diff-child'] = (el, value)->
 exports['selected'] =
     rendered: (el, value)->
         el._rendered = true
-        el.value = value
+        if el._renderedVal != undefined
+            el.value = el._renderedVal
+            el._renderedVal = undefined
+        else
+            el.value = value
+
+
 
     update: (el, value)->
-        el.value = value if el._rendered
+        if el._rendered
+            el.value = value
+            if el.value != value
+                if el._setValTime
+                    uti.nextTick.clear el._setValTime
+                el._setValTime = util.nextTick ->
+                    el.value = value
+                    #console.log el.options
+        else
+            el._renderedVal = value
 
 # 禁用，启用
 exports['disabled'] = (el, value)->

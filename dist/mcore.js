@@ -748,8 +748,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var has = Object.prototype.hasOwnProperty;
-
 	//
 	// We store our EE objects in a plain object whose properties are event names.
 	// If `Object.create(null)` is not supported we prefix the event names with a
@@ -765,7 +763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Function} fn Event handler to be called.
 	 * @param {Mixed} context Context for function execution.
-	 * @param {Boolean} [once=false] Only emit once
+	 * @param {Boolean} once Only emit once
 	 * @api private
 	 */
 	function EE(fn, context, once) {
@@ -784,37 +782,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	function EventEmitter() { /* Nothing to set */ }
 
 	/**
-	 * Hold the assigned EventEmitters by name.
+	 * Holds the assigned EventEmitters by name.
 	 *
 	 * @type {Object}
 	 * @private
 	 */
 	EventEmitter.prototype._events = undefined;
-
-	/**
-	 * Return an array listing the events for which the emitter has registered
-	 * listeners.
-	 *
-	 * @returns {Array}
-	 * @api public
-	 */
-	EventEmitter.prototype.eventNames = function eventNames() {
-	  var events = this._events
-	    , names = []
-	    , name;
-
-	  if (!events) return names;
-
-	  for (name in events) {
-	    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
-	  }
-
-	  if (Object.getOwnPropertySymbols) {
-	    return names.concat(Object.getOwnPropertySymbols(events));
-	  }
-
-	  return names;
-	};
 
 	/**
 	 * Return a list of assigned event listeners.
@@ -901,8 +874,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Register a new EventListener for the given event.
 	 *
 	 * @param {String} event Name of the event.
-	 * @param {Function} fn Callback function.
-	 * @param {Mixed} [context=this] The context of the function.
+	 * @param {Functon} fn Callback function.
+	 * @param {Mixed} context The context of the function.
 	 * @api public
 	 */
 	EventEmitter.prototype.on = function on(event, fn, context) {
@@ -926,7 +899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {String} event Name of the event.
 	 * @param {Function} fn Callback function.
-	 * @param {Mixed} [context=this] The context of the function.
+	 * @param {Mixed} context The context of the function.
 	 * @api public
 	 */
 	EventEmitter.prototype.once = function once(event, fn, context) {
@@ -1755,7 +1728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 12 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	
 	/**
@@ -1766,6 +1739,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @link http://vfasky.com
 	 */
 	'use strict';
+	var util;
+
+	util = __webpack_require__(6);
+
 
 	/*
 
@@ -1833,6 +1810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	> *如果事件不需要传参，侧不需要 `()`, 否则 h2svd-loader 编绎时，会报错*
 	 */
+
 	exports['show'] = function(el, value) {
 	  return el.style.display = value ? '' : 'none';
 	};
@@ -1857,11 +1835,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports['selected'] = {
 	  rendered: function(el, value) {
 	    el._rendered = true;
-	    return el.value = value;
+	    if (el._renderedVal !== void 0) {
+	      el.value = el._renderedVal;
+	      return el._renderedVal = void 0;
+	    } else {
+	      return el.value = value;
+	    }
 	  },
 	  update: function(el, value) {
 	    if (el._rendered) {
-	      return el.value = value;
+	      el.value = value;
+	      if (el.value !== value) {
+	        if (el._setValTime) {
+	          uti.nextTick.clear(el._setValTime);
+	        }
+	        return el._setValTime = util.nextTick(function() {
+	          return el.value = value;
+	        });
+	      }
+	    } else {
+	      return el._renderedVal = value;
 	    }
 	  }
 	};

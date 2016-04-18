@@ -1832,7 +1832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/***/ },
 	/* 12 */
-	/***/ function(module, exports) {
+	/***/ function(module, exports, __webpack_require__) {
 
 		
 		/**
@@ -1843,6 +1843,10 @@ return /******/ (function(modules) { // webpackBootstrap
 		 * @link http://vfasky.com
 		 */
 		'use strict';
+		var util;
+
+		util = __webpack_require__(6);
+
 
 		/*
 
@@ -1910,6 +1914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		> *如果事件不需要传参，侧不需要 `()`, 否则 h2svd-loader 编绎时，会报错*
 		 */
+
 		exports['show'] = function(el, value) {
 		  return el.style.display = value ? '' : 'none';
 		};
@@ -1934,11 +1939,26 @@ return /******/ (function(modules) { // webpackBootstrap
 		exports['selected'] = {
 		  rendered: function(el, value) {
 		    el._rendered = true;
-		    return el.value = value;
+		    if (el._renderedVal !== void 0) {
+		      el.value = el._renderedVal;
+		      return el._renderedVal = void 0;
+		    } else {
+		      return el.value = value;
+		    }
 		  },
 		  update: function(el, value) {
 		    if (el._rendered) {
-		      return el.value = value;
+		      el.value = value;
+		      if (el.value !== value) {
+		        if (el._setValTime) {
+		          uti.nextTick.clear(el._setValTime);
+		        }
+		        return el._setValTime = util.nextTick(function() {
+		          return el.value = value;
+		        });
+		      }
+		    } else {
+		      return el._renderedVal = value;
 		    }
 		  }
 		};
