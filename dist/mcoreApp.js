@@ -1937,26 +1937,29 @@ return /******/ (function(modules) { // webpackBootstrap
 		};
 
 		exports['selected'] = {
+		  asyncSet: function(el, value) {
+		    el.value = value;
+		    if (el.value !== value) {
+		      if (el._setValTime) {
+		        clearTimeout(el._setValTime);
+		      }
+		      return el._setValTime = setTimeout(function() {
+		        return el.value = value;
+		      }, 70);
+		    }
+		  },
 		  rendered: function(el, value) {
 		    el._rendered = true;
 		    if (el._renderedVal !== void 0) {
-		      el.value = el._renderedVal;
+		      exports['selected'].asyncSet(el, el._renderedVal);
 		      return el._renderedVal = void 0;
 		    } else {
-		      return el.value = value;
+		      return exports['selected'].asyncSet(el, value);
 		    }
 		  },
 		  update: function(el, value) {
 		    if (el._rendered) {
-		      el.value = value;
-		      if (el.value !== value) {
-		        if (el._setValTime) {
-		          util.nextTick.clear(el._setValTime);
-		        }
-		        return el._setValTime = util.nextTick(function() {
-		          return el.value = value;
-		        });
-		      }
+		      return exports['selected'].asyncSet(el, value);
 		    } else {
 		      return el._renderedVal = value;
 		    }

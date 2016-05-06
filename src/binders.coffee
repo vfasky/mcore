@@ -105,25 +105,27 @@ exports['no-diff-child'] = (el, value)->
     el._element._noDiffChild = value and true or false
 
 exports['selected'] =
+    asyncSet: (el, value)->
+        el.value = value
+        if el.value != value
+            if el._setValTime
+                clearTimeout el._setValTime
+            el._setValTime = setTimeout ->
+                el.value = value
+            , 70
+
     rendered: (el, value)->
         el._rendered = true
         if el._renderedVal != undefined
-            el.value = el._renderedVal
+            exports['selected'].asyncSet el, el._renderedVal
             el._renderedVal = undefined
         else
-            el.value = value
-
+            exports['selected'].asyncSet el, value
 
 
     update: (el, value)->
         if el._rendered
-            el.value = value
-            if el.value != value
-                if el._setValTime
-                    util.nextTick.clear el._setValTime
-                el._setValTime = util.nextTick ->
-                    el.value = value
-                    #console.log el.options
+            exports['selected'].asyncSet el, value
         else
             el._renderedVal = value
 
