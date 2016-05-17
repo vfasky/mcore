@@ -19,15 +19,15 @@ patch = require './patch'
 class Template extends EventEmitter
     ###
     ## demo
-    
+
     ```coffee
     {Template} = require 'mcore'
     tpl = new Template()
-    
-    
+
+
     tpl.showIx = (event, el, v, k)->
         console.log v, k
-    
+
     tpl.render require('./tpl/test.html'),
         list: [
            {name : 'ok1'}
@@ -36,7 +36,7 @@ class Template extends EventEmitter
     , -> # rendered
         document.body.appendChild tpl.refs
     ```
-    
+
     ```html
     <!-- ./tpl/test.html -->
     <ul>
@@ -44,16 +44,16 @@ class Template extends EventEmitter
         <span mc-data-ix="k + 1">{v.name}</span>
       </li>
     </ul>
-    
+
     ```
-    
+
     > **注：模板事件回调至少传入二个参数**
     > * 第一个参数：event
     > * 第二个参数：DOM
     > * ... 模板中定义的参数，如：
     > `mc-on-click="showIx(v, k)"` 中接收 v, k
     > 需要这样 `tpl.showIx = (event, el, v, k)->`
-    
+
     > *如果事件不需要传参，侧不需要 `()`, 否则 h2svd-loader 编绎时，会报错*
     ###
     constructor: ->
@@ -105,27 +105,27 @@ class Template extends EventEmitter
     tpl.set 'list', []
     ```
     **注意!**
-    
+
     `key` 只能是 scope 的属性，不能更新子属性
     如: `tpl.set 'list[0].name', 'test'` 是不正确的
-    
+
     正确的做法是:
     ```coffee
     list = tpl.get 'list'
     list[0].name = 'test'
     tpl.set 'list', list
     ```
-    
+
     你可以不停地更改 scope 的值，而不用担心性能问题，
     因为 scope 的更改，会放入队列中，放到浏览器的 nextTick 中渲染。
     换言之，你更改N次 scope , 模板引擎只更新一次 DOM
-    
+
     如果你需要在值应用到DOM后，执行回调，可以传入第三个参数
     ```coffee
     tpl.set 'list', list, ->
         console.log 'dom change'
     ```
-    
+
     你也可以强制模板引擎马上渲染DOM,而不是放入队列(当然，不推荐这样做，因为会阻塞后面的代码)
     ```coffee
     tpl.set 'list', list, true
@@ -191,6 +191,10 @@ class Template extends EventEmitter
     ###
     destroy: ->
         @emit 'destroy'
+
+        if @refs._element and @refs._element.destroy
+            @refs._element.destroy()
+            @refs._element = null
 
         if @refs and @refs.parentNode and @refs.parentNode.removeChild
             @refs.parentNode.removeChild @refs

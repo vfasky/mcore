@@ -22,6 +22,8 @@ class Element
         # 自定义组件
         @_component = null
 
+        @_componentTree = []
+
         @key = @props.key or undefined
 
         count = 0
@@ -52,9 +54,15 @@ class Element
 
 
             # 渲染子元素
-            each @children, (child)->
+            each @children, (child)=>
                 if child instanceof Element
                     childEl = child.render()
+                    if child._component
+                        @_componentTree.push child._component
+
+                    if child._componentTree
+                        for c in child._componentTree
+                            @_componentTree.push c
                 else
                     childEl = document.createTextNode child
 
@@ -62,6 +70,10 @@ class Element
 
             for binder in @_binders
                 binder.binder.rendered.call @, el, binder.value if binder.binder.rendered
+
+        if !el._element and @_componentTree.length > 0
+            el._element = @
+            @el = el
 
         el
 
@@ -84,10 +96,18 @@ class Element
 
 
     destroy: ->
-        return if !@template
 
         if @_component
             @_component.destroy()
+
+        for c in @_componentTree
+            #console.log c
+            c.destroy()
+
+        @_componentTree = []
+        @_component = null
+
+        return if !@template
 
         # 移除事件
         for attrName of @props
@@ -145,6 +165,7 @@ class Element
         el = document.createElement @tagName
         el._element = @
         @_component = new Template.components[@tagName] el, @
+        #@_componentTree.push @_component
 
         for attr, value of @props
             @setAttribute el, attr, value

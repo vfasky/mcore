@@ -15193,6 +15193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			    this._binders = [];
 			    this._bindersReg = [];
 			    this._component = null;
+			    this._componentTree = [];
 			    this.key = this.props.key || void 0;
 			    count = 0;
 			    each(this.children, (function(_this) {
@@ -15222,15 +15223,27 @@ return /******/ (function(modules) { // webpackBootstrap
 			        value = ref1[attr];
 			        this.setAttribute(el, attr, value);
 			      }
-			      each(this.children, function(child) {
-			        var childEl;
-			        if (child instanceof Element) {
-			          childEl = child.render();
-			        } else {
-			          childEl = document.createTextNode(child);
-			        }
-			        return el.appendChild(childEl);
-			      });
+			      each(this.children, (function(_this) {
+			        return function(child) {
+			          var c, childEl, j, len, ref2;
+			          if (child instanceof Element) {
+			            childEl = child.render();
+			            if (child._component) {
+			              _this._componentTree.push(child._component);
+			            }
+			            if (child._componentTree) {
+			              ref2 = child._componentTree;
+			              for (j = 0, len = ref2.length; j < len; j++) {
+			                c = ref2[j];
+			                _this._componentTree.push(c);
+			              }
+			            }
+			          } else {
+			            childEl = document.createTextNode(child);
+			          }
+			          return el.appendChild(childEl);
+			        };
+			      })(this));
 			      ref2 = this._binders;
 			      for (j = 0, len = ref2.length; j < len; j++) {
 			        binder = ref2[j];
@@ -15238,6 +15251,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			          binder.binder.rendered.call(this, el, binder.value);
 			        }
 			      }
+			    }
+			    if (!el._element && this._componentTree.length > 0) {
+			      el._element = this;
+			      this.el = el;
 			    }
 			    return el;
 			  };
@@ -15263,12 +15280,19 @@ return /******/ (function(modules) { // webpackBootstrap
 			  };
 
 			  Element.prototype.destroy = function() {
-			    var attrName, event, results;
-			    if (!this.template) {
-			      return;
-			    }
+			    var attrName, c, event, j, len, ref1, results;
 			    if (this._component) {
 			      this._component.destroy();
+			    }
+			    ref1 = this._componentTree;
+			    for (j = 0, len = ref1.length; j < len; j++) {
+			      c = ref1[j];
+			      c.destroy();
+			    }
+			    this._componentTree = [];
+			    this._component = null;
+			    if (!this.template) {
+			      return;
 			    }
 			    results = [];
 			    for (attrName in this.props) {
@@ -15551,6 +15575,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			  Template.prototype.destroy = function() {
 			    this.emit('destroy');
+			    if (this.refs._element && this.refs._element.destroy) {
+			      this.refs._element.destroy();
+			      this.refs._element = null;
+			    }
 			    if (this.refs && this.refs.parentNode && this.refs.parentNode.removeChild) {
 			      this.refs.parentNode.removeChild(this.refs);
 			    }
