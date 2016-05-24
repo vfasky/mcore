@@ -192,7 +192,7 @@ class Template extends EventEmitter
     destroy: ->
         @emit 'destroy'
 
-        if @refs._element and @refs._element.destroy
+        if @refs and @refs._element and @refs._element.destroy
             @refs._element.destroy()
             @refs._element = null
 

@@ -500,7 +500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Template.prototype.destroy = function() {
 	    this.emit('destroy');
-	    if (this.refs._element && this.refs._element.destroy) {
+	    if (this.refs && this.refs._element && this.refs._element.destroy) {
 	      this.refs._element.destroy();
 	      this.refs._element = null;
 	    }
