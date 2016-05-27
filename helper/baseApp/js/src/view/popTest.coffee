@@ -12,7 +12,7 @@ class PopTest extends PopUpView
         @close()
 
     openClick:(event,el)->
-        @.parent.open PopTest
+        @.parent.openSubView PopTest
 
 module.exports = PopTest
 module.exports.viewName = 'poptest'

@@ -16,7 +16,7 @@ class View extends require('./baseClass')
         super()
         @_plus()
         @el = @$el[0]
-        @.subViews = [4,5,3]
+        @.subViews = []
         @curVix = 0
         @once 'rendered', (refs)=>
             @el.appendChild refs
@@ -52,7 +52,7 @@ class View extends require('./baseClass')
         @.$el.remove()
 
     # 打开一个子视图
-    open: (View,options={})->
+    openSubView: (View,options={})->
         try
             # 初始化zIndex参数
             if !options.zIndex

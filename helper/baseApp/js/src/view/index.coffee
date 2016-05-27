@@ -15,7 +15,7 @@ class Index extends View
 
     openV: (event, el)->
         PopTest = require './popTest'
-        @.open PopTest,
+        @.openSubView PopTest,
             closeCallBack: (isBack)->
                 console.log isBack
 

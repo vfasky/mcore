@@ -3529,7 +3529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    View.__super__.constructor.call(this);
 	    this._plus();
 	    this.el = this.$el[0];
-	    this.subViews = [4, 5, 3];
+	    this.subViews = [];
 	    this.curVix = 0;
 	    this.once('rendered', (function(_this) {
 	      return function(refs) {
@@ -3571,7 +3571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.$el.remove();
 	  };
 
-	  View.prototype.open = function(View, options) {
+	  View.prototype.openSubView = function(View, options) {
 	    var _view, e, error;
 	    if (options == null) {
 	      options = {};
