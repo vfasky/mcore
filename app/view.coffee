@@ -16,7 +16,8 @@ class View extends require('./baseClass')
         super()
         @_plus()
         @el = @$el[0]
-
+        @.subViews = [4,5,3]
+        @curVix = 0
         @once 'rendered', (refs)=>
             @el.appendChild refs
 
@@ -50,6 +51,28 @@ class View extends require('./baseClass')
         super()
         @.$el.remove()
 
+    # 打开一个子视图
+    open: (View,options={})->
+        try
+            # 初始化zIndex参数
+            if !options.zIndex
+                options.zIndex = @.curVix + 1
+            _view = new View(@,options)
+            _view.vix = @.curVix++
+            if _view
+                _view.on 'close', (isBack)=>
+                    _tmpArr = []
+                    # 将改子view从父级的数组中移除
+                    @.subViews.forEach (v)->
+                        if v.vix != _view.vix
+                            _tmpArr.push _view
+                    @.subViews = _tmpArr
+                    # 视图关闭回调
+                    options.closeCallBack and options.closeCallBack(isBack)
+
+                _view.run()
+        catch e
+            throw e
 
     run: ->
 

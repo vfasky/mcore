@@ -16,6 +16,7 @@ mcoreApp.App = require './app'
 mcoreApp.Route = require './route'
 mcoreApp.BaseClass = require './baseClass'
 mcoreApp.View = require './view'
+mcoreApp.PopUpView = require './popUpView'
 mcoreApp.http = require './http'
 
 module.exports = mcoreApp
