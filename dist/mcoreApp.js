@@ -3639,6 +3639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function PopUpView(parent, opts) {
 	    this.parent = parent;
 	    this.opts = opts != null ? opts : {};
+	    PopUpView.__super__.constructor.call(this);
 	    this._plus();
 	    this.el = document.createElement('div');
 	    this.el.style.position = 'absolute';
@@ -3655,7 +3656,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _this.parent.$el[0].appendChild(_this.el);
 	      };
 	    })(this));
-	    PopUpView.__super__.constructor.call(this);
 	  }
 
 	  PopUpView.prototype._plus = function() {};

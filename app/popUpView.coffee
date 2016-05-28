@@ -13,6 +13,7 @@ $ = require 'jquery'
 class PopUpView extends require('./baseClass')
     constructor:(@parent,@opts={})->
         # console.log @
+        super()
         @_plus()
         @.el = document.createElement 'div'
         @.el.style.position = 'absolute'
@@ -22,14 +23,13 @@ class PopUpView extends require('./baseClass')
         @.el.style.height = '100%'
         @.el.style.backgroundColor = '#ffffff'
         @.el.style.zIndex = @opts.zIndex or 1
-        @app = @parent.app        
+        @app = @parent.app
 
 
         @once 'rendered', (refs)=>
             @el.appendChild refs
             @parent.$el[0].appendChild @el
 
-        super()
 
 
     _plus: ->

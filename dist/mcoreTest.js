@@ -18499,7 +18499,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    View.__super__.constructor.call(this);
 		    this._plus();
 		    this.el = this.$el[0];
-		    this.subViews = [4, 5, 3];
+		    this.subViews = [];
 		    this.curVix = 0;
 		    this.once('rendered', (function(_this) {
 		      return function(refs) {
@@ -18541,7 +18541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    return this.$el.remove();
 		  };
 
-		  View.prototype.open = function(View, options) {
+		  View.prototype.openSubView = function(View, options) {
 		    var _view, e, error;
 		    if (options == null) {
 		      options = {};
@@ -18609,6 +18609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		  function PopUpView(parent, opts) {
 		    this.parent = parent;
 		    this.opts = opts != null ? opts : {};
+		    PopUpView.__super__.constructor.call(this);
 		    this._plus();
 		    this.el = document.createElement('div');
 		    this.el.style.position = 'absolute';
@@ -18625,7 +18626,6 @@ return /******/ (function(modules) { // webpackBootstrap
 		        return _this.parent.$el[0].appendChild(_this.el);
 		      };
 		    })(this));
-		    PopUpView.__super__.constructor.call(this);
 		  }
 
 		  PopUpView.prototype._plus = function() {};
