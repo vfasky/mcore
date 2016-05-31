@@ -80,7 +80,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	mcoreApp.View = __webpack_require__(24);
 
-	mcoreApp.http = __webpack_require__(25);
+	mcoreApp.PopUpView = __webpack_require__(25);
+
+	mcoreApp.http = __webpack_require__(26);
 
 	module.exports = mcoreApp;
 
@@ -880,6 +882,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		'use strict';
 
+		var has = Object.prototype.hasOwnProperty;
+
 		//
 		// We store our EE objects in a plain object whose properties are event names.
 		// If `Object.create(null)` is not supported we prefix the event names with a
@@ -895,7 +899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		 *
 		 * @param {Function} fn Event handler to be called.
 		 * @param {Mixed} context Context for function execution.
-		 * @param {Boolean} once Only emit once
+		 * @param {Boolean} [once=false] Only emit once
 		 * @api private
 		 */
 		function EE(fn, context, once) {
@@ -914,12 +918,37 @@ return /******/ (function(modules) { // webpackBootstrap
 		function EventEmitter() { /* Nothing to set */ }
 
 		/**
-		 * Holds the assigned EventEmitters by name.
+		 * Hold the assigned EventEmitters by name.
 		 *
 		 * @type {Object}
 		 * @private
 		 */
 		EventEmitter.prototype._events = undefined;
+
+		/**
+		 * Return an array listing the events for which the emitter has registered
+		 * listeners.
+		 *
+		 * @returns {Array}
+		 * @api public
+		 */
+		EventEmitter.prototype.eventNames = function eventNames() {
+		  var events = this._events
+		    , names = []
+		    , name;
+
+		  if (!events) return names;
+
+		  for (name in events) {
+		    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+		  }
+
+		  if (Object.getOwnPropertySymbols) {
+		    return names.concat(Object.getOwnPropertySymbols(events));
+		  }
+
+		  return names;
+		};
 
 		/**
 		 * Return a list of assigned event listeners.
@@ -1006,8 +1035,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		 * Register a new EventListener for the given event.
 		 *
 		 * @param {String} event Name of the event.
-		 * @param {Functon} fn Callback function.
-		 * @param {Mixed} context The context of the function.
+		 * @param {Function} fn Callback function.
+		 * @param {Mixed} [context=this] The context of the function.
 		 * @api public
 		 */
 		EventEmitter.prototype.on = function on(event, fn, context) {
@@ -1031,7 +1060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		 *
 		 * @param {String} event Name of the event.
 		 * @param {Function} fn Callback function.
-		 * @param {Mixed} context The context of the function.
+		 * @param {Mixed} [context=this] The context of the function.
 		 * @api public
 		 */
 		EventEmitter.prototype.once = function once(event, fn, context) {
@@ -3500,6 +3529,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    View.__super__.constructor.call(this);
 	    this._plus();
 	    this.el = this.$el[0];
+	    this.subViews = [];
+	    this.curVix = 0;
 	    this.once('rendered', (function(_this) {
 	      return function(refs) {
 	        return _this.el.appendChild(refs);
@@ -3540,6 +3571,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this.$el.remove();
 	  };
 
+	  View.prototype.openSubView = function(View, options) {
+	    var _view, e, error;
+	    if (options == null) {
+	      options = {};
+	    }
+	    try {
+	      if (!options.zIndex) {
+	        options.zIndex = this.curVix + 1;
+	      }
+	      _view = new View(this, options);
+	      _view.vix = this.curVix++;
+	      if (_view) {
+	        _view.on('close', (function(_this) {
+	          return function(isBack) {
+	            var _tmpArr;
+	            _tmpArr = [];
+	            _this.subViews.forEach(function(v) {
+	              if (v.vix !== _view.vix) {
+	                return _tmpArr.push(_view);
+	              }
+	            });
+	            _this.subViews = _tmpArr;
+	            return options.closeCallBack && options.closeCallBack(isBack);
+	          };
+	        })(this));
+	        return _view.run();
+	      }
+	    } catch (error) {
+	      e = error;
+	      throw e;
+	    }
+	  };
+
 	  View.prototype.run = function() {};
 
 	  View.prototype.afterRun = function() {};
@@ -3553,6 +3617,79 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/**
+	 * 弹层式view 寄托于主view 没有url指向
+	 * @module PopUpView
+	 * @author vega <vegawong@126.com>
+	 */
+	var $, PopUpView, Template, ref, util,
+	  extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+	  hasProp = {}.hasOwnProperty;
+
+	$ = __webpack_require__(16);
+
+	ref = __webpack_require__(14), Template = ref.Template, util = ref.util;
+
+	PopUpView = (function(superClass) {
+	  extend(PopUpView, superClass);
+
+	  function PopUpView(parent, opts) {
+	    this.parent = parent;
+	    this.opts = opts != null ? opts : {};
+	    PopUpView.__super__.constructor.call(this);
+	    this._plus();
+	    this.el = document.createElement('div');
+	    this.el.style.position = 'absolute';
+	    this.el.style.left = 0;
+	    this.el.style.top = 0;
+	    this.el.style.width = '100%';
+	    this.el.style.height = '100%';
+	    this.el.style.backgroundColor = '#ffffff';
+	    this.el.style.zIndex = this.opts.zIndex || 1;
+	    this.app = this.parent.app;
+	    this.once('rendered', (function(_this) {
+	      return function(refs) {
+	        _this.el.appendChild(refs);
+	        return _this.parent.$el[0].appendChild(_this.el);
+	      };
+	    })(this));
+	  }
+
+	  PopUpView.prototype._plus = function() {};
+
+	  PopUpView.prototype.back = function() {
+	    return this.close(true);
+	  };
+
+	  PopUpView.prototype.close = function(isBack) {
+	    if (isBack == null) {
+	      isBack = false;
+	    }
+	    this.emit('close', isBack);
+	    return util.nextTick((function(_this) {
+	      return function() {
+	        return _this.destroy();
+	      };
+	    })(this));
+	  };
+
+	  PopUpView.prototype.destroy = function() {
+	    PopUpView.__super__.destroy.call(this);
+	    return $(this.el).remove();
+	  };
+
+	  return PopUpView;
+
+	})(__webpack_require__(23));
+
+	module.exports = PopUpView;
+
+
+/***/ },
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	

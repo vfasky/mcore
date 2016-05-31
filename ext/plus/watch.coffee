@@ -119,5 +119,19 @@ module.exports = (mcore)->
             @scope = @template.scope
             _ViewPlus.call @
 
+    # 扩展 PopUpView
+    if mcore.PopUpView
+        _PopUpViewPlus = mcore.PopUpView::_plus
+        mcore.PopUpView::_plus = ->
+            @watchObject = new Watch @template.scope, (path)=>
+                if @template._status == 3 and @template.virtualDomDefine
+                    @template.renderQueue()
+
+            @template.on 'destroy', =>
+                @watchObject.unwatch()
+
+            @scope = @template.scope
+            _PopUpViewPlus.call @
+
 
     return Watch
