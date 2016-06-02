@@ -176,8 +176,11 @@ module.exports = (mcore)->
     parseValidator = ($el, rules = [], $form)->
         name = $el.attr 'name'
         return false if !name
+        validatorAttr = $el.attr('validator').trim()
 
-        util.each $el.attr('validator').split('|'), (v)->
+        return false if !validatorAttr
+
+        util.each validatorAttr.split('|'), (v)->
             ix = String(v).indexOf ' err:'
             if ix != -1
                 eT = v.split(' err:')

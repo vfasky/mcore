@@ -51,6 +51,9 @@ module.exports = (mcore)->
     # 设置语言
     i18n.setLocale = (name)-> _local = name
 
+    # 取当前语言
+    i18n.getLocale = -> _local
+
     # 加载字典
     i18n.loadDict = (name, dict)-> _dict[name] = dict
 
