@@ -65,6 +65,12 @@ _rule =
             return String(x).trim().length > 0
         true
 
+    # trim
+    trim: (x = '')->
+        res =
+            type: 'formatter'
+            val: String(x).trim()
+
     # 是否字母
     isAlphabet: (x)-> _isAlphabetReg.test String(x)
 
@@ -265,12 +271,19 @@ module.exports = (mcore)->
 
                     v.args[0] = value
 
-                    if false == v.rule.apply(null, v.args)
+                    checkRes = v.rule.apply(null, v.args)
+                    #console.log checkRes
+
+                    if false == checkRes
                         err =
                             $el: $el
                             err: v.err
                             $form: $form
                         return false
+
+                    if checkRes.type and checkRes.type == 'formatter'
+                        $el.val checkRes.val
+                        data[v.name] = checkRes.val
 
 
                 callback err, data
