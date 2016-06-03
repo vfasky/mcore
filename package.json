@@ -1,6 +1,6 @@
 {
   "name": "mcoreapp",
-  "version": "2.0.49",
+  "version": "2.0.50",
   "description": "simple MVVM",
   "main": "dist/mcoreApp.js",
   "scripts": {
