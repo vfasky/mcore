@@ -239,7 +239,7 @@ module.exports = (mcore)->
         if -1 == name.indexOf('[')
             return data[name] or ''
 
-        $el.val().trim()
+        $el[0].value.trim()
 
 
     Template.binders['validator'] = Template.binders['validated'] =
