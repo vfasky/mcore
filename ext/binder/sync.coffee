@@ -31,4 +31,8 @@ module.exports = (mcore)->
                 $el = $ @
                 name = $el.attr 'name'
                 if name
-                    set name, @value
+                    if $el.is('[type=checkbox],[type=radio]')
+                        val = if $el.prop('checked') then @value else ''
+                        set name, val
+                    else
+                        set name, @value
