@@ -59,4 +59,6 @@ module.exports = (mcore)->
 
     Template.formatters['i18n'] = Template.formatters['_'] = i18n
 
+    Template.formatters['%'] = Template.formatters['sprintf'] = sprintf
+
     i18n

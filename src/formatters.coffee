@@ -27,6 +27,24 @@ exports['in'] = (x, arr...)->
     x in arr
 
 ###
+## objToStyle
+```html
+<span mc-style="{height: 100, width: 200} | objToStyle"></span>
+```
+###
+exports['objToStyle'] = (value)->
+    autoPx = ['width', 'height', 'left', 'top', 'right', 'bottom']
+    css = []
+    for key, val of value
+        if key in autoPx and util.isNumber(val)
+            val = val + 'px'
+
+        css.push "#{key}: #{val}"
+
+    css.join ';'
+
+
+###
 ## 添加过滤函数
 
 ```coffee

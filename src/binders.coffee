@@ -132,6 +132,11 @@ exports['selected'] =
 # 禁用，启用
 exports['disabled'] = (el, value)->
     el.disabled = value
+
+
+# focus
+exports['focus'] = (el, value)->
+    el.focus() if value and true or false
 ###
 ## mc-*
 设置对应属性的值(没有找到对应的自定义属性，就会执行该方式)

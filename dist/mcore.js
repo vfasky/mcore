@@ -1760,6 +1760,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	/*
+	## objToStyle
+	```html
+	<span mc-style="{height: 100, width: 200} | objToStyle"></span>
+	```
+	 */
+
+	exports['objToStyle'] = function(value) {
+	  var autoPx, css, key, val;
+	  autoPx = ['width', 'height', 'left', 'top', 'right', 'bottom'];
+	  css = [];
+	  for (key in value) {
+	    val = value[key];
+	    if (indexOf.call(autoPx, key) >= 0 && util.isNumber(val)) {
+	      val = val + 'px';
+	    }
+	    css.push(key + ": " + val);
+	  }
+	  return css.join(';');
+	};
+
+
+	/*
 	## 添加过滤函数
 
 	```coffee
@@ -1919,6 +1941,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports['disabled'] = function(el, value) {
 	  return el.disabled = value;
+	};
+
+	exports['focus'] = function(el, value) {
+	  if (value && true || false) {
+	    return el.focus();
+	  }
 	};
 
 
