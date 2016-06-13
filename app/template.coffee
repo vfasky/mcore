@@ -72,5 +72,10 @@ class Template extends mcore.Template
         # 移除事件
         if @_events[event].length == 0
             $(@refs).off event
+            for v, k in @_eventReged
+                if v == event
+                    @_eventReged.splice k, 1
+                    break
+
 
 module.exports = Template

@@ -2521,6 +2521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Template.prototype.removeEvent = function(event, el, id) {
+	    var j, k, len, ref, results, v;
 	    if (!this.refs) {
 	      return;
 	    }
@@ -2537,7 +2538,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    })(this));
 	    if (this._events[event].length === 0) {
-	      return $(this.refs).off(event);
+	      $(this.refs).off(event);
+	      ref = this._eventReged;
+	      results = [];
+	      for (k = j = 0, len = ref.length; j < len; k = ++j) {
+	        v = ref[k];
+	        if (v === event) {
+	          this._eventReged.splice(k, 1);
+	          break;
+	        } else {
+	          results.push(void 0);
+	        }
+	      }
+	      return results;
 	    }
 	  };
 

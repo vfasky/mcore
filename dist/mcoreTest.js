@@ -465,7 +465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+	var require;var require;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 	(function (process,global){
 	/**
 	 * Shim process.stdout.
@@ -18112,6 +18112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		  };
 
 		  Template.prototype.removeEvent = function(event, el, id) {
+		    var j, k, len, ref, results, v;
 		    if (!this.refs) {
 		      return;
 		    }
@@ -18128,7 +18129,19 @@ return /******/ (function(modules) { // webpackBootstrap
 		      };
 		    })(this));
 		    if (this._events[event].length === 0) {
-		      return $(this.refs).off(event);
+		      $(this.refs).off(event);
+		      ref = this._eventReged;
+		      results = [];
+		      for (k = j = 0, len = ref.length; j < len; k = ++j) {
+		        v = ref[k];
+		        if (v === event) {
+		          this._eventReged.splice(k, 1);
+		          break;
+		        } else {
+		          results.push(void 0);
+		        }
+		      }
+		      return results;
 		    }
 		  };
 
