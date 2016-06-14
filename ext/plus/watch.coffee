@@ -95,7 +95,7 @@ module.exports = (mcore)->
     _ComponentPlus = mcore.Component::_plus
     mcore.Component::_plus = ->
         @watchObject = new Watch @template.scope, (path)=>
-            if @template._status == 3 and @template.virtualDomDefine
+            if @template and @template._status == 3 and @template.virtualDomDefine
                 @template.renderQueue()
 
         @template.on 'destroy', =>

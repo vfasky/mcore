@@ -465,7 +465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var require;var require;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 	(function (process,global){
 	/**
 	 * Shim process.stdout.
@@ -16350,9 +16350,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			    this._eventReged.push(event);
 			    return this._eventListener[event] = (function(_this) {
 			      return function(e) {
-			        var tasks;
+			        var eventRes, tasks;
 			        tasks = _this._events[event];
-			        return each(tasks, function(task) {
+			        eventRes = null;
+			        each(tasks, function(task) {
 			          var _args, args, callbackName, res;
 			          if (task.el === e.target || nodeContains(task.el, e.target)) {
 			            res = null;
@@ -16377,6 +16378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			              console.log(task.callback);
 			              throw new Error('not callback : ' + task.callback);
 			            }
+			            eventRes = res;
 			            if (false === res) {
 			              if (e.stopPropagation && e.preventDefault) {
 			                e.stopPropagation();
@@ -16389,6 +16391,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			            return false;
 			          }
 			        });
+			        return eventRes;
 			      };
 			    })(this);
 			  };

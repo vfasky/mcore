@@ -336,6 +336,7 @@ class Template extends EventEmitter
         @_eventReged.push event
         @_eventListener[event] = (e)=>
             tasks = @_events[event]
+            eventRes = null
             each tasks, (task)=>
                 if task.el == e.target or nodeContains task.el, e.target
                     res = null
@@ -362,6 +363,7 @@ class Template extends EventEmitter
                         console.log task.callback
                         throw new Error 'not callback : ' + task.callback
 
+                    eventRes = res
                     if false == res
                         if e.stopPropagation and e.preventDefault
                             e.stopPropagation()
@@ -370,6 +372,8 @@ class Template extends EventEmitter
                             window.event.cancelBubble = true
                             window.event.returnValue = false
                     return false
+
+            eventRes
 
 
     ## 注册事件

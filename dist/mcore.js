@@ -653,9 +653,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._eventReged.push(event);
 	    return this._eventListener[event] = (function(_this) {
 	      return function(e) {
-	        var tasks;
+	        var eventRes, tasks;
 	        tasks = _this._events[event];
-	        return each(tasks, function(task) {
+	        eventRes = null;
+	        each(tasks, function(task) {
 	          var _args, args, callbackName, res;
 	          if (task.el === e.target || nodeContains(task.el, e.target)) {
 	            res = null;
@@ -680,6 +681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              console.log(task.callback);
 	              throw new Error('not callback : ' + task.callback);
 	            }
+	            eventRes = res;
 	            if (false === res) {
 	              if (e.stopPropagation && e.preventDefault) {
 	                e.stopPropagation();
@@ -692,6 +694,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return false;
 	          }
 	        });
+	        return eventRes;
 	      };
 	    })(this);
 	  };
