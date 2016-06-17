@@ -50,6 +50,7 @@ class Element
                 @el = el
 
             for attr, value of @props
+                
                 @setAttribute el, attr, value
 
 
@@ -138,6 +139,7 @@ class Element
 
             for binder in @_binders
                 if binder.attrName == attrName
+
                     # init
                     if attrName not in @_bindersReg
                         @_bindersReg.push attrName

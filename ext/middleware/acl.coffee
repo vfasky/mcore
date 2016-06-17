@@ -17,11 +17,12 @@ module.exports = (LoginView, notLoginAllowViewNames = [], hasLogin = ->)->
         isLogin = hasLogin @
 
         # 已经登录，放行
-        if isLogin == true
+        if isLogin == true or true == @view.__isReplaceLoginView
             return next()
 
         # 用 LoginView 替换当前的 view
         @view = new LoginView @view.$el, @app
         @app.curView.instantiate = @view
         @view.loginSuccessReload = true
+        @view.__isReplaceLoginView = true
         next()

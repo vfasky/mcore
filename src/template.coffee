@@ -154,7 +154,7 @@ class Template extends EventEmitter
     ```
     ###
     get: (key, defaultVal = null)->
-        if @scope.hasOwnProperty(key)
+        if @scope and @scope.hasOwnProperty(key)
             if isPlainObject(@scope[key])
                 return extend true, {}, @scope[key]
             else if isArray(@scope[key])
