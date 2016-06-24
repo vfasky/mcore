@@ -465,7 +465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+	var require;var require;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 	(function (process,global){
 	/**
 	 * Shim process.stdout.
@@ -17221,7 +17221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			    }
 			  });
 			  each(moves, function(move) {
-			    var el, index, insertNode;
+			    var el, error, error1, index, insertNode;
 			    index = move.index;
 			    if (move.type === 0) {
 			      if (staticNodeList[index] === node.childNodes[index]) {
@@ -17237,7 +17237,12 @@ return /******/ (function(modules) { // webpackBootstrap
 			    } else if (move.type === 1) {
 			      insertNode = maps[move.item.key] ? maps[move.item.key] : typeof move.item === 'object' ? move.item.render() : document.createTextNode(move.item);
 			      staticNodeList.splice(index, 0, insertNode);
-			      node.insertBefore(insertNode, node.childNodes[index] || null);
+			      try {
+			        node.insertBefore(insertNode, node.childNodes[index] || null);
+			      } catch (error1) {
+			        error = error1;
+			        console.log(node);
+			      }
 			    }
 			  });
 			};

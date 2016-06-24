@@ -98,7 +98,11 @@ reorderChildren = (node, moves) ->
             insertNode = if maps[move.item.key] then maps[move.item.key] else if typeof move.item == 'object' then move.item.render() else document.createTextNode(move.item)
 
             staticNodeList.splice index, 0, insertNode
-            node.insertBefore insertNode, node.childNodes[index] or null
+            try
+                node.insertBefore insertNode, node.childNodes[index] or null
+            catch error
+                console.log node
+                #console.log error
         return
     return
 
