@@ -455,14 +455,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (defaultVal == null) {
 	      defaultVal = null;
 	    }
-	    if (this.scope && this.scope.hasOwnProperty(key)) {
-	      if (isPlainObject(this.scope[key])) {
-	        return extend(true, {}, this.scope[key]);
-	      } else if (isArray(this.scope[key])) {
-	        return extend(true, [], this.scope[key]);
-	      } else {
-	        return this.scope[key];
-	      }
+	    if (this.scope.hasOwnProperty(key)) {
+	      return this.scope[key];
 	    }
 	    return defaultVal;
 	  };
