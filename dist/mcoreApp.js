@@ -1624,7 +1624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    }
 		  });
 		  each(moves, function(move) {
-		    var el, error, error1, index, insertNode;
+		    var el, index, insertNode;
 		    index = move.index;
 		    if (move.type === 0) {
 		      if (staticNodeList[index] === node.childNodes[index]) {
@@ -1640,12 +1640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    } else if (move.type === 1) {
 		      insertNode = maps[move.item.key] ? maps[move.item.key] : typeof move.item === 'object' ? move.item.render() : document.createTextNode(move.item);
 		      staticNodeList.splice(index, 0, insertNode);
-		      try {
-		        node.insertBefore(insertNode, node.childNodes[index] || null);
-		      } catch (error1) {
-		        error = error1;
-		        console.log(node);
-		      }
+		      node.insertBefore(insertNode, node.childNodes[index] || null);
 		    }
 		  });
 		};

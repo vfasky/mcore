@@ -243,6 +243,12 @@ module.exports = (mcore)->
 
 
     Template.binders['validator'] = Template.binders['validated'] =
+        update: (el, value)->
+            if el.tagName.toLowerCase() == 'form'
+                return false
+                
+            el.setAttribute 'validator', value
+
         rendered:(el, value)->
             if el.tagName.toLowerCase() != 'form' or !el._element
                 return el.setAttribute 'validator', value
