@@ -49,7 +49,8 @@ class Element
                 el._element = @
                 @el = el
 
-
+            for attr, value of @props
+                @setAttribute el, attr, value
 
             # 渲染子元素
             each @children, (child)=>
@@ -66,9 +67,8 @@ class Element
 
                 el.appendChild childEl
 
-            for attr, value of @props                
-                @setAttribute el, attr, value
-
+            if @props.hasOwnProperty 'value'
+                @setAttribute el, 'value', @props.value
 
             for binder in @_binders
                 binder.binder.rendered.call @, el, binder.value if binder.binder.rendered
