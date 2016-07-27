@@ -143,23 +143,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        el._element = this;
 	        this.el = el;
 	      }
-	      ref1 = this.props;
-	      for (attr in ref1) {
-	        value = ref1[attr];
-	        this.setAttribute(el, attr, value);
-	      }
 	      each(this.children, (function(_this) {
 	        return function(child) {
-	          var c, childEl, j, len, ref2;
+	          var c, childEl, j, len, ref1;
 	          if (child instanceof Element) {
 	            childEl = child.render();
 	            if (child._component) {
 	              _this._componentTree.push(child._component);
 	            }
 	            if (child._componentTree) {
-	              ref2 = child._componentTree;
-	              for (j = 0, len = ref2.length; j < len; j++) {
-	                c = ref2[j];
+	              ref1 = child._componentTree;
+	              for (j = 0, len = ref1.length; j < len; j++) {
+	                c = ref1[j];
 	                _this._componentTree.push(c);
 	              }
 	            }
@@ -169,6 +164,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return el.appendChild(childEl);
 	        };
 	      })(this));
+	      ref1 = this.props;
+	      for (attr in ref1) {
+	        value = ref1[attr];
+	        this.setAttribute(el, attr, value);
+	      }
 	      ref2 = this._binders;
 	      for (j = 0, len = ref2.length; j < len; j++) {
 	        binder = ref2[j];

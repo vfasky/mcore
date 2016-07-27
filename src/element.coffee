@@ -49,9 +49,6 @@ class Element
                 el._element = @
                 @el = el
 
-            for attr, value of @props
-                
-                @setAttribute el, attr, value
 
 
             # 渲染子元素
@@ -68,6 +65,10 @@ class Element
                     childEl = document.createTextNode child
 
                 el.appendChild childEl
+
+            for attr, value of @props                
+                @setAttribute el, attr, value
+
 
             for binder in @_binders
                 binder.binder.rendered.call @, el, binder.value if binder.binder.rendered

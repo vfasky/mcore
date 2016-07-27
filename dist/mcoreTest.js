@@ -465,7 +465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var require;var require;var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;/* WEBPACK VAR INJECTION */(function(global, Buffer, setImmediate) {(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return require(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 	(function (process,global){
 	/**
 	 * Shim process.stdout.
@@ -15840,23 +15840,18 @@ return /******/ (function(modules) { // webpackBootstrap
 			        el._element = this;
 			        this.el = el;
 			      }
-			      ref1 = this.props;
-			      for (attr in ref1) {
-			        value = ref1[attr];
-			        this.setAttribute(el, attr, value);
-			      }
 			      each(this.children, (function(_this) {
 			        return function(child) {
-			          var c, childEl, j, len, ref2;
+			          var c, childEl, j, len, ref1;
 			          if (child instanceof Element) {
 			            childEl = child.render();
 			            if (child._component) {
 			              _this._componentTree.push(child._component);
 			            }
 			            if (child._componentTree) {
-			              ref2 = child._componentTree;
-			              for (j = 0, len = ref2.length; j < len; j++) {
-			                c = ref2[j];
+			              ref1 = child._componentTree;
+			              for (j = 0, len = ref1.length; j < len; j++) {
+			                c = ref1[j];
 			                _this._componentTree.push(c);
 			              }
 			            }
@@ -15866,6 +15861,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			          return el.appendChild(childEl);
 			        };
 			      })(this));
+			      ref1 = this.props;
+			      for (attr in ref1) {
+			        value = ref1[attr];
+			        this.setAttribute(el, attr, value);
+			      }
 			      ref2 = this._binders;
 			      for (j = 0, len = ref2.length; j < len; j++) {
 			        binder = ref2[j];
