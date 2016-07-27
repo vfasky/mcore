@@ -1278,7 +1278,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    return el.className = value;
 		  }
 		  tagName = (el.tagName || '').toLowerCase();
-		  if (attrName === 'value' && (tagName === 'input' || tagName === 'textarea')) {
+		  if (attrName === 'value' && (tagName === 'input' || tagName === 'textarea' || tagName === 'select')) {
 		    return el.value = value;
 		  }
 		  if (el._element && el._element.setAttribute && !noHash) {
@@ -1624,7 +1624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    }
 		  });
 		  each(moves, function(move) {
-		    var el, error, error1, index, insertNode;
+		    var el, index, insertNode;
 		    index = move.index;
 		    if (move.type === 0) {
 		      if (staticNodeList[index] === node.childNodes[index]) {
@@ -1640,12 +1640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		    } else if (move.type === 1) {
 		      insertNode = maps[move.item.key] ? maps[move.item.key] : typeof move.item === 'object' ? move.item.render() : document.createTextNode(move.item);
 		      staticNodeList.splice(index, 0, insertNode);
-		      try {
-		        node.insertBefore(insertNode, node.childNodes[index] || null);
-		      } catch (error1) {
-		        error = error1;
-		        console.log(node);
-		      }
+		      node.insertBefore(insertNode, node.childNodes[index] || null);
 		    }
 		  });
 		};
@@ -3061,8 +3056,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Parse a string for the raw tokens.
 	 *
-	 * @param  {String} str
-	 * @return {Array}
+	 * @param  {string} str
+	 * @return {!Array}
 	 */
 	function parse (str) {
 	  var tokens = []
@@ -3084,22 +3079,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      continue
 	    }
 
+	    var next = str[index]
+	    var prefix = res[2]
+	    var name = res[3]
+	    var capture = res[4]
+	    var group = res[5]
+	    var modifier = res[6]
+	    var asterisk = res[7]
+
 	    // Push the current path onto the tokens.
 	    if (path) {
 	      tokens.push(path)
 	      path = ''
 	    }
 
-	    var prefix = res[2]
-	    var name = res[3]
-	    var capture = res[4]
-	    var group = res[5]
-	    var suffix = res[6]
-	    var asterisk = res[7]
-
-	    var repeat = suffix === '+' || suffix === '*'
-	    var optional = suffix === '?' || suffix === '*'
-	    var delimiter = prefix || '/'
+	    var partial = prefix != null && next != null && next !== prefix
+	    var repeat = modifier === '+' || modifier === '*'
+	    var optional = modifier === '?' || modifier === '*'
+	    var delimiter = res[2] || '/'
 	    var pattern = capture || group || (asterisk ? '.*' : '[^' + delimiter + ']+?')
 
 	    tokens.push({
@@ -3108,6 +3105,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      delimiter: delimiter,
 	      optional: optional,
 	      repeat: repeat,
+	      partial: partial,
+	      asterisk: !!asterisk,
 	      pattern: escapeGroup(pattern)
 	    })
 	  }
@@ -3128,11 +3127,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Compile a string to a template function for the path.
 	 *
-	 * @param  {String}   str
-	 * @return {Function}
+	 * @param  {string}             str
+	 * @return {!function(Object=, Object=)}
 	 */
 	function compile (str) {
 	  return tokensToFunction(parse(str))
+	}
+
+	/**
+	 * Prettier encoding of URI path segments.
+	 *
+	 * @param  {string}
+	 * @return {string}
+	 */
+	function encodeURIComponentPretty (str) {
+	  return encodeURI(str).replace(/[\/?#]/g, function (c) {
+	    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+	  })
+	}
+
+	/**
+	 * Encode the asterisk parameter. Similar to `pretty`, but allows slashes.
+	 *
+	 * @param  {string}
+	 * @return {string}
+	 */
+	function encodeAsterisk (str) {
+	  return encodeURI(str).replace(/[?#]/g, function (c) {
+	    return '%' + c.charCodeAt(0).toString(16).toUpperCase()
+	  })
 	}
 
 	/**
@@ -3145,13 +3168,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Compile all the patterns before compilation.
 	  for (var i = 0; i < tokens.length; i++) {
 	    if (typeof tokens[i] === 'object') {
-	      matches[i] = new RegExp('^' + tokens[i].pattern + '$')
+	      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$')
 	    }
 	  }
 
-	  return function (obj) {
+	  return function (obj, opts) {
 	    var path = ''
 	    var data = obj || {}
+	    var options = opts || {}
+	    var encode = options.pretty ? encodeURIComponentPretty : encodeURIComponent
 
 	    for (var i = 0; i < tokens.length; i++) {
 	      var token = tokens[i]
@@ -3167,6 +3192,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (value == null) {
 	        if (token.optional) {
+	          // Prepend partial segment prefixes.
+	          if (token.partial) {
+	            path += token.prefix
+	          }
+
 	          continue
 	        } else {
 	          throw new TypeError('Expected "' + token.name + '" to be defined')
@@ -3175,7 +3205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (isarray(value)) {
 	        if (!token.repeat) {
-	          throw new TypeError('Expected "' + token.name + '" to not repeat, but received "' + value + '"')
+	          throw new TypeError('Expected "' + token.name + '" to not repeat, but received `' + JSON.stringify(value) + '`')
 	        }
 
 	        if (value.length === 0) {
@@ -3187,10 +3217,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        for (var j = 0; j < value.length; j++) {
-	          segment = encodeURIComponent(value[j])
+	          segment = encode(value[j])
 
 	          if (!matches[i].test(segment)) {
-	            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
+	            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '", but received `' + JSON.stringify(segment) + '`')
 	          }
 
 	          path += (j === 0 ? token.prefix : token.delimiter) + segment
@@ -3199,7 +3229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        continue
 	      }
 
-	      segment = encodeURIComponent(value)
+	      segment = token.asterisk ? encodeAsterisk(value) : encode(value)
 
 	      if (!matches[i].test(segment)) {
 	        throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but received "' + segment + '"')
@@ -3215,8 +3245,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Escape a regular expression string.
 	 *
-	 * @param  {String} str
-	 * @return {String}
+	 * @param  {string} str
+	 * @return {string}
 	 */
 	function escapeString (str) {
 	  return str.replace(/([.+*?=^!:${}()[\]|\/])/g, '\\$1')
@@ -3225,8 +3255,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Escape the capturing group by escaping special characters and meaning.
 	 *
-	 * @param  {String} group
-	 * @return {String}
+	 * @param  {string} group
+	 * @return {string}
 	 */
 	function escapeGroup (group) {
 	  return group.replace(/([=!:$\/()])/g, '\\$1')
@@ -3235,9 +3265,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Attach the keys as a property of the regexp.
 	 *
-	 * @param  {RegExp} re
-	 * @param  {Array}  keys
-	 * @return {RegExp}
+	 * @param  {!RegExp} re
+	 * @param  {Array}   keys
+	 * @return {!RegExp}
 	 */
 	function attachKeys (re, keys) {
 	  re.keys = keys
@@ -3248,7 +3278,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Get the flags for a regexp from the options.
 	 *
 	 * @param  {Object} options
-	 * @return {String}
+	 * @return {string}
 	 */
 	function flags (options) {
 	  return options.sensitive ? '' : 'i'
@@ -3257,9 +3287,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Pull out keys from a regexp.
 	 *
-	 * @param  {RegExp} path
-	 * @param  {Array}  keys
-	 * @return {RegExp}
+	 * @param  {!RegExp} path
+	 * @param  {!Array}  keys
+	 * @return {!RegExp}
 	 */
 	function regexpToRegexp (path, keys) {
 	  // Use a negative lookahead to match only capturing groups.
@@ -3273,6 +3303,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        delimiter: null,
 	        optional: false,
 	        repeat: false,
+	        partial: false,
+	        asterisk: false,
 	        pattern: null
 	      })
 	    }
@@ -3284,10 +3316,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Transform an array into a regexp.
 	 *
-	 * @param  {Array}  path
-	 * @param  {Array}  keys
-	 * @param  {Object} options
-	 * @return {RegExp}
+	 * @param  {!Array}  path
+	 * @param  {Array}   keys
+	 * @param  {!Object} options
+	 * @return {!RegExp}
 	 */
 	function arrayToRegexp (path, keys, options) {
 	  var parts = []
@@ -3304,10 +3336,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Create a path regexp from string input.
 	 *
-	 * @param  {String} path
-	 * @param  {Array}  keys
-	 * @param  {Object} options
-	 * @return {RegExp}
+	 * @param  {string}  path
+	 * @param  {!Array}  keys
+	 * @param  {!Object} options
+	 * @return {!RegExp}
 	 */
 	function stringToRegexp (path, keys, options) {
 	  var tokens = parse(path)
@@ -3326,10 +3358,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Expose a function for taking tokens and returning a RegExp.
 	 *
-	 * @param  {Array}  tokens
-	 * @param  {Array}  keys
-	 * @param  {Object} options
-	 * @return {RegExp}
+	 * @param  {!Array}  tokens
+	 * @param  {Object=} options
+	 * @return {!RegExp}
 	 */
 	function tokensToRegExp (tokens, options) {
 	  options = options || {}
@@ -3348,17 +3379,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      route += escapeString(token)
 	    } else {
 	      var prefix = escapeString(token.prefix)
-	      var capture = token.pattern
+	      var capture = '(?:' + token.pattern + ')'
 
 	      if (token.repeat) {
 	        capture += '(?:' + prefix + capture + ')*'
 	      }
 
 	      if (token.optional) {
-	        if (prefix) {
+	        if (!token.partial) {
 	          capture = '(?:' + prefix + '(' + capture + '))?'
 	        } else {
-	          capture = '(' + capture + ')?'
+	          capture = prefix + '(' + capture + ')?'
 	        }
 	      } else {
 	        capture = prefix + '(' + capture + ')'
@@ -3394,30 +3425,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * placeholder key descriptions. For example, using `/user/:id`, `keys` will
 	 * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
 	 *
-	 * @param  {(String|RegExp|Array)} path
-	 * @param  {Array}                 [keys]
-	 * @param  {Object}                [options]
-	 * @return {RegExp}
+	 * @param  {(string|RegExp|Array)} path
+	 * @param  {(Array|Object)=}       keys
+	 * @param  {Object=}               options
+	 * @return {!RegExp}
 	 */
 	function pathToRegexp (path, keys, options) {
 	  keys = keys || []
 
 	  if (!isarray(keys)) {
-	    options = keys
+	    options = /** @type {!Object} */ (keys)
 	    keys = []
 	  } else if (!options) {
 	    options = {}
 	  }
 
 	  if (path instanceof RegExp) {
-	    return regexpToRegexp(path, keys, options)
+	    return regexpToRegexp(path, /** @type {!Array} */ (keys))
 	  }
 
 	  if (isarray(path)) {
-	    return arrayToRegexp(path, keys, options)
+	    return arrayToRegexp(/** @type {!Array} */ (path), /** @type {!Array} */ (keys), options)
 	  }
 
-	  return stringToRegexp(path, keys, options)
+	  return stringToRegexp(/** @type {string} */ (path), /** @type {!Array} */ (keys), options)
 	}
 
 

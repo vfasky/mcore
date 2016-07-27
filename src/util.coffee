@@ -98,7 +98,7 @@ exports.setElementAttr = (el, attrName, value, noHash)->
 
     tagName = (el.tagName or '').toLowerCase()
 
-    if attrName == 'value' and tagName in ['input', 'textarea']
+    if attrName == 'value' and tagName in ['input', 'textarea', 'select']
         return el.value = value
 
     if el._element and el._element.setAttribute and !noHash
