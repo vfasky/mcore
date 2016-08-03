@@ -28,7 +28,7 @@ module.exports = (mcore)->
 
         unwatchByPath: (path)->
             reg = @_watchReg[path]
-            return !reg
+            return if !reg
             # 取消观察
             if reg.type == 'object'
                 Object.unobserve reg.obj, reg.observer
