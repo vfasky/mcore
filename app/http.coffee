@@ -68,7 +68,6 @@ http = do ->
             options.type = 'GET'
             options.dataType = 'jsonp'
 
-        #console.log options
 
         xhr = $.ajax(
             url,
@@ -96,7 +95,7 @@ http = do ->
                     res = {}
 
                 errCallback res, hideError
-                
+
         .always ->
             http.onComplete xhr
 

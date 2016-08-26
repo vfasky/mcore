@@ -56,7 +56,9 @@ module.exports = (mcore)->
                         if util.isPlainObject(obj[change.name]) or util.isArray(obj[change.name])
                             @_watchTotal = 1
                             @watch obj[change.name], root + '.' + change.name
-
+                    else if change.type == 'splice'
+                        @unwatchByPath root
+                        @watch obj, root
                     else if change.type == 'delete' and @_watchReg[root + '.' + change.name]
                         @unwatchByPath root + '.' + change.name
 
